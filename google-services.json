@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "511900415351",
+    "project_id": "entereza-analytics",
+    "storage_bucket": "entereza-analytics.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:511900415351:android:9632e55d9c6641c9e05d72",
+        "android_client_info": {
+          "package_name": "com.entereza.client"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "511900415351-b1g7213gfgt8ur96qqfnlinf9rjardj8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzRmWGq1kM5-f4gn1kEvJ49N2utlvZPzg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "511900415351-b1g7213gfgt8ur96qqfnlinf9rjardj8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "511900415351-ej15snog5mn00ikjcbuqeqa1pap18nkn.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.entereza.client",
+                "app_store_id": "6443708697"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

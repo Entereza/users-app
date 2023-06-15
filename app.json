@@ -1,0 +1,101 @@
+{
+  "expo": {
+    "name": "Entereza",
+    "slug": "enterezaClient",
+    "version": "1.1.6",
+    "orientation": "portrait",
+    "icon": "./assets/IconEntereza.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/IconEntereza.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "scheme": "com.entereza.client",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.entereza.client",
+      "buildNumber": "53",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Requerimos tu ubicación para poder darte información sobre las empresas afiliadas de tu ciudad.",
+        "NSUserTrackingUsageDescription": "Esto permite a Entereza ofrecerte la mejor experiencia y mayor información sobre las empresas afiliadas que están en tu ciudad.",
+        "UIBackgroundModes": [
+          "fetch",
+          "remote-notification"
+        ]
+      }
+    },
+    "android": {
+      "httpTimeout": 60000,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/IconEntereza.png",
+        "backgroundColor": "#000000"
+      },
+      "package": "com.entereza.client",
+      "versionCode": 49,
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "googleServicesFile": "./google-services.json",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "com.entereza.client"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
+    },
+    "web": {
+      "favicon": "./assets/IconEntereza.png"
+    },
+    "plugins": [
+      "expo-apple-authentication",
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "Esto permite a Entereza ofrecerte la mejor experiencia y mayor información sobre las empresas afiliadas que están en tu ciudad."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Esto permite a Entereza acceder a tus fotos para poder utilizar esta función."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/IconEntereza.png",
+          "color": "#ffffff"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "7f0e7cbd-8088-4569-94bd-21702f3afe04"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/7f0e7cbd-8088-4569-94bd-21702f3afe04"
+    }
+  }
+}
