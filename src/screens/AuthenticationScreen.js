@@ -168,7 +168,7 @@ export default function AuthenticationScreen() {
     };
 
     return (
-        <SafeAreaView style={{ backgroundColor: theme.transparent, flex: 1 }}>
+        <SafeAreaView style={{ backgroundColor: theme.dark }}>
             <ViewStyled
                 backgroundColor={theme.dark}
                 width={100}
@@ -232,7 +232,8 @@ export default function AuthenticationScreen() {
                         >
                             <ViewStyled
                                 width={100}
-                                height={23}
+                                height={16}
+                                marginBottom={auth === 'flex' ?  8 : 4}
                                 backgroundColor={theme.transparent}
                                 style={{
                                     justifyContent: 'center',
@@ -264,39 +265,32 @@ export default function AuthenticationScreen() {
                 }
 
                 <Pressable onPress={Keyboard.dismiss} >
-                    <KeyboardAvoidingView
-                        behavior={Platform.OS === "ios" ? "padding" : "position"}
-                        style={{
-                            justifyContent: 'flex-end'
-                        }}
-                    >
-                        <AuthComponent
-                            outputRange={outputRangeAuth}
-                            outputRange2={outputRangeAuth2}
-                            showButton={showButton}
-                            authOpacity={authOpacity}
-                            display={auth}
-                            goLogin={GoLogin}
-                            shadow={shadow}
-                        />
+                    <AuthComponent
+                        outputRange={outputRangeAuth}
+                        outputRange2={outputRangeAuth2}
+                        showButton={showButton}
+                        authOpacity={authOpacity}
+                        display={auth}
+                        goLogin={GoLogin}
+                        shadow={shadow}
+                    />
 
-                        <LoginComponent
-                            loginOpacity={loginOpacity}
-                            outputRange={outputRangeLogin}
-                            outputRange2={outputRangeLogin2}
-                            display={login}
-                            goBack={GoBackAuth}
-                            goRegisterScreen={GoRegister}
-                        />
+                    <LoginComponent
+                        loginOpacity={loginOpacity}
+                        outputRange={outputRangeLogin}
+                        outputRange2={outputRangeLogin2}
+                        display={login}
+                        goBack={GoBackAuth}
+                        goRegisterScreen={GoRegister}
+                    />
 
-                        <RegisterComponent
-                            registerOpacity={registerOpacity}
-                            registerRef={registerRef}
-                            outputRange={outputRangeRegister}
-                            display={register}
-                            goBack={GoBackLogin}
-                        />
-                    </KeyboardAvoidingView>
+                    <RegisterComponent
+                        registerOpacity={registerOpacity}
+                        registerRef={registerRef}
+                        outputRange={outputRangeRegister}
+                        display={register}
+                        goBack={GoBackLogin}
+                    />
                 </Pressable>
             </ViewStyled>
         </SafeAreaView>

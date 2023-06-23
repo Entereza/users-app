@@ -39,7 +39,7 @@
         "backgroundColor": "#000000"
       },
       "package": "com.entereza.client",
-      "versionCode": 49,
+      "versionCode": 50,
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.FOREGROUND_SERVICE",

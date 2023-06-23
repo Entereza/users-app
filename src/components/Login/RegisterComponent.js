@@ -9,7 +9,7 @@ import TextStyled from '../ui/TextStyled';
 import { theme } from '../../utils/theme';
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
 
-import { Animated, KeyboardAvoidingView, ScrollView } from 'react-native';
+import { Animated, KeyboardAvoidingView, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import adjustFontSize from '../../utils/adjustText';
 import { useDispatch } from 'react-redux';
@@ -21,6 +21,7 @@ import ButtonNext from '../Btn/ButtonNext';
 import { codeErrors } from '../../utils/codeErrors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { _authLogin } from '../../redux/actions/authActions';
+import { Keyboard } from 'react-native';
 
 export default function RegisterComponent({ display = 'none', registerOpacity, registerRef, outputRange, goBack }) {
     const [animation] = React.useState(new Animated.Value(0));
@@ -44,7 +45,8 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
         Animated.parallel([
             Animated.timing(animationRef.current, {
                 toValue: 1,
-                duration: 200,
+                duration: 300,
+                delay: 20,
                 useNativeDriver: false,
             }),
             Animated.timing(registerRef.current, {
@@ -63,25 +65,59 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
 
     const goLoginScreen = () => {
         setArrowDisplay('none')
+        setIsSubmitting(false)
         setTimeout(() => {
             goBack()
-        }, 200);
+        }, 300);
 
         Animated.parallel([
+            Animated.timing(animationRef.current, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: false,
+            }),
             Animated.timing(registerRef.current, {
                 toValue: 1,
                 duration: 300,
                 useNativeDriver: true,
-            }),
-            Animated.timing(animationRef.current, {
-                toValue: 0,
-                duration: 200,
-                useNativeDriver: false,
             })
         ]).start()
     }
 
+    const [keyboardPadding, setKeyboardPadding] = React.useState(0);
+
+    const _keyboardDidShow = (e) => {
+        setKeyboardPadding(e.endCoordinates.height / 2);
+    };
+
+    const _keyboardDidHide = () => {
+        setKeyboardPadding(0);
+    };
+
+    React.useEffect(() => {
+        Keyboard.addListener('keyboardDidShow', _keyboardDidShow);
+        Keyboard.addListener('keyboardDidHide', _keyboardDidHide);
+
+        // cleanup function
+        return () => {
+            Keyboard.removeAllListeners('keyboardDidShow', _keyboardDidShow);
+            Keyboard.removeAllListeners('keyboardDidHide', _keyboardDidHide);
+        };
+    }, []);
+
+
     // Funciones para el  Registro
+    const inputNombres = React.useRef(null);
+    const inputApellidos = React.useRef(null);
+    const inputEmail = React.useRef(null);
+    const inputPassword = React.useRef(null);
+    const inputPasswordConfirm = React.useRef(null);
+
+    const [error, setError] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState('');
+
+    const [buttonText, setbuttonText] = React.useState('Crear Cuenta')
+
     const [showPassword, setShowPassword] = React.useState(false);
     const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -104,6 +140,8 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
         validationSchema: schemaRegister,
         validateOnChange: true,
         onSubmit: async (values) => {
+            setError(false)
+            setbuttonText('Creando Usuario... ⏳')
             setIsSubmitting(true)
             try {
                 let data = {
@@ -132,6 +170,7 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                 const response = await res.json();
 
                 if (response.codeError === "COD215") {
+                    setbuttonText('Iniciando Sesión... ⏳')
                     console.log("Registro exitoso: ", response)
                     let dataLogin = {
                         mail: values.email,
@@ -140,70 +179,78 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                         vrf: ""
                     }
 
-                    const res = await fetchWithoutToken('entereza/login_user', "POST", dataLogin)
-                    const {
-                        entereza,
-                        codigoEntidad,
-                        jwt,
-                        rol,
-                        mail,
-                        ...rest
-                    } = await res.json()
-
-                    if (entereza.codeError === codeErrors.cod105 || entereza.codeError === codeErrors.cod95) {
-                        Toast.show({
-                            type: "success",
-                            position: "bottom",
-                            text1: "Inicio de Sesión Exitoso",
-                            visibilityTime: 1000,
-                            bottomOffset: 130,
-                        })
-
-                        await Promise.all([
-                            AsyncStorage.setItem('ENT-EMAIL', mail),
-                            AsyncStorage.setItem('ENT-CODUSR', codigoEntidad),
-                            AsyncStorage.setItem('ENT-TKN', jwt),
-                        ])
-
-                        dispatch(_authLogin(data))
-                    } else {
-                        console.log("Respuesta Login: ", entereza)
-
-                        Toast.show({
-                            type: "error",
-                            position: "bottom",
-                            text1: `${entereza.msgError}`,
-                            bottomOffset: 130,
-                        })
-                    }
+                    loginUser(dataLogin)
                 } else if (response.codeError === "COD056") {
                     console.log('Correo en Uso: ', response)
-
+                    setbuttonText('Crear Cuenta')
                     setErrorEmail(true)
                 } else {
+                    setError(true)
+                    setbuttonText('Crear Cuenta')
                     console.log('Error Register Entereza: ', response)
-
-                    Toast.show({
-                        type: "error",
-                        position: "bottom",
-                        text1: "Ha ocurrido un error al Registrar.",
-                        text2: `${response.msgError}`
-                    })
+                    setErrorMessage(response.msgError)
                 }
             } catch (err) {
                 console.log('Error Register: ', err);
-
-                Toast.show({
-                    type: "error",
-                    position: "bottom",
-                    text1: "Ha ocurrido un Error",
-                    text2: "Por favor, intente nuevamente en unos minutos."
-                })
+                setbuttonText('Crear Cuenta')
+                setError(true)
+                setErrorMessage('Error al Registrar. Por favor, intente nuevamente en unos minutos.')
             }
-            Toast.hide()
             setIsSubmitting(false)
         }
     });
+
+    const loginUser = async (dataLogin) => {
+        setIsSubmitting(true)
+        try {
+            const res = await fetchWithoutToken('entereza/login_use', "POST", dataLogin)
+            const {
+                entereza,
+                codigoEntidad,
+                jwt,
+                rol,
+                mail,
+                ...rest
+            } = await res.json()
+
+            if (entereza.codeError === codeErrors.cod105 || entereza.codeError === codeErrors.cod95) {
+                formik.resetForm()
+                startAnimationButton()
+
+                await Promise.all([
+                    AsyncStorage.setItem('ENT-EMAIL', mail),
+                    AsyncStorage.setItem('ENT-CODUSR', codigoEntidad),
+                    AsyncStorage.setItem('ENT-TKN', jwt),
+                ])
+
+                dispatch(_authLogin(dataLogin))
+            } else {
+                setbuttonText('Crear Cuenta')
+                console.log("Respuesta Login: ", entereza)
+
+                setErrorMessage(entereza.msgError)
+            }
+        } catch (error) {
+            formik.resetForm()
+            console.log('Error Login: ', error)
+            setbuttonText('Crear Cuenta')
+            setError(true)
+            setErrorMessage('Su cuenta fue creada exitosamente, intente nuevamente en la pantalla de Iniciar Sesión.')
+
+            goBackOnError()
+        }
+        setIsSubmitting(false)
+    }
+
+    const goBackOnError = () => {
+        setIsSubmitting(true)
+
+        setTimeout(() => {
+            setError(false)
+            setIsSubmitting(false)
+            goLoginScreen()
+        }, 4000);
+    }
 
     const styles = {
         inputIcon: {
@@ -217,10 +264,31 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
             marginBottom: 5
         },
         labelInput: {
-            color: theme.quaternary,
+            color: theme.primary,
             fontSize: adjustFontSize(12)
         }
     }
+
+    const colorValue = React.useRef(new Animated.Value(0)).current;
+
+    const backgroundColor = colorValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: [theme.dark, theme.success]
+    });
+
+    const startAnimationButton = () => {
+        Animated.parallel([
+            Animated.timing(colorValue, {
+                toValue: 1,
+                duration: 1000,
+                useNativeDriver: false
+            }),
+        ]).start();
+
+        setTimeout(() => {
+            setbuttonText('¡Bienvenido!')
+        }, 800);
+    };
 
     return (
         <>
@@ -258,11 +326,12 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                 style={{
                     width: widthPercentageToDP(100),
                     height: heightInterpolation,
-                    backgroundColor: theme.primary,
+                    backgroundColor: theme.dark,
                     justifyContent: 'flex-start',
                     alignItems: 'center',
                     borderTopLeftRadius: 70,
-                    display: display
+                    display: display,
+                    marginBottom: keyboardPadding
                 }}
             >
                 <ScrollView
@@ -331,11 +400,17 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                 rightIcon={
                                     <Icon
                                         type='material-community'
-                                        name="account-multiple-outline"
+                                        name="account-circle-outline"
                                         iconStyle={styles.inputIcon}
                                     />
                                 }
-                                onChangeText={text => formik.setFieldValue("nombres", text)}
+                                value={formik.values.nombres}
+                                onChangeText={text => {
+                                    const formattedText = text.split(' ').map(s => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
+                                    formik.setFieldValue("nombres", formattedText);
+                                }}
+                                returnKeyType='next'
+                                onSubmitEditing={() => inputApellidos.current.focus()}
                                 errorMessage={formik.errors.nombres}
                             />
 
@@ -347,12 +422,19 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                 rightIcon={
                                     <Icon
                                         type='material-community'
-                                        name="account-multiple"
+                                        name="account-multiple-outline"
                                         iconStyle={styles.inputIcon}
                                     />
                                 }
-                                onChangeText={text => formik.setFieldValue("apellidos", text)}
+                                value={formik.values.apellidos}
+                                onChangeText={text => {
+                                    const formattedText = text.split(' ').map(s => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
+                                    formik.setFieldValue("apellidos", formattedText);
+                                }}
                                 errorMessage={formik.errors.apellidos}
+                                ref={inputApellidos}
+                                returnKeyType='next'
+                                onSubmitEditing={() => inputEmail.current.focus()}
                             />
 
                             <Input
@@ -364,12 +446,16 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                 rightIcon={
                                     <Icon
                                         type='material-community'
-                                        name="account-circle-outline"
+                                        name="at"
                                         iconStyle={styles.inputIcon}
                                     />
                                 }
-                                onChangeText={text => formik.setFieldValue("email", text)}
+                                value={formik.values.email}
+                                onChangeText={text => formik.setFieldValue("email", text.trim())}
                                 errorMessage={errorEmail ? 'El correo ya está en uso' : formik.errors.email}
+                                ref={inputEmail}
+                                returnKeyType='next'
+                                onSubmitEditing={() => inputPassword.current.focus()}
                             />
 
                             <Input
@@ -386,8 +472,12 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                         onPress={showHiddenPassword}
                                     />
                                 }
+                                value={formik.values.password}
                                 onChangeText={text => formik.setFieldValue("password", text)}
                                 errorMessage={formik.errors.password}
+                                ref={inputPassword}
+                                returnKeyType='next'
+                                onSubmitEditing={() => inputPasswordConfirm.current.focus()}
                             />
 
                             <Input
@@ -402,12 +492,16 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                         iconStyle={styles.inputIcon}
                                     />
                                 }
+                                value={formik.values.passwordConfirm}
                                 onChangeText={text => formik.setFieldValue("passwordConfirm", text)}
-                                errorMessage={formik.errors.passwordConfirm}
+                                errorMessage={error ? errorMessage : formik.errors.passwordConfirm}
+                                onSubmitEditing={formik.handleSubmit}
+                                errorStyle={{ fontSize: error ? 14 : 12 }}
+                                ref={inputPasswordConfirm}
                             />
 
                             <ViewStyled
-                                height={13}
+                                height={14}
                                 backgroundColor={theme.transparent}
                                 style={{
                                     justifyContent: 'center',
@@ -415,14 +509,50 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                 }}
                             >
 
-                                <ButtonNext
-                                    disabled={isSubmitting}
-                                    color={theme.dark}
-                                    colorText={theme.primary}
-                                    width={90}
-                                    text={!isSubmitting ? 'Crear Cuenta' : 'Registrando Usuario...⏳'}
-                                    onPress={formik.handleSubmit}
-                                />
+                                <ViewStyled
+                                    backgroundColor={theme.transparent}
+                                    width={100}
+                                    height={7}
+                                    style={{
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    <TouchableOpacity onPress={formik.handleSubmit} disabled={!(formik.dirty && formik.isValid) || isSubmitting}>
+                                        <ViewStyled
+                                            width={90}
+                                            height={6}
+                                            backgroundColor={theme.transparent}
+                                            borderRadius={2}
+                                            style={{
+                                                justifyContent: 'center',
+                                                alignItems: 'center'
+                                            }}
+                                        >
+                                            <Animated.View
+                                                style={{
+                                                    backgroundColor: !(formik.dirty && formik.isValid) ? theme.background : backgroundColor,
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    borderRadius: 15,
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center'
+                                                }}
+                                            >
+                                                <TextStyled
+                                                    fontSize={16}
+                                                    color={!(formik.dirty && formik.isValid) ? theme.tertiaryGradient : theme.primary}
+                                                    textAlign={'center'}
+                                                    style={{
+                                                        marginBottom: 4,
+                                                    }}
+                                                >
+                                                    {buttonText}
+                                                </TextStyled>
+                                            </Animated.View>
+                                        </ViewStyled>
+                                    </TouchableOpacity >
+                                </ViewStyled>
 
                                 <ViewStyled
                                     marginTop={1}

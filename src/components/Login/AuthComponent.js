@@ -19,7 +19,7 @@ export default function AuthComponent({ showButton, display = 'flex', goLogin, a
         <ViewStyled
             width={100}
             height={70}
-            backgroundColor={theme.primary}
+            backgroundColor={theme.dark}
             style={{
                 display: display,
                 alignItems: 'center',
@@ -66,7 +66,7 @@ export default function AuthComponent({ showButton, display = 'flex', goLogin, a
                         <TextStyled
                             textAlign='center'
                             fontSize={24}
-                            color={theme.dark}
+                            color={theme.primary}
                             style={{
                                 width: "100%",
                             }}
@@ -129,7 +129,7 @@ export default function AuthComponent({ showButton, display = 'flex', goLogin, a
                         <TextStyled
                             fontSize={14}
                             textAlign='center'
-                            color={theme.dark}
+                            color={theme.primary}
                             style={{
                                 width: '100%',
                             }}

@@ -99,10 +99,10 @@ export default function ForgotPassword() {
             <ViewStyled
                 backgroundColor={theme.transparent}
                 width={100}
-                paddingLeft={7}
+                paddingLeft={7.5}
                 height={4}
                 style={{
-                    justifyContent: 'space-between',
+                    justifyContent: 'flex-end',
                     alignItems: 'flex-start',
                 }}
             >

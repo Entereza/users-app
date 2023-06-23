@@ -4,6 +4,7 @@ export const theme = {
     secondary: '#888cf3',
     tertiary: '#818181',
     quaternary: '#2a2a2a',
+    green3: '#C6FBFE',
     skeleton: '#e5e5e5',
     dark: '#000000',
     orange:'#FF9085',
@@ -22,5 +23,5 @@ export const theme = {
     green2: '#2CFF8D',
     greenDark: '#1C8D86',
     turquese: '#22FFEA',
-    facebook: '#5064a4'
+    facebook: '#1977f3'
 }

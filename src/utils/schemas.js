@@ -22,7 +22,6 @@ export const schemaRegister = Yup.object().shape({
 });
 
 export const schemaLogin = Yup.object().shape({
-
     email: Yup.string().email('Email Inválido').required('El correo es requerido'),
     password: Yup.string()
         .required('La contraseña es requerida')

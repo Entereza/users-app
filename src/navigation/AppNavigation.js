@@ -16,8 +16,8 @@ import * as Updates from 'expo-updates';
 import { _uiFinishChecking, _uiStartChecking } from '../redux/actions/uiActions';
 
 export default function AppNavigation() {
-
-  const [isModalVisible, setModalVisible] = React.useState(false);
+  const [textUpdates, setTextUpdates] = React.useState(true);
+  const [updateAvailable, setUpdateAvailable] = React.useState(false);
 
   const dispatch = useDispatch();
 
@@ -28,10 +28,10 @@ export default function AppNavigation() {
       const update = await Updates.checkForUpdateAsync();
 
       if (update.isAvailable) {
-        setModalVisible(true);
+        setUpdateAvailable(true);
         await Updates.fetchUpdateAsync();
 
-        setModalVisible(false);
+        setUpdateAvailable(false);
         await Updates.reloadAsync();
       } else {
         console.log('No hay updates disponibles')
@@ -40,6 +40,7 @@ export default function AppNavigation() {
       console.error(e);
     } finally {
       console.log('Close Updates.')
+      setTextUpdates(false)
       dispatch(__authValidate())
     }
   }
@@ -54,9 +55,8 @@ export default function AppNavigation() {
   if (checking) {
     return (
       <>
-        <LoaderScreen />
-
-        <ModalUpdateTest isModalVisible={isModalVisible} />
+        <LoaderScreen textUpdates={textUpdates} updateAvailable={updateAvailable} />
+        {/* <ModalUpdateTest isModalVisible={isModalVisible} /> */}
       </>
     )
   } else {

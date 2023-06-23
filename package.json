@@ -63,7 +63,8 @@
     "redux": "^4.2.0",
     "redux-thunk": "^2.4.1",
     "sharp-cli": "^2.1.1",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "expo-linear-gradient": "~12.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",
