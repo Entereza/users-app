@@ -37,15 +37,15 @@ export default function ContinueGoogle({ shadow }) {
 
     const [nonce, setNonce] = React.useState(null);
 
-    React.useEffect(() => {
-        generateNonce();
-    }, []);
+    // React.useEffect(() => {
+    //     generateNonce();
+    // }, []);
 
-    const generateNonce = async () => {
-        const buffer = await Random.getRandomBytesAsync(16);
-        const generatedNonce = [...new Uint8Array(buffer)].map(b => String.fromCharCode(b)).join('');
-        setNonce(generatedNonce);
-    }
+    // const generateNonce = async () => {
+    //     const buffer = await Random.getRandomBytesAsync(16);
+    //     const generatedNonce = [...new Uint8Array(buffer)].map(b => String.fromCharCode(b)).join('');
+    //     setNonce(generatedNonce);
+    // }
 
     const [request, response, promptAsync] = useAuthRequest(
         {
@@ -109,9 +109,7 @@ export default function ContinueGoogle({ shadow }) {
                 disabled={!request || !nonce}
                 shadow={shadow}
                 title={"Continuar con Google"}
-                onPress={() => {
-                    promptAsync();
-                }}
+                onPress={() => null}
                 backgroundColor={theme.primary}
                 image={require('./GoogleLogo.png')}
                 colorText={theme.dark}

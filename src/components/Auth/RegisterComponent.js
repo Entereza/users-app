@@ -1,5 +1,4 @@
 import React from 'react'
-import Toast from "react-native-toast-message";
 
 //Importar Responsive View
 import ViewStyled from '../ui/ViewStyled';

@@ -8,9 +8,6 @@ import { useFonts } from 'expo-font';
 import AppNavigation from './src/navigation/AppNavigation';
 import { store } from './src/redux/store';
 
-//toasts
-import Toast from 'react-native-toast-message'
-
 export default function App() {
   const [fontsLoaded] = useFonts({
     BRFirma: require('./assets/fonts/BRFirma-Regular.otf'),
