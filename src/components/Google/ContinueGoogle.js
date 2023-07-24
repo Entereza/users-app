@@ -107,12 +107,14 @@ export default function ContinueGoogle({ shadow }) {
 
             <ButtonAuthentication
                 disabled={!request || !nonce}
-                shadow={shadow}
+                shadow={false}
                 title={"Continuar con Google"}
                 onPress={() => null}
-                backgroundColor={theme.primary}
+                backgroundColor={theme.dark}
+                WithBorder={true}
+                borderColor={theme.tertiary}
+                colorText={theme.primary}
                 image={require('./GoogleLogo.png')}
-                colorText={theme.dark}
             />
 
             <Modal

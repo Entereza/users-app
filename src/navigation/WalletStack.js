@@ -12,9 +12,7 @@ const Stack = createNativeStackNavigator();
 
 export default function WalletStack() {
     return (
-        <>
-            <FloatingButton />
-            
+        <>            
             <Stack.Navigator
                 screenOptions={{
                     headerShown: false,

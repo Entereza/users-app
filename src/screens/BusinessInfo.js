@@ -20,6 +20,7 @@ import { Skeleton, Box, HStack, NativeBaseProvider } from "native-base";
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { customStyles } from '../utils/customStyles'
 import { useSelector } from 'react-redux'
+import ButtonMenu from '../components/Btn/ButtonMenu'
 
 export default function BusinessInfo({ route }) {
     const { data } = route.params;
@@ -369,64 +370,6 @@ export default function BusinessInfo({ route }) {
                     </ViewStyled>
 
                     <ViewStyled
-                        width={98}
-                        height={7}
-                        marginTop={1}
-                        backgroundColor={theme.transparent}
-                        style={{
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                        }}
-                    >
-                        {
-                            loadingSkeleton
-                                ? SkeletonButton()
-                                : <>
-                                    <ViewStyled
-                                        backgroundColor={theme.transparent}
-                                        width={96}
-                                        height={6}
-                                        style={{
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                        }}
-                                    >
-                                        <TouchableOpacity onPress={handleOnModal}>
-                                            <ViewStyled
-                                                width={95}
-                                                height={6}
-                                                backgroundColor={theme.transparent}
-                                                borderRadius={2}
-                                                style={{
-                                                    flexDirection: 'row',
-                                                    justifyContent: 'center',
-                                                    alignItems: 'center',
-                                                    borderWidth: 2,
-                                                    borderColor: theme.dark
-                                                }}
-                                            >
-                                                <TextStyled
-                                                    fontSize={20}
-                                                    color={theme.dark}
-                                                    style={{
-                                                        marginRight: widthPercentageToDP(3)
-                                                    }}
-                                                >
-                                                    Ver Menú
-                                                </TextStyled>
-                                                <Ionicons
-                                                    name="ios-fast-food-outline"
-                                                    size={adjustFontSize(25)}
-                                                    color={theme.dark}
-                                                />
-                                            </ViewStyled>
-                                        </TouchableOpacity>
-                                    </ViewStyled>
-                                </>
-                        }
-                    </ViewStyled>
-
-                    <ViewStyled
                         width={100}
                         marginTop={1}
                         height={sucursalData.length >= 4 ? 2 + (12.5 * sucursalData.length) : 50}
@@ -521,6 +464,8 @@ export default function BusinessInfo({ route }) {
                     </ViewStyled> */}
                 </ViewStyled>
             </ScrollView>
+
+            <ButtonMenu onPress={() => null} showButton='flex' />
 
             <Modal
                 animationType="fade"

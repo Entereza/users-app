@@ -40,19 +40,10 @@ export default function BusinessCategoryScreen({ route }) {
             );
 
             const { entereza, empresasHUBWColors, empresasImages, empHorariosSuc } = await res.json();
+            let empresasLenght = empresasHUBWColors.empresasHUBLinks.length
+            console.log('Lenght Empresas On Category: ', empresasLenght)
 
             if (entereza.codeError === codeErrors.cod200) {
-                let empresasLenght = empresasHUBWColors.empresasHUBLinks.length
-                console.log('Lenght Empresas On Category: ', empresasLenght)
-
-                if (empresasLenght === 0) {
-                    setFinalEmpresas(true)
-                    if (page === 0) {
-                        setNotFound(true)
-                    }
-                    setHasMore(false)
-                }
-
                 let newEmpresa = empresasHUBWColors.empresasHUBLinks.map((empresa) => {
                     let imgEmpresa = empresasImages.lista_empresas_img.find((img) => img.codigoEmpresa === empresa.codigoEmpresa);
                     let backgroundEmpresa = empresasImages.lista_empresas_img.find((background) => background.codigoEmpresa === empresa.codigoEmpresa);
@@ -101,9 +92,20 @@ export default function BusinessCategoryScreen({ route }) {
             } else {
                 console.log("Error Entereza Business");
             }
+
+            if (empresasLenght === 0) {
+                setFinalEmpresas(true)
+                if (page === 0) {
+                    setNotFound(true)
+                }
+                setTimeout(() => {
+                    setHasMore(false)
+                }, 1000)
+            }
         } catch (err) {
             console.log("Error entereza BusinessCategoryItem: ", err)
         } finally {
+
             setTimeout(() => {
                 setRefreshing(false)
             }, 500);
@@ -116,6 +118,7 @@ export default function BusinessCategoryScreen({ route }) {
         setDataItems([])
         console.log('reloadEmp Starts')
         setHasMore(true)
+        setRefreshing(true)
     }
 
     const [refreshing, setRefreshing] = React.useState(false);
@@ -130,14 +133,11 @@ export default function BusinessCategoryScreen({ route }) {
     }
 
     React.useEffect(() => {
-        console.log(page)
         if (location.address.state !== null) {
             console.log('Location not null: ', location.address.state)
             if (finalEmpresas !== true) {
                 console.log('Fin Empresas: ', page)
                 getInfo3()
-            } else {
-                console.log('Final1nt: ', page)
             }
         } else {
             console.log('Location null: ', location.address.state)

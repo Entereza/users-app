@@ -101,7 +101,7 @@ export default function ModalExplications() {
                             width={100}
                             height={100}
                             backgroundColor={theme.transparent}
-                            paddingTop={4}
+                            paddingTop={3}
                             style={{
                                 alignItems: 'center',
                                 justifyContent: 'flex-start',
@@ -188,7 +188,7 @@ export default function ModalExplications() {
                         style={{
                             justifyContent: 'center',
                             alignItems: 'center',
-                            top: -10
+                            top: -25
                         }}
                     >
                         <ViewStyled
@@ -224,7 +224,7 @@ export default function ModalExplications() {
                         style={{
                             justifyContent: 'center',
                             alignItems: 'center',
-                            top: -10
+                            top: -25
                         }}
                     >
                         <LinearGradient
@@ -256,11 +256,11 @@ export default function ModalExplications() {
                 dotClickEnabled={true}
                 activeDotStyle={{
                     backgroundColor: theme.primary,
-                    top: -50
+                    top: -65
                 }}
                 dotStyle={{
                     backgroundColor: theme.tertiary,
-                    top: -50
+                    top: -65
                 }}
             />
         </>

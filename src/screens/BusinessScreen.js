@@ -23,10 +23,12 @@ import NavigationHeader from "../components/navigation/NavigationHeader";
 import { useNavigation } from "@react-navigation/native";
 import BusinessInputRedirect from "../components/business/BusinessRedirectInput";
 import BusinessPromotions from "../components/business/BusinessPromotions";
+import FloatingButton from "../components/Btn/FloatingButton";
 
 export default function BusinessHome() {
   const [page, setPage] = useState(0);
   const [loadingSkeleton, setLoadingSkeleton] = useState(true)
+  const [loadingSkeletonCategory, setLoadingSkeletonCategory] = useState(true)
   const [loadingSkeletonEmpresas, setLoadingSkeletonEmpresas] = useState(true)
   const [loadingMoreEmpresas, setLoadingMoreEmpresas] = useState(true)
 
@@ -268,6 +270,8 @@ export default function BusinessHome() {
 
   const getInfo = async () => {
     try {
+      setStartPromotions(false)
+      setLoadingSkeletonCategory(true)
       setLoadingSkeleton(true)
       setLoadingSkeletonEmpresas(true)
       setLoadingMoreEmpresas(true)
@@ -305,9 +309,7 @@ export default function BusinessHome() {
               }
             });
             setImg(arrayRubros);
-            setLoadingSkeleton(false)
             getInfoEmpresas5()
-            setStartPromotions(true)
           } else {
             setHasMore(false)
             navigation.navigate("ChangeUbication")
@@ -415,8 +417,17 @@ export default function BusinessHome() {
           setDataEmpresas((prev) => [...prev, ...newEmpresa]);
         }
 
-        setLoadingSkeletonEmpresas(false)
-        setLoadingMoreEmpresas(false)
+        setStartPromotions(true)
+        setTimeout(() => {
+          setLoadingSkeletonCategory(false)
+        }, 100);
+        setTimeout(() => {
+          setLoadingSkeleton(false)
+        }, 200);
+        setTimeout(() => {
+          setLoadingSkeletonEmpresas(false)
+          setLoadingMoreEmpresas(false)
+        }, 300);
       } else {
         console.log("Error Entereza Business");
       }
@@ -447,6 +458,8 @@ export default function BusinessHome() {
   const onRefresh = () => {
     setRefreshing(true)
     setHasMore(false)
+    setLoadingSkeletonCategory(true)
+    setStartPromotions(false)
     setLoadingMoreEmpresas(true)
     setLoadingSkeleton(true)
     setLoadingSkeletonEmpresas(true)
@@ -490,14 +503,14 @@ export default function BusinessHome() {
         <ViewStyled
           marginTop={1}
           backgroundColor={theme.transparent}
-          height={60 + (empresaslength * 23)}
+          height={62 + (empresaslength * 23)}
           style={{
             justifyContent: 'flex-start',
             alignItems: 'center',
             paddingBottom: 50,
           }}
         >
-          <BusinessInputRedirect city={location !== null ? location.address.state : 'Cochabamba'} loadingSkeleton={loadingSkeleton} />
+          <BusinessInputRedirect city={location !== null ? location.address.state : 'Cochabamba'} loadingSkeleton={!startPromotions} />
 
           <BusinessPromotions
             city={location ? location.address.state : 'Cochabamba'}
@@ -525,7 +538,7 @@ export default function BusinessHome() {
                 flexDirection: 'row'
               }}
             >
-              {loadingSkeleton
+              {loadingSkeletonCategory
                 ? SkeletonCategory()
                 : <>
                   <FlatList
@@ -599,6 +612,8 @@ export default function BusinessHome() {
           </ScrollView>
         </ViewStyled>
       </ScrollView>
+
+      <FloatingButton />
     </>
   );
 }

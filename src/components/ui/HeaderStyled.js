@@ -31,6 +31,7 @@ export default function HeaderStyled({
 
     const [adjustOpen, setAdjustOpen] = React.useState(false)
     const [modalPermissions, setModalPermissions] = React.useState(false)
+    const [notFirstTime, setNotFirstTime] = React.useState(false)
 
     const [showAlert, setShowAlert] = React.useState(false)
     const [alertText, setAlertText] = React.useState({
@@ -69,7 +70,7 @@ export default function HeaderStyled({
         }
     }
 
-    const handleCloseModal = async() => {
+    const handleCloseModal = async () => {
         const ModalFirstShow = await AsyncStorage.getItem('PERMISSIONS')
 
         console.log('ModalFirst: ', ModalFirstShow)
@@ -86,15 +87,17 @@ export default function HeaderStyled({
     }
 
     const handleIconUbication = async () => {
+        setNotFirstTime(true)
+        setModalPermissions(true)
         console.log('handleIconUbication')
-        setShowAlert(true)
-        setAlertText({
-            title: 'Encuentra empresas cercanas',
-            message: `Necesitamos tu ubicación para mostrarte las empresas cercanas.`,
-            type: 'maps',
-            cancelText: 'Cancelar',
-            confirmText: 'Permitir'
-        })
+        // setShowAlert(true)
+        // setAlertText({
+        //     title: 'Encuentra empresas cercanas',
+        //     message: `Necesitamos tu ubicación para mostrarte las empresas cercanas.`,
+        //     type: 'maps',
+        //     cancelText: 'Cancelar',
+        //     confirmText: 'Permitir'
+        // })
     }
 
     const openAdjusts = () => {
@@ -387,7 +390,11 @@ export default function HeaderStyled({
                             marginBottom: 30
                         }}
                     >
-                        Permisos de Ubicación
+                        {
+                            notFirstTime
+                                ? 'Encuentra las empresas cercanas'
+                                : 'Permisos de ubicación'
+                        }
                     </TextStyled>
 
                     <ViewStyled
@@ -415,34 +422,46 @@ export default function HeaderStyled({
                         width={95}
                         height={13}
                         marginTop={1}
-                        marginBottom={4}
+                        marginBottom={notFirstTime ? 8 : 4}
                         style={{
                             justifyContent: 'center',
                             alignItems: 'center',
                         }}
                     >
-                        <TextStyled
-                            textAlign='center'
-                            color={theme.dark}
-                            fontSize={19}
-                            style={{
-                                width: '90%',
-                            }}
-                        >
-                            {`Para brindarte las `}
-                            <TextStyled
-                                textAlign='center'
-                                color={theme.secondary}
-                                fontSize={19}
-                                style={{
-                                    width: '90%',
-                                }}
-                            >
-                                {`mejores ofertas y precios en delivery`}
-                            </TextStyled>
-                            {`, necesitamos tu permiso para conocer tu ubicación`}
-                        </TextStyled>
-
+                        {
+                            notFirstTime
+                                ? <TextStyled
+                                    textAlign='center'
+                                    color={theme.dark}
+                                    fontSize={19}
+                                    style={{
+                                        width: '90%',
+                                    }}
+                                >
+                                    Necesitamos acceso a tu ubicación para mostrarte las empresas cercanas.
+                                </TextStyled>
+                                : <TextStyled
+                                    textAlign='center'
+                                    color={theme.dark}
+                                    fontSize={19}
+                                    style={{
+                                        width: '90%',
+                                    }}
+                                >
+                                    {`Para brindarte las `}
+                                    <TextStyled
+                                        textAlign='center'
+                                        color={theme.secondary}
+                                        fontSize={19}
+                                        style={{
+                                            width: '90%',
+                                        }}
+                                    >
+                                        {`mejores ofertas y precios en delivery`}
+                                    </TextStyled>
+                                    {`, necesitamos tu permiso para conocer tu ubicación`}
+                                </TextStyled>
+                        }
                     </ViewStyled>
 
                     <ViewStyled
@@ -454,9 +473,6 @@ export default function HeaderStyled({
                             alignItems: 'center',
                         }}
                     >
-                        {/* //Omitir como linea y boton permitir */}
-
-
                         <ButtonNext
                             fontSize={20}
                             width={80}
@@ -475,7 +491,11 @@ export default function HeaderStyled({
                                     marginTop: 10
                                 }}
                             >
-                                {`Omitir`}
+                                {
+                                    notFirstTime
+                                    ? `Cancelar`
+                                    : `Omitir`
+                                }
                             </TextStyled>
                         </Pressable>
                     </ViewStyled>

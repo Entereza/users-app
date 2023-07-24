@@ -11,7 +11,7 @@ import { theme } from '../../utils/theme';
 import { customStyles } from '../../utils/customStyles';
 import adjustFontSize from '../../utils/adjustText';
 
-export default function ButtonAuthentication({ disabled = false, title, onPress, image = require('./EnterezaLogo.png'), backgroundColor = theme.dark, colorText = theme.primary, showButton = 'flex', shadow = true, margin = true }) {
+export default function ButtonAuthentication({ disabled = false, title, onPress, image = require('./EnterezaLogo.png'), backgroundColor = theme.dark, colorText = theme.primary, showButton = 'flex', shadow = true, margin = true, borderColor = theme.transparent, WithBorder = false }) {
     return (
         <ViewStyled
             width={80}
@@ -35,18 +35,22 @@ export default function ButtonAuthentication({ disabled = false, title, onPress,
                         flexDirection: 'row',
                         justifyContent: 'flex-start',
                         alignItems: 'center',
-                        paddingLeft: 30
+                        paddingLeft: 30,
+                        borderColor: borderColor,
+                        borderWidth: WithBorder ? 1 : 0
                     }
                 ]}
             >
                 <ViewStyled
-                    width={7}
-                    height={5}
-                    marginRight={3}
+                    width={8}
+                    height={4}
+                    marginRight={2.5}
                     backgroundColor={theme.transparent}
                     style={{
                         justifyContent: 'center',
                         alignItems: 'center',
+                        // borderColor: theme.danger,
+                        // borderWidth: 1
                     }}
                 >
                     <ImageStyled

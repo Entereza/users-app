@@ -84,8 +84,6 @@ export default function BusinessPromotions({ city, reload, start }) {
     { nombre: '1', ciudad: 'CB' },
     { nombre: '2', ciudad: 'CB' },
     { nombre: '3', ciudad: 'CB' },
-    { nombre: '4', ciudad: 'CB' },
-    { nombre: '5', ciudad: 'LP' },
     { nombre: '6', ciudad: 'LP' },
     { nombre: '7', ciudad: 'LP' },
     { nombre: '8', ciudad: 'LP' },
@@ -94,14 +92,14 @@ export default function BusinessPromotions({ city, reload, start }) {
   return (
     <ViewStyled
       width={95}
-      height={12}
-      marginTop={0.9}
+      height={14}
+      marginTop={1}
       marginLeftAuto
       marginRightAuto
       backgroundColor={theme.transparent}
     >
       {
-        loadingSkeleton
+        !start
           ? SkeletonBusiness()
           :
           <FlatList

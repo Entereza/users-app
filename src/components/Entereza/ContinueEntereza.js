@@ -4,21 +4,17 @@ import ButtonAuthentication from '../Btn/ButtonAuthentication';
 import { useNavigation } from '@react-navigation/native';
 
 export default function ContinueEntereza({ onPress, shadow }) {
-
-    const navigation = useNavigation()
-
-    const RedirectLogin = () => {
-        navigation.navigate("LoginEnterezaScreen");
-    }
     return (
         <>
             <ButtonAuthentication
-                shadow={shadow}
+                shadow={false}
                 title={"Continuar con Entereza"}
                 onPress={onPress}
-                backgroundColor={theme.secondary}
-                image={require('./EnterezaLogo.png')}
+                backgroundColor={theme.dark}
+                WithBorder={true}
+                borderColor={theme.tertiary}
                 colorText={theme.primary}
+                image={require('./EnterezaLogo.png')}
                 margin={false}
             />
         </>

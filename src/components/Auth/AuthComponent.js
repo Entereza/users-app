@@ -94,7 +94,7 @@ export default function AuthComponent({ showButton, display = 'flex', goLogin, a
                                 width: "90%",
                             }}
                         >
-                            {'¿Cómo te gustaría iniciar sesión?'}
+                            {'¿Cómo te gustaría continuar?'}
                         </TextStyled>
                     </ViewStyled>
 
@@ -110,7 +110,7 @@ export default function AuthComponent({ showButton, display = 'flex', goLogin, a
                     >
                         <ContinueGoogle shadow={shadow} />
 
-                        <ContinueFacebook shadow={shadow} />
+                        <ContinueFacebook shadow={shadow} display={showButton} />
 
                         <ContinueApple shadow={shadow} display={showButton} />
 

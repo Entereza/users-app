@@ -17,6 +17,7 @@ import TextStyled from '../components/ui/TextStyled';
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import adjustFontSize from '../utils/adjustText';
+import FloatingButton from '../components/Btn/FloatingButton';
 
 export default function WalletScreen({ route }) {
   // Verificar si es la primera vez
@@ -347,6 +348,8 @@ export default function WalletScreen({ route }) {
 
   return (
     <>
+      <FloatingButton />
+
       <Animated.ScrollView
         scrollEnabled={false}
         contentContainerStyle={{

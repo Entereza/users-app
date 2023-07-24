@@ -20,7 +20,8 @@ export default function PublicNavigation() {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-          navigationBarHidden: true,
+          navigationBarHidden: false,
+          navigationBarColor: theme.dark
         }}
         initialRouteName="ModalExplications"
       >

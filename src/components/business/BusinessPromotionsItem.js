@@ -37,8 +37,8 @@ export default function BusinessPromotionsItem({ item, city }) {
         <>
             <ViewStyled
                 backgroundColor={theme.transparent}
-                width={46}
-                height={12}
+                width={60}
+                height={14}
                 marginRight={3}
                 style={{
                     alignItems: 'center',

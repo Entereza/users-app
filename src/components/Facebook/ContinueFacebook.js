@@ -18,7 +18,7 @@ import ButtonAuthentication from '../Btn/ButtonAuthentication';
 
 WebBrowser.maybeCompleteAuthSession();
 
-export default function ContinueFacebook({ shadow }) {
+export default function ContinueFacebook({ display }) {
     const [text, setText] = React.useState('')
     const [Loading, setLoading] = React.useState(false)
 
@@ -138,12 +138,15 @@ export default function ContinueFacebook({ shadow }) {
             }
 
             <ButtonAuthentication
-                shadow={shadow}
+                shadow={false}
                 title={"Continuar con Facebook"}
                 onPress={() => null}
-                backgroundColor={theme.facebook}
-                image={require('./FacebookLogo.png')}
+                backgroundColor={theme.dark}
+                WithBorder={true}
+                borderColor={theme.tertiary}
                 colorText={theme.primary}
+                image={require('./FacebookLogo.png')}
+                showButton={display}
             />
 
             <Modal

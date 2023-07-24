@@ -91,12 +91,14 @@ export default function ContinueApple({ display, shadow }) {
     return (
         <>
             <ButtonAuthentication
-                shadow={shadow}
+                shadow={false}
                 title={"Continuar con Apple"}
                 onPress={() => null}
                 backgroundColor={theme.dark}
-                image={require('./AppleLogo.png')}
+                WithBorder={true}
+                borderColor={theme.tertiary}
                 colorText={theme.primary}
+                image={require('./AppleLogo.png')}
                 showButton={display}
             />
 
