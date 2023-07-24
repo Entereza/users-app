@@ -22,6 +22,7 @@ import ButtonNext from "../components/Btn/ButtonNext";
 import NavigationHeader from "../components/navigation/NavigationHeader";
 import { useNavigation } from "@react-navigation/native";
 import BusinessInputRedirect from "../components/business/BusinessRedirectInput";
+import BusinessPromotions from "../components/business/BusinessPromotions";
 
 export default function BusinessHome() {
   const [page, setPage] = useState(0);
@@ -306,7 +307,7 @@ export default function BusinessHome() {
             setImg(arrayRubros);
             setLoadingSkeleton(false)
             getInfoEmpresas5()
-            // setStartPromotions(true)
+            setStartPromotions(true)
           } else {
             setHasMore(false)
             navigation.navigate("ChangeUbication")
@@ -493,25 +494,31 @@ export default function BusinessHome() {
           style={{
             justifyContent: 'flex-start',
             alignItems: 'center',
-            paddingBottom: 50
+            paddingBottom: 50,
           }}
         >
           <BusinessInputRedirect city={location !== null ? location.address.state : 'Cochabamba'} loadingSkeleton={loadingSkeleton} />
+
+          <BusinessPromotions
+            city={location ? location.address.state : 'Cochabamba'}
+            reload={loadingSkeleton}
+            start={startPromotions}
+          />
+
           <ViewStyled
-            marginTop={1}
             backgroundColor={theme.transparent}
             width={95}
-            height={26}
-            marginBottom={0.6}
+            height={13}
+            marginTop={2}
             marginLeftAuto
             marginRightAuto
           >
-            <BusinessBubbles city={location !== null ? location.address.state : 'Cochabamba'} loadingSkeleton={loadingSkeleton} />
+            {/* <BusinessBubbles city={location !== null ? location.address.state : 'Cochabamba'} loadingSkeleton={loadingSkeleton} /> */}
+
             <ViewStyled
               backgroundColor={theme.transparent}
               width={95}
               height={12}
-              marginTop={2}
               style={{
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -542,12 +549,6 @@ export default function BusinessHome() {
             </ViewStyled>
           </ViewStyled>
 
-          {/* <BusinessPromotions
-            city={location ? location.address.state : 'Cochabamba'}
-            reload={loadingSkeleton}
-            start={startPromotions}
-          /> */}
-
           <ScrollView
             scrollEnabled={false}
             horizontal={true}
@@ -560,7 +561,7 @@ export default function BusinessHome() {
               ,
               justifyContent: 'center',
               alignItems: 'flex-start',
-              backgroundColor: theme.transparent
+              backgroundColor: theme.transparent,
             }}
           >
             {

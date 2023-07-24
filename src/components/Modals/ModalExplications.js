@@ -20,6 +20,7 @@ import Img2 from '../../assets/modal/im3.png'
 import Img3 from '../../assets/modal/im2.png'
 import Img4 from '../../assets/modal/im4.png'
 import Img5 from '../../assets/modal/im5.png'
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 
@@ -98,11 +99,12 @@ export default function ModalExplications() {
                     <>
                         <ViewStyled
                             width={100}
-                            height={88}
+                            height={100}
                             backgroundColor={theme.transparent}
+                            paddingTop={4}
                             style={{
                                 alignItems: 'center',
-                                justifyContent: 'flex-end',
+                                justifyContent: 'flex-start',
                             }}
                         >
                             <ViewStyled
@@ -186,7 +188,7 @@ export default function ModalExplications() {
                         style={{
                             justifyContent: 'center',
                             alignItems: 'center',
-                            top: -55
+                            top: -10
                         }}
                     >
                         <ViewStyled
@@ -222,13 +224,13 @@ export default function ModalExplications() {
                         style={{
                             justifyContent: 'center',
                             alignItems: 'center',
-                            top: -55
+                            top: -10
                         }}
                     >
                         <LinearGradient
                             colors={[theme.green3, theme.secondary, theme.salmon]}
-                            start={{ x: 0, y: 1 }}
-                            end={{ x: 1, y: 0 }}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
                             style={{
                                 width: widthPercentageToDP(90),
                                 height: heightPercentageToDP(7),
@@ -247,19 +249,18 @@ export default function ModalExplications() {
                             </TextStyled>
                         </LinearGradient>
                     </ViewStyled >
-                )
-                }
+                )}
 
                 showSkipButton={false}
 
                 dotClickEnabled={true}
                 activeDotStyle={{
                     backgroundColor: theme.primary,
-                    top: -100
+                    top: -50
                 }}
                 dotStyle={{
                     backgroundColor: theme.tertiary,
-                    top: -100
+                    top: -50
                 }}
             />
         </>

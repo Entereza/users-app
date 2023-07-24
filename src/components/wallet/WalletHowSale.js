@@ -19,27 +19,41 @@ import adjustFontSize from '../../utils/adjustText';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
 
+import Img1 from '../../assets/modal/im1.png'
+import Img2 from '../../assets/modal/im3.png'
+import Img3 from '../../assets/modal/im2.png'
+import Img4 from '../../assets/modal/im4.png'
+import Img5 from '../../assets/modal/im5.png'
+import { LinearGradient } from 'expo-linear-gradient';
+
 const slides = [
     {
-        key: 'one',
-        title: 'Visita tus lugares favoritos',
-        text: 'Ve a cualquiera de nuestros negocios afiliados y compra con normalidad.\n(Paga el mismo precio de siempre)',
-        image: How1,
+        key: '1',
+        text: 'Visita empresas afiliadas o pide por delivery.',
+        image: Img1,
     },
     {
-        key: 'two',
-        title: 'Gana dinero con Entereza',
-        text: 'Indica que eres usuario de Entereza y dicta tu número de CI, este es tu código de compra en todos los negocios afiliados.',
-        image: How2,
+        key: '2',
+        text: 'Informa al cajero que eres usuario de Entereza',
+        image: Img2,
     },
     {
-        key: 'three',
-        title: 'Así de sencillo ganaste cashback con Entereza',
-        text: 'Verifica tu saldo en tiempo real ingresando a tu aplicación y asegúrate que llego tu cashback (Reembolso).',
-        image: How3,
-    }
-];
+        key: '3',
+        text: 'Dile al cajero tu número de Carnet de Identidad',
+        image: Img3,
 
+    },
+    {
+        key: '4',
+        text: 'Paga el mismo precio de siempre',
+        image: Img4,
+    },
+    {
+        key: '5',
+        text: '¡Y listo! Verifica el saldo de tu cuenta Entereza',
+        image: Img5,
+    },
+];
 export default function WalletHowSale() {
 
     const [modal, setModal] = useState(false);
@@ -113,8 +127,8 @@ export default function WalletHowSale() {
             >
                 <ViewStyled
                     backgroundColor={theme.black}
-                    width={35}
-                    height={25 / 2}
+                    width={44}
+                    height={13}
                     style={{
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -127,52 +141,27 @@ export default function WalletHowSale() {
                         shadowRadius: 3.5,
                         elevation: 15,
                     }}
-                    marginHorizontal={2}
                     borderRadius={2}
+                    paddingHorizontal={2}
                 >
-                    <Animated.View
-                        style={{
-                            backgroundColor: theme.salmon,
-                            height: heightInterpolation2,
-                            width: widthInterpolation,
-                            display: buttonOpen,
-                            position: 'absolute',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            borderRadius: 100,
-                            bottom: heightPercentageToDP(11),
-                            right: widthPercentageToDP(-1),
-                            transform: [{ translateY: heightInterpolation }, { translateX: translateXInterpolation },],
-                        }}
-                    />
                     <TextStyled
                         textAlign='center'
-                        fontSize={14}
-                        numberOfLines={4}
+                        fontSize={17}
                         color={theme.primary}
-                        style={{
-                            width: "90%",
-                            // marginBottom: 5
-                        }}
                     >
                         {'¿Cómo'}
                         <TextStyled
-                            fontWeight='700'
+                            fontWeight='bold'
                             textAlign='center'
-                            fontSize={15}
-                            numberOfLines={4}
+                            fontSize={17}
                             color={theme.salmon}
-                            style={{
-                                width: "90%",
-                                // marginBottom: 5
-                            }}
                         >
-                            {' GANAR '}
+                            {' FUNCIONA'}
                         </TextStyled>
-                        {'con Entereza?'}
+                        {'?'}
                     </TextStyled>
                 </ViewStyled>
-                
+
             </Pressable>
 
             <Modal
@@ -185,126 +174,180 @@ export default function WalletHowSale() {
                     style={{
                         position: 'relative',
                     }}
+
+                    contentContainerStyle={{
+                        backgroundColor: theme.dark,
+                        justifyContent: 'flex-end',
+                    }}
+
+                    data={slides}
                     renderItem={({ item }) => (
+                        <>
+                            <ViewStyled
+                                width={100}
+                                height={88}
+                                backgroundColor={theme.transparent}
+                                paddingTop={2}
+                                style={{
+                                    alignItems: 'center',
+                                    justifyContent: 'flex-start',
+                                }}
+                            >
+                                <ViewStyled
+                                    width={100}
+                                    height={6}
+                                    marginBottom={8}
+                                    backgroundColor={theme.transparent}
+                                    style={{
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    <TextStyled
+                                        textAlign='center'
+                                        fontFamily='ArtegraBold'
+                                        fontSize={25}
+                                        color={theme.primary}
+                                    >
+                                        Entereza
+                                    </TextStyled>
+                                </ViewStyled>
+
+                                <ViewStyled
+                                    width={100}
+                                    height={50}
+                                    backgroundColor={theme.transparent}
+                                    style={{
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        // borderWidth: 1,
+                                        // borderColor: theme.orange,
+                                    }}
+                                >
+                                    <ImageStyled
+                                        source={item.image}
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            resizeMode: 'contain',
+                                        }}
+                                    />
+                                </ViewStyled>
+
+                                <ViewStyled
+                                    width={100}
+                                    height={16}
+                                    marginTop={1}
+                                    marginBottom={3}
+                                    backgroundColor={theme.transparent}
+                                    style={{
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        // borderWidth: 1,
+                                        // borderColor: theme.danger,
+                                    }}
+                                >
+                                    <TextStyled
+                                        textAlign='center'
+                                        fontFamily='ArtegraBold'
+                                        fontSize={30}
+                                        color={theme.primary}
+                                        style={{
+                                            width: '95%'
+                                        }}
+                                    >
+                                        {
+                                            item.text
+                                        }
+                                    </TextStyled>
+                                </ViewStyled>
+                            </ViewStyled>
+                        </>
+                    )}
+
+                    showNextButton={true}
+                    renderNextButton={() => (
                         <ViewStyled
-                            height={100}
-                            width={100}
-                            backgroundColor={theme.primary}
+                            backgroundColor={theme.transparent}
+                            width={90}
+                            height={8}
                             style={{
-                                position: 'relative',
-                                alignItems: 'center',
                                 justifyContent: 'center',
-                                flexDirection: item.key === 'two' ? 'column-reverse' : 'column',
+                                alignItems: 'center',
+                                top: -10
                             }}
                         >
                             <ViewStyled
                                 width={90}
-                                backgroundColor={theme.transparent}
-                                height={22}
-                                marginBottom={item.key === 'two' ? 5 : 5}
-                                marginTop={item.key === 'two' ? 5 : 5}
+                                height={7}
+                                backgroundColor={theme.dark}
+                                borderRadius={2}
                                 style={{
                                     justifyContent: 'center',
-                                    alignItems: 'center'
+                                    alignItems: 'center',
+                                    borderWidth: 1,
+                                    borderColor: theme.primary
                                 }}
                             >
                                 <TextStyled
-                                    fontSize={26}
-                                    color={theme.quaternary}
-                                    fontWeight='700'
-                                    style={{
-                                        marginBottom: '3%',
-                                        width: "90%"
-                                    }}
+                                    fontSize={20}
+                                    color={theme.primary}
+                                    fontFamily='ArtegraBold'
                                 >
-                                    {
-                                        item.title
-                                    }
-                                </TextStyled>
-                                <TextStyled
-                                    color={theme.tertiary}
-                                    fontSize={16}
-                                    style={{
-                                        width: "90%"
-                                    }}
-                                >
-                                    {
-                                        item.text
-                                    }
+                                    Continuar
                                 </TextStyled>
                             </ViewStyled>
-
-                            <ImageStyled
-                                source={item.image}
-                                width={85}
-                                height={40}
-                                style={{
-                                    marginBottom: item.key === 'two' ? 4 : 'auto',
-                                    resizeMode: 'contain',
-                                }}
-                            />
-
                         </ViewStyled>
                     )}
-                    data={slides}
-                    onDone={handleOnDone}
-                    showSkipButton={false}
+
                     showDoneButton={true}
-                    showNextButton={true}
-                    nextLabel={'Siguiente'}
-                    skipLabel={'Saltar'}
-                    doneLabel={'Finalizar'}
-                    dotColor={theme.tertiaryGradient}
-                    activeDotColor={theme.secondary}
-                    renderNextButton={() => (
-                        <ViewStyled
-                            width={14}
-                            height={7}
-                            backgroundColor={`${theme.secondary}22`}
-                            borderRadius={7}
-                            style={{
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                top: -15,
-                                right: 10,
-                            }}
-                        >
-                            <Ionicons name="arrow-forward" size={adjustFontSize(38)} color={theme.secondary} />
-                        </ViewStyled>
-                    )}
+                    onDone={handleOnDone}
                     renderDoneButton={() => (
                         <ViewStyled
-                            width={14}
-                            height={7}
-                            backgroundColor={`${theme.secondary}22`}
-                            borderRadius={7}
+                            backgroundColor={theme.transparent}
+                            width={90}
+                            height={8}
                             style={{
-                                alignItems: 'center',
                                 justifyContent: 'center',
-                                top: -15,
-                                right: 10,
+                                alignItems: 'center',
+                                top: -10
                             }}
                         >
-                            <Ionicons name="checkmark" size={adjustFontSize(38)} color={theme.secondary} />
-                        </ViewStyled>
+                            <LinearGradient
+                                colors={[theme.green3, theme.secondary, theme.salmon]}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 1 }}
+                                style={{
+                                    width: widthPercentageToDP(90),
+                                    height: heightPercentageToDP(7),
+                                    borderRadius: heightPercentageToDP(2),
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    borderWidth: 1,
+                                }}
+                            >
+                                <TextStyled
+                                    fontSize={20}
+                                    color={theme.dark}
+                                    fontFamily='ArtegraBold'
+                                >
+                                    Empezar
+                                </TextStyled>
+                            </LinearGradient>
+                        </ViewStyled >
                     )}
-                    renderSkipButton={() => (
-                        <TextStyled
-                            fontSize={18}
-                            color={theme.tertiary}
-                        >
-                            Saltar
-                        </TextStyled>
-                    )}
+
+                    showSkipButton={false}
+
+                    dotClickEnabled={true}
                     activeDotStyle={{
-                        backgroundColor: `${theme.secondary}aa`,
-                        top: -35
+                        backgroundColor: theme.primary,
+                        top: -50
                     }}
                     dotStyle={{
-                        backgroundColor: `${theme.secondary}22`,
-                        top: -35
+                        backgroundColor: theme.tertiary,
+                        top: -50
                     }}
-                    bottomButton={false}
                 />
             </Modal>
         </>

@@ -7,13 +7,11 @@ import ImageStyled from '../components/ui/ImageStyled';
 
 //import styles
 import { theme } from '../utils/theme'
-import AuthComponent from '../components/Login/AuthComponent';
-import LoginComponent from '../components/Login/LoginComponent';
-import RegisterComponent from '../components/Login/RegisterComponent';
+import AuthComponent from '../components/Auth/AuthComponent';
+import LoginComponent from '../components/Auth/LoginComponent';
+import RegisterComponent from '../components/Auth/RegisterComponent';
 import { Ionicons } from '@expo/vector-icons';
 import adjustFontSize from '../utils/adjustText';
-import { heightPercentageToDP } from 'react-native-responsive-screen';
-import ModalExplications from '../components/Modals/ModalExplications';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AuthenticationScreen() {

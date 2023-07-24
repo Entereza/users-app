@@ -51,7 +51,7 @@ export default function BusinessInputRedirect({ city, loadingSkeleton }) {
             <ViewStyled
                 backgroundColor={theme.transparent}
                 width={100}
-                height={9}
+                height={7}
                 style={{
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -63,7 +63,7 @@ export default function BusinessInputRedirect({ city, loadingSkeleton }) {
                 >
                     <ViewStyled
                         width={95}
-                        height={8}
+                        height={6}
                         backgroundColor={theme.primary}
                         borderRadius={2}
                         paddingHorizontal={3}

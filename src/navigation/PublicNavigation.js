@@ -20,7 +20,7 @@ export default function PublicNavigation() {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-          navigationBarColor: theme.dark
+          navigationBarHidden: true,
         }}
         initialRouteName="ModalExplications"
       >
@@ -51,7 +51,6 @@ export default function PublicNavigation() {
           component={ModalExplications}
           options={{
             animation: 'fade',
-            navigationBarColor: theme.dark
           }}
         />
       </Stack.Navigator>

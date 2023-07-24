@@ -39,13 +39,13 @@ export default function LoaderScreen({ textUpdates, updateAvailable }) {
 
             <TextStyled
                 fontFamily='ArtegraBold'
-                fontSize={adjustFontSize(14)}
+                fontSize={adjustFontSize(16)}
                 color={theme.primary}
             >
                 {
                     textUpdates
                         ? updateAvailable
-                            ? `Actualizando...`
+                            ? `Actualizando Entereza...`
                             : `Verificando Actualizaciones...`
                         : `Cargando Datos...`
                 }

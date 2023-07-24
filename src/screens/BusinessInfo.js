@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { ScrollView, TouchableOpacity, RefreshControl, } from 'react-native'
+import { ScrollView, TouchableOpacity, RefreshControl, Pressable, Modal, } from 'react-native'
 
 import ViewStyled from '../components/ui/ViewStyled'
 import { theme } from '../utils/theme'
@@ -31,34 +31,50 @@ export default function BusinessInfo({ route }) {
 
     const [loadingSkeleton, setLoadingSkeleton] = React.useState(true)
 
-    const [colorFb, setColorFb] = React.useState('#818181')
-    const [colorIg, setColorIg] = React.useState('#818181')
+    // const [colorFb, setColorFb] = React.useState('#818181')
+    // const [colorIg, setColorIg] = React.useState('#818181')
 
-    const OpenFb = () => {
-        Linking.openURL(fb)
-    }
-    const OpenIg = () => {
-        Linking.openURL(insta)
-    }
+    // const OpenFb = () => {
+    //     Linking.openURL(fb)
+    // }
+    // const OpenIg = () => {
+    //     Linking.openURL(insta)
+    // }
 
-    const SetColorsRedes = () => {
-        if (fb !== '') {
-            setColorFb('#4267B2')
-        }
-        if (insta !== '') {
-            setColorIg('#833AB4')
-        }
-    }
+    // const SetColorsRedes = () => {
+    //     if (fb !== '') {
+    //         setColorFb('#4267B2')
+    //     }
+    //     if (insta !== '') {
+    //         setColorIg('#833AB4')
+    //     }
+    // }
 
-    React.useEffect(() => {
-        SetColorsRedes()
-    }, [])
+    // React.useEffect(() => {
+    //     SetColorsRedes()
+    // }, [])
+
+    const SkeletonButton = () => {
+        return (
+            <NativeBaseProvider>
+                <Box w="100%" alignItems={'center'} >
+                    <HStack marginTop={'0.5'} justifyContent={'center'} alignItems={'center'} backgroundColor={theme.primary} w={widthPercentageToDP(94)} h={heightPercentageToDP(8)} borderWidth="1" space={1} rounded="lg" _dark={{
+                        borderColor: "coolGray.500"
+                    }} _light={{
+                        borderColor: "coolGray.200"
+                    }} p="4">
+                        <Skeleton speed={1} w={widthPercentageToDP(88)} h={heightPercentageToDP(6)} rounded="lg" startColor={theme.skeleton} endColor={theme.secondary} />
+                    </HStack>
+                </Box>
+            </NativeBaseProvider>
+        )
+    }
 
     const SkeletonSucursals = () => {
         return (
             <NativeBaseProvider>
                 <Box w="100%" alignItems={'center'} >
-                    <HStack marginBottom={heightPercentageToDP(1)} backgroundColor={theme.primary} w={widthPercentageToDP(94)} h={heightPercentageToDP(11)} borderWidth="1" space={1} rounded="lg" _dark={{
+                    <HStack marginBottom={heightPercentageToDP(0.5)} backgroundColor={theme.primary} w={widthPercentageToDP(94)} h={heightPercentageToDP(11)} borderWidth="1" space={1} rounded="lg" _dark={{
                         borderColor: "coolGray.500"
                     }} _light={{
                         borderColor: "coolGray.200"
@@ -68,7 +84,7 @@ export default function BusinessInfo({ route }) {
                         <Skeleton.Text speed={1} lines={2} alignItems="center" px="12" marginLeft={"-2"} />
                     </HStack>
 
-                    <HStack marginBottom={heightPercentageToDP(1)} backgroundColor={theme.primary} w={widthPercentageToDP(94)} h={heightPercentageToDP(11)} borderWidth="1" space={1} rounded="lg" _dark={{
+                    <HStack marginBottom={heightPercentageToDP(0.5)} backgroundColor={theme.primary} w={widthPercentageToDP(94)} h={heightPercentageToDP(11)} borderWidth="1" space={1} rounded="lg" _dark={{
                         borderColor: "coolGray.500"
                     }} _light={{
                         borderColor: "coolGray.200"
@@ -78,7 +94,7 @@ export default function BusinessInfo({ route }) {
                         <Skeleton.Text speed={1} lines={2} alignItems="center" px="12" marginLeft={"-2"} />
                     </HStack>
 
-                    <HStack marginBottom={heightPercentageToDP(1)} backgroundColor={theme.primary} w={widthPercentageToDP(94)} h={heightPercentageToDP(11)} borderWidth="1" space={1} rounded="lg" _dark={{
+                    <HStack marginBottom={heightPercentageToDP(0.5)} backgroundColor={theme.primary} w={widthPercentageToDP(94)} h={heightPercentageToDP(11)} borderWidth="1" space={1} rounded="lg" _dark={{
                         borderColor: "coolGray.500"
                     }} _light={{
                         borderColor: "coolGray.200"
@@ -119,19 +135,6 @@ export default function BusinessInfo({ route }) {
     }
 
     const [sucursalData, setSucursalData] = React.useState([])
-
-    // newSucursal.sort((a, b) => {
-    //     // Busca los objetos "codKilometros" que corresponden a cada empresa
-    //     const kilomA = empHorariosSuc.codKilometros.find((k) => k.codigoEmpresa === a.codigoEmpresa);
-    //     const kilomB = empHorariosSuc.codKilometros.find((k) => k.codigoEmpresa === b.codigoEmpresa);
-
-    //     // Si ambos objetos existen, compara sus propiedades "km"
-    //     if (kilomA && kilomB) {
-    //         return kilomA.km - kilomB.km;
-    //     }
-    //     // Si falta uno de los objetos, deja la comparación a cargo del sort anterior
-    //     return 0;
-    // });
 
     const getInfoSucursals = async () => {
         setLoadingSkeleton(true)
@@ -205,6 +208,12 @@ export default function BusinessInfo({ route }) {
         }
     }, [location])
 
+    const [modal, setModal] = React.useState(false);
+
+    const handleOnModal = async () => {
+        setModal(!modal)
+    };
+
     return (
         <>
             <ScrollView
@@ -222,7 +231,7 @@ export default function BusinessInfo({ route }) {
                 <ViewStyled
                     backgroundColor={theme.transparent}
                     width={100}
-                    height={sucursalData.length > 4 ? 60 + (12.5 * sucursalData.length) : 106}
+                    height={sucursalData.length > 4 ? 65 + (12.5 * sucursalData.length) : 110}
                     style={{
                         justifyContent: 'flex-start',
                         alignItems: 'center',
@@ -360,6 +369,64 @@ export default function BusinessInfo({ route }) {
                     </ViewStyled>
 
                     <ViewStyled
+                        width={98}
+                        height={7}
+                        marginTop={1}
+                        backgroundColor={theme.transparent}
+                        style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}
+                    >
+                        {
+                            loadingSkeleton
+                                ? SkeletonButton()
+                                : <>
+                                    <ViewStyled
+                                        backgroundColor={theme.transparent}
+                                        width={96}
+                                        height={6}
+                                        style={{
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        <TouchableOpacity onPress={handleOnModal}>
+                                            <ViewStyled
+                                                width={95}
+                                                height={6}
+                                                backgroundColor={theme.transparent}
+                                                borderRadius={2}
+                                                style={{
+                                                    flexDirection: 'row',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                    borderWidth: 2,
+                                                    borderColor: theme.dark
+                                                }}
+                                            >
+                                                <TextStyled
+                                                    fontSize={20}
+                                                    color={theme.dark}
+                                                    style={{
+                                                        marginRight: widthPercentageToDP(3)
+                                                    }}
+                                                >
+                                                    Ver Menú
+                                                </TextStyled>
+                                                <Ionicons
+                                                    name="ios-fast-food-outline"
+                                                    size={adjustFontSize(25)}
+                                                    color={theme.dark}
+                                                />
+                                            </ViewStyled>
+                                        </TouchableOpacity>
+                                    </ViewStyled>
+                                </>
+                        }
+                    </ViewStyled>
+
+                    <ViewStyled
                         width={100}
                         marginTop={1}
                         height={sucursalData.length >= 4 ? 2 + (12.5 * sucursalData.length) : 50}
@@ -381,7 +448,7 @@ export default function BusinessInfo({ route }) {
                         }
                     </ViewStyled>
 
-                    <ViewStyled
+                    {/* <ViewStyled
                         width={95}
                         height={10}
                         backgroundColor={theme.transparent}
@@ -451,9 +518,18 @@ export default function BusinessInfo({ route }) {
                                 </TouchableOpacity>
                             </ViewStyled>
                         </ViewStyled>
-                    </ViewStyled>
+                    </ViewStyled> */}
                 </ViewStyled>
             </ScrollView>
+
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={modal}
+                onRequestClose={handleOnModal}
+            >
+
+            </Modal>
         </>
 
     )

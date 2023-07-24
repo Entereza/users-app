@@ -29,3 +29,20 @@ export const fetchWithToken = async (path, method, body) => {
     }
 
 }
+
+export const fetchWithToken2 = async (path, method, body) => {
+    const baseURL = 'http://35.238.246.148:8444';
+    const token = await AsyncStorage.getItem('ENT-TKN');
+
+    const url = baseURL + "/" + path;
+    const requestOptions = {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
+    };
+
+    return global.fetch(url, requestOptions);
+};

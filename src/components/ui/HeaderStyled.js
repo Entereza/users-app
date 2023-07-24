@@ -24,7 +24,6 @@ export default function HeaderStyled({
     routeName,
     reloadEmp
 }) {
-    console.log('NeimFirst: ', routeName)
     const dispatch = useDispatch()
 
     const [showButton, setShowButton] = React.useState(false)
@@ -233,7 +232,7 @@ export default function HeaderStyled({
 
     return (
         <>
-            <SafeAreaView style={{ backgroundColor: theme.background }} >
+            <SafeAreaView edges={['top']} style={{ backgroundColor: theme.background }} >
                 <ViewStyled
                     backgroundColor={theme.primary}
                     paddingHorizontal={4}

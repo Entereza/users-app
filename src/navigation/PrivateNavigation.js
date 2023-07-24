@@ -18,39 +18,33 @@ import * as Location from 'expo-location'
 import * as Tracking from 'expo-tracking-transparency';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchWithToken } from '../utils/fetchWithToken';
-import FloatingButton from '../components/Btn/FloatingButton';
 // import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import NotificacionWallet from '../components/Notifications/NotificationsWallet';
 import { Platform } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import LoaderScreen from '../screens/LoaderScreen';
+import DataUsers from '../screens/DataUsersScreen';
 
 const Tab = createBottomTabNavigator();
 
-export default function PrivateNavigation() {
-  const dispatch = useDispatch()
-  const { info } = useSelector(state => state.auth)
-  const User = useSelector(state => state.auth)
+export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
 
-  const [buttonOpen, setButtonOpen] = React.useState(false)
-
-  const MostrarCompletar = async () => {
-    const Sexo = await info.usuarioBean?.sexo;
-    const Fecha = await info.usuarioBean?.fecha_nacimiento;
-    const Contacto = await info.usuarioBean?.contacto;
-
-    if (Sexo != null && Fecha != null && Contacto != null) {
-      setButtonOpen(false)
-    } else {
-      console.log('Check Info Faltan valores')
-      setButtonOpen(true)
-    }
-  }
+  const navigation = useNavigation()
 
   React.useEffect(() => {
-    if (info != null) {
-      MostrarCompletar()
+    if (dataUsersIsNotComplete !== null) {
+      console.log('DataUsers: ', dataUsersIsNotComplete)
+      if (dataUsersIsNotComplete === true) {
+        navigation.navigate('DataUsers');
+      } else {
+        navigation.navigate('WalletStack');
+      }
     }
-  }, [info])
+  }, [dataUsersIsNotComplete])
+
+  const dispatch = useDispatch()
+  const User = useSelector(state => state.auth)
 
   useEffect(() => {
     dispatch(__authGetInfo())
@@ -355,18 +349,17 @@ export default function PrivateNavigation() {
 
   return (
     <>
-      <InitialModals />
-
       <NotificacionWallet />
 
       <Tab.Navigator
-        initialRouteName="WalletScreen"
+        initialRouteName={"LoaderScreen"}
         screenOptions={{
           tabBarShowLabel: false,
           tabBarActiveTintColor: theme.secondary,
           tabBarHideOnKeyboard: true,
           tabBarAllowFontScaling: true,
           tabBarStyle: {
+            display: 'flex',
             position: 'absolute',
           },
         }}
@@ -374,16 +367,23 @@ export default function PrivateNavigation() {
         <Tab.Screen
           name="WalletStack"
           component={WalletStack}
-          options={{
-            tabBarShowLabel: true,
-            tabBarLabel: 'Billetera',
-            tabBarLabelStyle: { paddingBottom: 2 },
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="credit-card" color={color} size={size} />
-            ),
-            headerShown: false
+          options={({ route }) => {
+            const firstTime = route?.params?.params?.firstTime || false;
+
+            console.log('Route.Params: ', route)
+            return {
+              tabBarShowLabel: true,
+              tabBarLabel: 'Billetera',
+              tabBarLabelStyle: { paddingBottom: 2 },
+              tabBarIcon: ({ color, size }) => (
+                <MaterialCommunityIcons name="credit-card" color={color} size={size} />
+              ),
+              headerShown: false,
+              tabBarStyle: { display: firstTime ? 'none' : 'flex' }
+            };
           }}
         />
+
         <Tab.Screen
           name="BusinessStack"
           component={BusinessStack}
@@ -406,17 +406,37 @@ export default function PrivateNavigation() {
           name="Profile"
           component={ProfileStack}
           options={{
-            tabBarActiveTintColor: buttonOpen ? "#FF9085" : theme.secondary,
+            tabBarActiveTintColor: theme.secondary,
             tabBarShowLabel: true,
             tabBarLabel: 'Perfil',
             tabBarLabelStyle: { paddingBottom: 2 },
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
-                name={buttonOpen ? "account-alert" : "account-circle"}
-                color={buttonOpen ? "#FF9085" : color}
+                name={"account-circle"}
+                color={color}
                 size={size}
               />
             ),
+            headerShown: false
+          }}
+        />
+
+        <Tab.Screen
+          name="DataUsers"
+          component={DataUsers}
+          options={{
+            tabBarStyle: { display: 'none' },
+            tabBarItemStyle: { display: 'none' },
+            headerShown: false
+          }}
+        />
+
+        <Tab.Screen
+          name="LoaderScreen"
+          component={LoaderScreen}
+          options={{
+            tabBarStyle: { display: 'none' },
+            tabBarItemStyle: { display: 'none' },
             headerShown: false
           }}
         />

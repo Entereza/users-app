@@ -10,7 +10,7 @@ import { theme } from '../../utils/theme';
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
 
 import { Animated, KeyboardAvoidingView, ScrollView, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import adjustFontSize from '../../utils/adjustText';
 import { useDispatch } from 'react-redux';
 import { fetchWithoutToken } from '../../utils/fetchWithoutToken';
@@ -20,7 +20,7 @@ import { Input, Icon, Button } from '@rneui/themed';
 import ButtonNext from '../Btn/ButtonNext';
 import { codeErrors } from '../../utils/codeErrors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { _authLogin } from '../../redux/actions/authActions';
+import { __authGetInfo, _authLogin } from '../../redux/actions/authActions';
 import { Keyboard } from 'react-native';
 
 export default function RegisterComponent({ display = 'none', registerOpacity, registerRef, outputRange, goBack }) {
@@ -31,12 +31,12 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
 
     const heightInterpolation = animation.interpolate({
         inputRange: [0, 1],
-        outputRange: [heightPercentageToDP(70), heightPercentageToDP(90)],
+        outputRange: [heightPercentageToDP(70), heightPercentageToDP(95)],
     });
 
     const heightInterpolationArrow = animation.interpolate({
         inputRange: [0, 1],
-        outputRange: [heightPercentageToDP(30), heightPercentageToDP(10)],
+        outputRange: [heightPercentageToDP(30), heightPercentageToDP(5)],
     });
 
     const startAnimation = () => {
@@ -64,9 +64,9 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
     }, [display])
 
     const goLoginScreen = () => {
-        setArrowDisplay('none')
         setIsSubmitting(false)
         setTimeout(() => {
+            setArrowDisplay('none')
             goBack()
         }, 300);
 
@@ -83,29 +83,6 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
             })
         ]).start()
     }
-
-    const [keyboardPadding, setKeyboardPadding] = React.useState(0);
-
-    const _keyboardDidShow = (e) => {
-        setKeyboardPadding(e.endCoordinates.height / 2);
-    };
-
-    const _keyboardDidHide = () => {
-        setKeyboardPadding(0);
-    };
-
-    React.useEffect(() => {
-        Keyboard.addListener('keyboardDidShow', _keyboardDidShow);
-        Keyboard.addListener('keyboardDidHide', _keyboardDidHide);
-
-        // cleanup function
-        return () => {
-            Keyboard.removeAllListeners('keyboardDidShow', _keyboardDidShow);
-            Keyboard.removeAllListeners('keyboardDidHide', _keyboardDidHide);
-        };
-    }, []);
-
-
     // Funciones para el  Registro
     const inputNombres = React.useRef(null);
     const inputApellidos = React.useRef(null);
@@ -113,10 +90,41 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
     const inputPassword = React.useRef(null);
     const inputPasswordConfirm = React.useRef(null);
 
+    const [focusedInput, setFocusedInput] = React.useState(null);
+
+    const paddingInput = 2.5;
+
+    const [keyboardPadding, setKeyboardPadding] = React.useState(0);
+
+    const _keyboardDidShow = (e) => {
+        if (focusedInput !== null) {
+            setKeyboardPadding(e.endCoordinates.height / paddingInput);
+        }
+    };
+
+    const _keyboardDidHide = () => {
+        setFocusedInput(null)
+        setKeyboardPadding(0)
+    };
+
+    React.useEffect(() => {
+        Keyboard.addListener('keyboardDidShow', _keyboardDidShow);
+        Keyboard.addListener('keyboardDidHide', _keyboardDidHide);
+
+        return () => {
+            Keyboard.removeAllListeners('keyboardDidShow', _keyboardDidShow);
+            Keyboard.removeAllListeners('keyboardDidHide', _keyboardDidHide);
+        };
+    }, [focusedInput]);
+
     const [error, setError] = React.useState(false);
+    const [errorTotal, setErrorTotal] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState('');
+    const [errorEntereza, setErrorEntereza] = React.useState(true);
 
     const [buttonText, setbuttonText] = React.useState('Crear Cuenta')
+    const [iconLoading, setIconLoading] = React.useState(false)
+    const [iconCheck, setIconCheck] = React.useState(false)
 
     const [showPassword, setShowPassword] = React.useState(false);
     const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -129,6 +137,51 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
 
     const dispatch = useDispatch()
 
+    const delayFormik = () => {
+        setbuttonText('Creando Usuario... ')
+        startWidthAnimation(0.4, 1500);
+        setErrorEmail(false)
+        setErrorTotal(false)
+        setIsSubmitting(true)
+        setIconLoading(true)
+        setError(false)
+        setErrorMessage('')
+
+        setTimeout(() => {
+            formik.handleSubmit()
+        }, 2000);
+    }
+
+    //Animations
+
+    const colorValue = React.useRef(new Animated.Value(0)).current;
+    const errorColor = React.useRef(new Animated.Value(0)).current;
+    const widthValue = React.useRef(new Animated.Value(0)).current;
+
+    const backgroundColor = colorValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: [errorEntereza ? theme.transparent : theme.secondary, theme.green3]
+    });
+
+    const errorBackgroundColor = errorColor.interpolate({
+        inputRange: [0, 1],
+        outputRange: [theme.secondary, errorTotal ? theme.danger : theme.salmon] // cambia theme.dark a tu color de inicio preferido
+    });
+
+    const buttonWidth = widthValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0%', '100%'],
+    });
+
+    // Función de animación para la anchura
+    const startWidthAnimation = (toValue, duration) => {
+        Animated.timing(widthValue, {
+            toValue,
+            duration,
+            useNativeDriver: false
+        }).start();
+    };
+
     const formik = useFormik({
         initialValues: {
             nombres: "",
@@ -140,9 +193,6 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
         validationSchema: schemaRegister,
         validateOnChange: true,
         onSubmit: async (values) => {
-            setError(false)
-            setbuttonText('Creando Usuario... ⏳')
-            setIsSubmitting(true)
             try {
                 let data = {
                     nombres: values.nombres,
@@ -160,7 +210,7 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                     },
                 };
 
-                console.log('Values: ', data)
+                console.log('Values For Register: ', data)
 
                 const res = await fetchWithoutToken(
                     "entereza/usuarios_op",
@@ -170,40 +220,126 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                 const response = await res.json();
 
                 if (response.codeError === "COD215") {
-                    setbuttonText('Iniciando Sesión... ⏳')
                     console.log("Registro exitoso: ", response)
+
                     let dataLogin = {
                         mail: values.email,
                         password: values.password,
                         code: "USER",
                         vrf: ""
                     }
+                    setIconLoading(false)
+                    setbuttonText('Registro Exitoso ')
+                    startWidthAnimation(0.7, 1000);
 
-                    loginUser(dataLogin)
+                    setTimeout(() => {
+                        setIconLoading(true)
+                        loginUser(dataLogin)
+                        setbuttonText('Iniciando Sesión... ')
+                    }, 1500);
                 } else if (response.codeError === "COD056") {
-                    console.log('Correo en Uso: ', response)
-                    setbuttonText('Crear Cuenta')
-                    setErrorEmail(true)
+                    Animated.sequence([
+                        Animated.timing(widthValue, {
+                            toValue: 0.6,
+                            duration: 1000,
+                            useNativeDriver: false
+                        }),
+                        Animated.timing(errorColor, {
+                            toValue: 1,
+                            duration: 200,
+                            useNativeDriver: false
+                        }),
+                        Animated.timing(widthValue, {
+                            toValue: 0,
+                            duration: 500,
+                            useNativeDriver: false
+                        }),
+                        Animated.timing(errorColor, {
+                            toValue: 0,
+                            duration: 0,
+                            useNativeDriver: false
+                        }),
+                    ]).start();
+
+                    setTimeout(() => {
+                        setIsSubmitting(false)
+                        setErrorEmail(true)
+                        setbuttonText('Crear Cuenta')
+                        console.log('Correo en Uso: ', response)
+                    }, 1800)
                 } else {
-                    setError(true)
-                    setbuttonText('Crear Cuenta')
                     console.log('Error Register Entereza: ', response)
-                    setErrorMessage(response.msgError)
+
+                    Animated.sequence([
+                        Animated.timing(widthValue, {
+                            toValue: 0.6,
+                            duration: 1000,
+                            useNativeDriver: false
+                        }),
+                        Animated.timing(errorColor, {
+                            toValue: 1,
+                            duration: 200,
+                            useNativeDriver: false
+                        }),
+                        Animated.timing(widthValue, {
+                            toValue: 0,
+                            duration: 500,
+                            useNativeDriver: false
+                        }),
+                        Animated.timing(errorColor, {
+                            toValue: 0,
+                            duration: 0,
+                            useNativeDriver: false
+                        }),
+                    ]).start();
+
+                    setTimeout(() => {
+                        setbuttonText('Crear Cuenta')
+                        setIsSubmitting(false)
+                        setError(true)
+                        setErrorMessage(response.msgError)
+                    }, 1800)
                 }
             } catch (err) {
                 console.log('Error Register: ', err);
-                setbuttonText('Crear Cuenta')
-                setError(true)
-                setErrorMessage('Error al Registrar. Por favor, intente nuevamente en unos minutos.')
+
+                Animated.sequence([
+                    Animated.timing(widthValue, {
+                        toValue: 0.5,
+                        duration: 500,
+                        useNativeDriver: false
+                    }),
+                    Animated.timing(errorColor, {
+                        toValue: 1,
+                        duration: 100,
+                        useNativeDriver: false
+                    }),
+                    Animated.timing(widthValue, {
+                        toValue: 0,
+                        duration: 500,
+                        useNativeDriver: false
+                    }),
+                    Animated.timing(errorColor, {
+                        toValue: 0,
+                        duration: 0,
+                        useNativeDriver: false
+                    }),
+                ]).start();
+
+                setTimeout(() => {
+                    setbuttonText('Crear Cuenta')
+                    setIsSubmitting(false)
+                    setErrorTotal(true)
+                    setError(true)
+                    setErrorMessage('Error al Registrar. Por favor, intente nuevamente en unos minutos.')
+                }, 1100)
             }
-            setIsSubmitting(false)
         }
     });
 
     const loginUser = async (dataLogin) => {
-        setIsSubmitting(true)
         try {
-            const res = await fetchWithoutToken('entereza/login_use', "POST", dataLogin)
+            const res = await fetchWithoutToken('entereza/login_user', "POST", dataLogin)
             const {
                 entereza,
                 codigoEntidad,
@@ -214,32 +350,118 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
             } = await res.json()
 
             if (entereza.codeError === codeErrors.cod105 || entereza.codeError === codeErrors.cod95) {
-                formik.resetForm()
-                startAnimationButton()
+                startWidthAnimation(0.8, 1000);
+
+                console.log('Inicio de sesión exitoso: ', entereza)
 
                 await Promise.all([
                     AsyncStorage.setItem('ENT-EMAIL', mail),
                     AsyncStorage.setItem('ENT-CODUSR', codigoEntidad),
                     AsyncStorage.setItem('ENT-TKN', jwt),
-                ])
+                ]);
 
-                dispatch(_authLogin(dataLogin))
+                setTimeout(async () => {
+                    await Promise.all([
+                        console.log('Starts __authGetInfo from loginUser'),
+                        dispatch(__authGetInfo()),
+                    ]).then(() => {
+                        setTimeout(() => {
+                            setErrorEntereza(false)
+                            setIconCheck(true)
+                            console.log('Submitting: ', isSubmitting)
+                            setIconLoading(false)
+                            setbuttonText('¡Bienvenido!')
+                        }, 1000);
+                        Animated.sequence([
+                            Animated.timing(widthValue, {
+                                toValue: 1,
+                                duration: 1000,
+                                useNativeDriver: false
+                            }),
+                            Animated.timing(colorValue, {
+                                toValue: 1,
+                                duration: 1200,
+                                useNativeDriver: false
+                            })
+                        ]).start(() => {
+                            console.log('Finish Animations from Login.')
+                            formik.resetForm()
+                            dispatch(_authLogin(dataLogin))
+                        })
+                    })
+                }, 1000);
             } else {
-                setbuttonText('Crear Cuenta')
-                console.log("Respuesta Login: ", entereza)
+                //Sequencia de Animacion para error de la peticion
+                Animated.sequence([
+                    Animated.timing(widthValue, {
+                        toValue: 0.9,
+                        duration: 1000,
+                        useNativeDriver: false
+                    }),
+                    Animated.timing(errorColor, {
+                        toValue: 1,
+                        duration: 200,
+                        useNativeDriver: false
+                    }),
+                    Animated.timing(widthValue, {
+                        toValue: 0,
+                        duration: 500,
+                        useNativeDriver: false
+                    }),
+                    Animated.timing(errorColor, {
+                        toValue: 0,
+                        duration: 0,
+                        useNativeDriver: false
+                    }),
+                ]).start();
 
-                setErrorMessage(entereza.msgError)
+                setTimeout(() => {
+                    console.log("Respuesta Login: ", entereza)
+
+                    setIsSubmitting(false)
+                    setbuttonText('Crear Cuenta')
+                    setError(true)
+                    setErrorMessage(entereza.msgError)
+                }, 1900)
             }
         } catch (error) {
-            formik.resetForm()
-            console.log('Error Login: ', error)
-            setbuttonText('Crear Cuenta')
-            setError(true)
-            setErrorMessage('Su cuenta fue creada exitosamente, intente nuevamente en la pantalla de Iniciar Sesión.')
+            setErrorTotal(true)
+            console.log('Error onLogin: ', error)
 
-            goBackOnError()
+            Animated.sequence([
+                Animated.timing(widthValue, {
+                    toValue: 0.8,
+                    duration: 1000,
+                    useNativeDriver: false
+                }),
+                Animated.timing(errorColor, {
+                    toValue: 1,
+                    duration: 200,
+                    useNativeDriver: false
+                }),
+                Animated.timing(widthValue, {
+                    toValue: 0,
+                    duration: 500,
+                    useNativeDriver: false
+                }),
+                Animated.timing(errorColor, {
+                    toValue: 0,
+                    duration: 0,
+                    useNativeDriver: false
+                }),
+            ]).start();
+
+            setTimeout(() => {
+                formik.resetForm()
+
+                setIsSubmitting(false)
+                setbuttonText('Crear Cuenta')
+                setIsSubmitting(false)
+                setError(true)
+                setErrorMessage('Su cuenta fue creada exitosamente, intente nuevamente en la pantalla de Iniciar Sesión.')
+                goBackOnError()
+            }, 1700)
         }
-        setIsSubmitting(false)
     }
 
     const goBackOnError = () => {
@@ -259,35 +481,41 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
         },
         containerInput: {
             width: widthPercentageToDP(90),
-            height: heightPercentageToDP(13),
+            height: heightPercentageToDP(12),
+
+            marginBottom: 5
+        },
+        passwordErrorInput: {
+            width: widthPercentageToDP(90),
+            height: error ? heightPercentageToDP(13) : heightPercentageToDP(12),
 
             marginBottom: 5
         },
         labelInput: {
             color: theme.primary,
             fontSize: adjustFontSize(12)
-        }
+        },
+        inputText: {
+            color: theme.primary
+        },
+        errorText: {
+            color: theme.salmon
+        },
     }
 
-    const colorValue = React.useRef(new Animated.Value(0)).current;
-
-    const backgroundColor = colorValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: [theme.dark, theme.success]
-    });
-
     const startAnimationButton = () => {
-        Animated.parallel([
-            Animated.timing(colorValue, {
-                toValue: 1,
-                duration: 1000,
-                useNativeDriver: false
-            }),
-        ]).start();
+        Animated.timing(colorValue, {
+            toValue: 1,
+            duration: 1300,
+            useNativeDriver: false
+        }).start();
 
         setTimeout(() => {
+            setIconCheck(true)
+            console.log('Submitting: ', isSubmitting)
+            setIconLoading(false)
             setbuttonText('¡Bienvenido!')
-        }, 800);
+        }, 700);
     };
 
     return (
@@ -295,15 +523,23 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
             <Animated.View
                 style={{
                     backgroundColor: theme.transparent,
+                    transform: [
+                        {
+                            translateX: registerOpacity.interpolate({
+                                inputRange: [1, 2],
+                                outputRange: [outputRange, 0], // Cambia estos valores según tus necesidades
+                            }),
+                        },
+                    ],
                     display: arrowDisplay,
-                    height: heightInterpolationArrow,
+                    height: heightPercentageToDP(5),
                     justifyContent: 'flex-start',
                     alignItems: 'center',
                 }}
             >
                 <ViewStyled
                     width={100}
-                    height={10}
+                    height={5}
                     backgroundColor={theme.transparent}
                     paddingLeft={5}
                     borderRadius={1}
@@ -325,8 +561,8 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
             <Animated.View
                 style={{
                     width: widthPercentageToDP(100),
-                    height: heightInterpolation,
-                    backgroundColor: theme.dark,
+                    height: heightPercentageToDP(95),
+                    backgroundColor: theme.transparent,
                     justifyContent: 'flex-start',
                     alignItems: 'center',
                     borderTopLeftRadius: 70,
@@ -338,11 +574,11 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                     contentContainerStyle={{
                         flexGrow: 1,
                         backgroundColor: theme.transparent,
-                        height: '110%',
+                        height: '105%',
                         justifyContent: 'flex-start',
                         alignItems: 'center',
                     }}
-                    showsVerticalScrollIndicator={false}
+                    showsVerticalScrollIndicator={true}
                     scrollToOverflowEnabled={false}
                 >
                     <Animated.View
@@ -361,9 +597,8 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                     >
                         <ViewStyled
                             width={100}
-                            height={10}
-                            marginTop={2}
-                            marginBottom={1}
+                            height={5}
+                            marginBottom={2}
                             backgroundColor={theme.transparent}
                             style={{
                                 justifyContent: 'center',
@@ -393,10 +628,12 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                             }}
                         >
                             <Input
+                                ref={inputNombres}
                                 label='Nombres'
                                 placeholder="Inti"
                                 labelStyle={styles.labelInput}
                                 containerStyle={styles.containerInput}
+                                style={styles.inputText}
                                 rightIcon={
                                     <Icon
                                         type='material-community'
@@ -412,6 +649,7 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                 returnKeyType='next'
                                 onSubmitEditing={() => inputApellidos.current.focus()}
                                 errorMessage={formik.errors.nombres}
+                                errorStyle={styles.errorText}
                             />
 
                             <Input
@@ -419,6 +657,7 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                 placeholder="Rojas Saldias"
                                 labelStyle={styles.labelInput}
                                 containerStyle={styles.containerInput}
+                                style={styles.inputText}
                                 rightIcon={
                                     <Icon
                                         type='material-community'
@@ -432,6 +671,7 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                     formik.setFieldValue("apellidos", formattedText);
                                 }}
                                 errorMessage={formik.errors.apellidos}
+                                errorStyle={styles.errorText}
                                 ref={inputApellidos}
                                 returnKeyType='next'
                                 onSubmitEditing={() => inputEmail.current.focus()}
@@ -443,6 +683,7 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                 onChange={() => setErrorEmail(false)}
                                 labelStyle={styles.labelInput}
                                 containerStyle={styles.containerInput}
+                                style={styles.inputText}
                                 rightIcon={
                                     <Icon
                                         type='material-community'
@@ -453,6 +694,7 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                 value={formik.values.email}
                                 onChangeText={text => formik.setFieldValue("email", text.trim())}
                                 errorMessage={errorEmail ? 'El correo ya está en uso' : formik.errors.email}
+                                errorStyle={styles.errorText}
                                 ref={inputEmail}
                                 returnKeyType='next'
                                 onSubmitEditing={() => inputPassword.current.focus()}
@@ -463,6 +705,7 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                 placeholder="********"
                                 labelStyle={styles.labelInput}
                                 containerStyle={styles.containerInput}
+                                style={styles.inputText}
                                 secureTextEntry={!showPassword}
                                 rightIcon={
                                     <Icon
@@ -475,7 +718,9 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                 value={formik.values.password}
                                 onChangeText={text => formik.setFieldValue("password", text)}
                                 errorMessage={formik.errors.password}
+                                errorStyle={styles.errorText}
                                 ref={inputPassword}
+                                onFocus={() => setFocusedInput('password')}
                                 returnKeyType='next'
                                 onSubmitEditing={() => inputPasswordConfirm.current.focus()}
                             />
@@ -484,7 +729,8 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                 label='Confirma tu Contraseña'
                                 placeholder="*********"
                                 labelStyle={styles.labelInput}
-                                containerStyle={styles.containerInput}
+                                containerStyle={styles.passwordErrorInput}
+                                style={styles.inputText}
                                 rightIcon={
                                     <Icon
                                         type='material-community'
@@ -495,9 +741,10 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                 value={formik.values.passwordConfirm}
                                 onChangeText={text => formik.setFieldValue("passwordConfirm", text)}
                                 errorMessage={error ? errorMessage : formik.errors.passwordConfirm}
-                                onSubmitEditing={formik.handleSubmit}
-                                errorStyle={{ fontSize: error ? 14 : 12 }}
+                                onSubmitEditing={delayFormik}
+                                errorStyle={{ fontSize: error ? 14 : 12, color: errorTotal ? theme.danger : theme.salmon }}
                                 ref={inputPasswordConfirm}
+                                onFocus={() => setFocusedInput('confirmPassword')}
                             />
 
                             <ViewStyled
@@ -518,7 +765,10 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                         alignItems: 'center',
                                     }}
                                 >
-                                    <TouchableOpacity onPress={formik.handleSubmit} disabled={!(formik.dirty && formik.isValid) || isSubmitting}>
+                                    <TouchableOpacity
+                                        onPress={delayFormik}
+                                        disabled={!(formik.dirty && formik.isValid) || isSubmitting}
+                                    >
                                         <ViewStyled
                                             width={90}
                                             height={6}
@@ -529,27 +779,69 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                                 alignItems: 'center'
                                             }}
                                         >
-                                            <Animated.View
+                                            <ViewStyled // este sería el contenedor de la "barra de carga"
+                                                width={90}
+                                                height={6}
+                                                borderRadius={2}
+                                                backgroundColor={theme.transparent}
                                                 style={{
-                                                    backgroundColor: !(formik.dirty && formik.isValid) ? theme.background : backgroundColor,
-                                                    width: '100%',
-                                                    height: '100%',
-                                                    borderRadius: 15,
-                                                    justifyContent: 'center',
-                                                    alignItems: 'center'
+                                                    overflow: 'hidden', // para que la barra de carga no se desborde
                                                 }}
                                             >
-                                                <TextStyled
-                                                    fontSize={16}
-                                                    color={!(formik.dirty && formik.isValid) ? theme.tertiaryGradient : theme.primary}
-                                                    textAlign={'center'}
+                                                <Animated.View // esta es la "barra de carga"
                                                     style={{
-                                                        marginBottom: 4,
+                                                        width: buttonWidth,
+                                                        height: '100%',
+                                                        backgroundColor: errorBackgroundColor,
+                                                        display: isSubmitting ? 'flex' : 'none'
+                                                    }}
+                                                />
+                                                <Animated.View
+                                                    style={{
+                                                        backgroundColor:
+                                                            !(formik.dirty && formik.isValid)
+                                                                ? theme.tertiaryGradient
+                                                                : isSubmitting
+                                                                    ? backgroundColor
+                                                                    : theme.dark,
+                                                        borderColor: !(formik.dirty && formik.isValid) ? theme.tertiary : theme.primary,
+                                                        borderWidth: 1,
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        borderRadius: 15,
+                                                        justifyContent: 'center',
+                                                        alignItems: 'center',
+                                                        flexDirection: 'row',
+                                                        position: 'absolute', // agregamos esta propiedad
                                                     }}
                                                 >
-                                                    {buttonText}
-                                                </TextStyled>
-                                            </Animated.View>
+                                                    <TextStyled
+                                                        fontSize={16}
+                                                        color={
+                                                            !(formik.dirty && formik.isValid)
+                                                                ? theme.tertiary
+                                                                : iconCheck
+                                                                    ? theme.dark
+                                                                    : theme.primary
+                                                        }
+                                                        textAlign={'center'}
+                                                    >
+                                                        {buttonText}
+                                                    </TextStyled>
+                                                    <MaterialCommunityIcons
+                                                        name={
+                                                            iconLoading
+                                                                ? 'timer-sand'
+                                                                : 'check-bold'
+                                                        }
+                                                        size={adjustFontSize(16)}
+                                                        color={iconCheck ? theme.dark : theme.primary}
+                                                        style={{
+                                                            display: buttonText !== 'Crear Cuenta' && buttonText !== 'Registro exitoso ' ? 'flex' : 'none'
+                                                        }}
+                                                    />
+                                                </Animated.View>
+                                            </ViewStyled>
                                         </ViewStyled>
                                     </TouchableOpacity >
                                 </ViewStyled>

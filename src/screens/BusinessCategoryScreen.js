@@ -8,6 +8,7 @@ import { fetchWithToken } from '../utils/fetchWithToken'
 import { codeErrors } from '../utils/codeErrors'
 import ListItem from '../components/business/ListItem'
 import { useSelector } from 'react-redux'
+import { RefreshControl } from 'react-native'
 
 export default function BusinessCategoryScreen({ route }) {
     const { location } = useSelector(state => state.auth);
@@ -29,6 +30,7 @@ export default function BusinessCategoryScreen({ route }) {
 
     const getInfo3 = async () => {
         try {
+            console.log('Number Items Saved: ', dataItems.length)
             const lat = await location.coords?.latitude
             const lng = await location.coords?.longitude
 
@@ -101,23 +103,46 @@ export default function BusinessCategoryScreen({ route }) {
             }
         } catch (err) {
             console.log("Error entereza BusinessCategoryItem: ", err)
+        } finally {
+            setTimeout(() => {
+                setRefreshing(false)
+            }, 500);
         }
     }
 
     const reloadEmp = async () => {
+        setPage(0)
         setFinalEmpresas(false)
         setDataItems([])
-        console.log('reloadEmp')
+        console.log('reloadEmp Starts')
         setHasMore(true)
     }
 
+    const [refreshing, setRefreshing] = React.useState(false);
+
+    const onRefresh = async () => {
+        setPage(0)
+        setFinalEmpresas(false)
+        setDataItems([])
+        console.log('Starts onRefresh: ', page, dataItems.length)
+        setHasMore(true)
+        setRefreshing(true)
+    }
+
     React.useEffect(() => {
+        console.log(page)
         if (location.address.state !== null) {
+            console.log('Location not null: ', location.address.state)
             if (finalEmpresas !== true) {
+                console.log('Fin Empresas: ', page)
                 getInfo3()
+            } else {
+                console.log('Final1nt: ', page)
             }
+        } else {
+            console.log('Location null: ', location.address.state)
         }
-    }, [location, page])
+    }, [location, page, refreshing])
 
     return (
         <>
@@ -160,6 +185,9 @@ export default function BusinessCategoryScreen({ route }) {
                                 numColumns={1}
                                 onEndReachedThreshold={0.7}
                                 onEndReached={nextPage}
+                                refreshControl={
+                                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                                }
                                 ListFooterComponent={() =>
                                     notFound
                                         ? <ViewStyled

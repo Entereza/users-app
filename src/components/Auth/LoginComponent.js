@@ -14,7 +14,7 @@ import ForgotPassword from '../Modals/ForgotPassword';
 import adjustFontSize from '../../utils/adjustText';
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
 import ButtonNext from '../Btn/ButtonNext';
-import { _authLogin } from '../../redux/actions/authActions';
+import { __authGetInfo, _authLogin } from '../../redux/actions/authActions';
 import { useDispatch } from 'react-redux';
 import { codeErrors } from '../../utils/codeErrors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -68,30 +68,54 @@ export default function LoginComponent({ display = 'flex', loginOpacity, outputR
                     mail,
                     ...rest
                 } = await res.json()
-
                 if (entereza.codeError === codeErrors.cod105 || entereza.codeError === codeErrors.cod95) {
-                    // Para cambiar el color
-                    startWidthAnimation(1, 1000); // Para la barra de carga completa
-                    setTimeout(() => {
-                        setErrorEntereza(false)
-                        startAnimation();
-                    }, 1000);
+                    Animated.timing(widthValue, {
+                        toValue: 0.8,
+                        duration: 1000,
+                        useNativeDriver: false
+                    }).start()
+
+                    console.log('Inicio de sesión exitoso: ', entereza)
 
                     await Promise.all([
                         AsyncStorage.setItem('ENT-EMAIL', mail),
                         AsyncStorage.setItem('ENT-CODUSR', codigoEntidad),
                         AsyncStorage.setItem('ENT-TKN', jwt),
-                    ])
+                    ]);
 
-                    setTimeout(() => {
-                        formik.resetForm()
-                        dispatch(_authLogin(data))
-                    }, 2100);
+                    await Promise.all([
+                        console.log('Starts __authGetInfo'),
+                        dispatch(__authGetInfo()),
+                    ]).then(() => {
+                        setTimeout(() => {
+                            setErrorEntereza(false)
+                            setIconCheck(true)
+                            console.log('Submitting: ', isSubmitting)
+                            setIconLoading(false)
+                            setbuttonText('¡Bienvenido!')
+                        }, 1000);
+                        Animated.sequence([
+                            Animated.timing(widthValue, {
+                                toValue: 1,
+                                duration: 1000,
+                                useNativeDriver: false
+                            }),
+                            Animated.timing(colorValue, {
+                                toValue: 1,
+                                duration: 1300,
+                                useNativeDriver: false
+                            })
+                        ]).start(() => {
+                            console.log('Finish Animations.')
+                            formik.resetForm()
+                            dispatch(_authLogin(data))
+                        })
+                    })
                 } else {
                     //Sequencia de Animacion para error de la peticion
                     Animated.sequence([
                         Animated.timing(widthValue, {
-                            toValue: 0.85,
+                            toValue: 0.75,
                             duration: 1000,
                             useNativeDriver: false
                         }),
@@ -118,10 +142,12 @@ export default function LoginComponent({ display = 'flex', loginOpacity, outputR
                         setError(true)
                         console.log("Respuesta Login: ", entereza)
                         setErrorMessage(entereza.msgError)
-                    }, 1500)
+                    }, 1800)
                 }
             } catch (error) {
                 setErrorTotal(true)
+                formik.resetForm()
+
                 console.log('Error LoginComponent: ', error);
 
                 Animated.sequence([
@@ -154,7 +180,7 @@ export default function LoginComponent({ display = 'flex', loginOpacity, outputR
                     setIsSubmitting(false)
                     setError(true)
                     setErrorMessage('Ocurrio un error. Por favor intente nuevamente en unos minutos.')
-                }, 1000)
+                }, 1100)
             }
         }
     });
@@ -213,20 +239,12 @@ export default function LoginComponent({ display = 'flex', loginOpacity, outputR
     const errorBackgroundColor = errorColor.interpolate({
         inputRange: [0, 1],
         outputRange: [theme.secondary, errorTotal ? theme.danger : theme.salmon] // cambia theme.dark a tu color de inicio preferido
-    });    
+    });
 
     const buttonWidth = widthValue.interpolate({
         inputRange: [0, 1],
         outputRange: ['0%', '100%'],
     });
-
-    const resetWidthAnimation = () => {
-        Animated.timing(widthValue, {
-            toValue: 0,
-            duration: 0,
-            useNativeDriver: false
-        }).start();
-    };
 
     // Función de animación para la anchura
     const startWidthAnimation = (toValue, duration) => {
@@ -253,6 +271,9 @@ export default function LoginComponent({ display = 'flex', loginOpacity, outputR
         }, 700);
     };
 
+    const inputEmail = React.useRef(null);
+    const inputPassword = React.useRef(null);
+
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "position"}
@@ -265,7 +286,7 @@ export default function LoginComponent({ display = 'flex', loginOpacity, outputR
             <ViewStyled
                 width={100}
                 height={70}
-                backgroundColor={theme.dark}
+                backgroundColor={theme.transparent}
                 paddingTop={2}
                 style={{
                     justifyContent: 'flex-start',
@@ -342,6 +363,8 @@ export default function LoginComponent({ display = 'flex', loginOpacity, outputR
                                 containerStyle={styles.containerInput}
                                 style={styles.inputText}
                                 value={formik.values.email}
+                                ref={inputEmail}
+                                onSubmitEditing={() => inputPassword.current.focus()}
                                 rightIcon={
                                     <Icon
                                         type='material-community'
@@ -352,6 +375,7 @@ export default function LoginComponent({ display = 'flex', loginOpacity, outputR
                                 onChangeText={text => formik.setFieldValue("email", text.trim())}
                                 errorStyle={styles.errorText}
                                 errorMessage={formik.errors.email}
+                                returnKeyType='next'
                             />
                             <Input
                                 label='Contraseña'
@@ -369,6 +393,7 @@ export default function LoginComponent({ display = 'flex', loginOpacity, outputR
                                         onPress={showHiddenPassword}
                                     />
                                 }
+                                ref={inputPassword}
                                 onChangeText={text => formik.setFieldValue("password", text)}
                                 errorMessage={error ? errorMessage : formik.errors.password}
                                 errorStyle={{ fontSize: error ? 14 : 12, color: errorTotal ? theme.danger : theme.salmon }}
@@ -452,9 +477,6 @@ export default function LoginComponent({ display = 'flex', loginOpacity, outputR
                                                                 : theme.primary
                                                     }
                                                     textAlign={'center'}
-                                                    style={{
-                                                        marginRight: buttonText !== 'Iniciar Sesión' ? 5 : 0
-                                                    }}
                                                 >
                                                     {buttonText}
                                                 </TextStyled>

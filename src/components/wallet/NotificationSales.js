@@ -20,6 +20,7 @@ import { TouchableOpacity } from 'react-native'
 import AlertStyled from '../ui/AlertStyled'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { fetchWithToken } from '../../utils/fetchWithToken'
+import { RefreshControl } from 'react-native'
 
 export default function NotificationSales({ promocionInicial, horas, numeroUsuarios, refresh }) {
     const { info } = useSelector(state => state.auth)
@@ -32,7 +33,7 @@ export default function NotificationSales({ promocionInicial, horas, numeroUsuar
     })
     const handleCloseAlert = () => setShowAlert(false)
 
-    console.log('NotificationSales: ', promocionInicial, horas, numeroUsuarios)
+    // console.log('NotificationSales: ', promocionInicial, horas, numeroUsuarios)
 
     const [caducado, setCaducado] = React.useState(false)
 
@@ -106,6 +107,14 @@ export default function NotificationSales({ promocionInicial, horas, numeroUsuar
     }, [horas])
 
 
+    const [refreshing, setRefreshing] = React.useState(false);
+
+    const onRefresh = () => {
+        setRefreshing(true)
+        console.log('Reloading Page Wallet Screen.js')
+        setTimeout(() => { setRefreshing(false) }, 500);
+    }
+
     return (
         <>
             {
@@ -128,12 +137,17 @@ export default function NotificationSales({ promocionInicial, horas, numeroUsuar
                 contentContainerStyle={{
                     flexGrow: 1,
                     backgroundColor: theme.transparent,
-                    height: heightPercentageToDP(53)
+                    height: heightPercentageToDP(55)
                 }}
                 showsVerticalScrollIndicator={false}
                 scrollToOverflowEnabled={false}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+
+                }
             >
                 <ViewStyled
+                    marginTop={1}
                     marginBottom={1}
 
                     width={90}
