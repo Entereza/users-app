@@ -20,15 +20,15 @@ export default function ContinueGoogle({ shadow }) {
 
     React.useEffect(() => {
         GoogleSignin.configure({
-            webClientId: '511900415351-u8a9qj8q91nc2d6jan3vvhoqhajir6v8.apps.googleusercontent.com', // client ID of type WEB for your server (needed to verify user ID and offline access)
-            offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
-            forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
+            webClientId: '511900415351-u8a9qj8q91nc2d6jan3vvhoqhajir6v8.apps.googleusercontent.com',
+            offlineAccess: true,
+            forceCodeForRefreshToken: true,
             scopes: [
                 'profile',
                 'email',
                 'openid',
-                'https://www.googleapis.com/auth/user.phonenumbers.read', // Para acceder al número de teléfono
-                'https://www.googleapis.com/auth/user.birthday.read', // Para acceder a la fecha de nacimiento
+                'https://www.googleapis.com/auth/user.phonenumbers.read',
+                'https://www.googleapis.com/auth/user.birthday.read',
             ]
         });
 

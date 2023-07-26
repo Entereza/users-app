@@ -110,7 +110,7 @@ export default function AuthComponent({ showButton, display = 'flex', goLogin, a
                     >
                         <ContinueGoogle shadow={shadow} />
 
-                        <ContinueFacebook shadow={shadow} display={showButton} />
+                        <ContinueFacebook shadow={shadow} />
 
                         <ContinueApple shadow={shadow} display={showButton} />
 
