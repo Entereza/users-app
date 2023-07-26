@@ -18,7 +18,7 @@ export default function PublicNavigation() {
         screenOptions={{
           headerShown: false,
           navigationBarHidden: false,
-          navigationBarColor: theme.dark
+          navigationBarColor: theme.transparent
         }}
         initialRouteName="ModalExplications"
       >

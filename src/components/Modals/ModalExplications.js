@@ -188,7 +188,7 @@ export default function ModalExplications() {
                         style={{
                             justifyContent: 'center',
                             alignItems: 'center',
-                            top: -25
+                            top: heightPercentageToDP(-6)
                         }}
                     >
                         <ViewStyled
@@ -224,7 +224,7 @@ export default function ModalExplications() {
                         style={{
                             justifyContent: 'center',
                             alignItems: 'center',
-                            top: -25
+                            top: heightPercentageToDP(-6)
                         }}
                     >
                         <LinearGradient
@@ -256,11 +256,11 @@ export default function ModalExplications() {
                 dotClickEnabled={true}
                 activeDotStyle={{
                     backgroundColor: theme.primary,
-                    top: -65
+                    top: heightPercentageToDP(-11)
                 }}
                 dotStyle={{
                     backgroundColor: theme.tertiary,
-                    top: -65
+                    top: heightPercentageToDP(-11)
                 }}
             />
         </>

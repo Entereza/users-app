@@ -30,10 +30,10 @@
           "fetch",
           "remote-notification"
         ]
-      }
+      },
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
-      "httpTimeout": 60000,
       "adaptiveIcon": {
         "foregroundImage": "./assets/IconEntereza.png",
         "backgroundColor": "#000000"
@@ -66,6 +66,7 @@
     },
     "plugins": [
       "expo-apple-authentication",
+      "@react-native-google-signin/google-signin",
       [
         "expo-tracking-transparency",
         {

@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "511900415351-o4h1055kmlku12n50vn9vrto3k04jls2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.entereza.client",
+            "certificate_hash": "4808ac4727cd332424cd39eef0e3d98e9fcf5f71"
+          }
+        },
+        {
           "client_id": "511900415351-b1g7213gfgt8ur96qqfnlinf9rjardj8.apps.googleusercontent.com",
           "client_type": 3
         }
