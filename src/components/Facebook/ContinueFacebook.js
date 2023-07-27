@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { _authLogin } from '../../redux/actions/authActions'
 import AlertStyled from '../ui/AlertStyled'
-import { Modal, ActivityIndicator } from 'react-native';
+import { Modal, ActivityIndicator, Alert } from 'react-native';
 import ViewStyled from '../ui/ViewStyled';
 import TextStyled from '../ui/TextStyled';
 import { theme } from '../../utils/theme';
@@ -17,37 +17,42 @@ export default function ContinueFacebook({ display }) {
     const [Loading, setLoading] = React.useState(false)
     const auth = getAuth(app)
 
-    Settings.setAppID('3933991310158655')
-    Settings.setAppName('Entereza')
-
-
-    Settings.initializeSDK()
-
     const SignInWithFB = async () => {
-        LoginManager.logInWithPermissions(["public_profile", "email"]).then(
-            function (result) {
-                if (result.isCancelled) {
-                    console.log("Login cancelled");
-                    return;
-                } else {
-                    console.log(
-                        "Login success with permissions: " +
-                        result.grantedPermissions.toString()
-                    );
-                }
-            },
-        ).then(async() => {
-            const data = await AccessToken.getCurrentAccessToken()
-            console.log('Data: ', data)
+        const result = await LoginManager.logInWithPermissions(["public_profile", "email", "user_photos", "user_gender"])
 
-            if (!data) {
-                console.log('Something went wrong obtaining access token.')
-            }
+        if (result.isCancelled) {
+            console.log("Login cancelled");
+            return;
+        } else {
+            console.log('Result LoginManager: ', result)
+        }
 
-            const credential = FacebookAuthProvider.credential(data.accessToken)
-            const user = await signInWithCredential(auth, credential);
-            console.log(user);
-        })
+        const data = await AccessToken.getCurrentAccessToken()
+        console.log('Data: ', data)
+
+        if (!data) {
+            console.log('Something went wrong obtaining access token.')
+        }
+
+        const credential = FacebookAuthProvider.credential(data.accessToken);
+        const userCredential = await signInWithCredential(auth, credential);
+        const user = userCredential.user;
+        const birthdayUser = await userCredential._tokenResponse.dateOfBirth;
+        const genderUser = userCredential.rawUserInfo.gender;
+        console.log('Credential: ', userCredential);
+      
+       // Extract user information
+        const email = user.email || 'N/A';
+        const gender = genderUser || 'N/A';
+        const birthday = birthdayUser || 'N/A';
+        const firstName = user.providerData[0].displayName.split(' ')[0] || 'N/A';
+        const lastName = user.providerData[0].displayName.split(' ')[1] || 'N/A';
+      
+        // Display user information in an alert
+        Alert.alert(
+          'User Information',
+          `Email: ${email}\nGender: ${gender}\nBirthday: ${birthday}\nFirst Name: ${firstName}\nLast Name: ${lastName}`
+        );
     }
 
     return (
