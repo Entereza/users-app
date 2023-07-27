@@ -31,8 +31,6 @@ export default function ContinueGoogle({ shadow }) {
                 'https://www.googleapis.com/auth/user.birthday.read',
             ]
         });
-
-        isSignedIn()
     }, [])
 
     const signIn = async () => {
@@ -59,16 +57,6 @@ export default function ContinueGoogle({ shadow }) {
                 console.log('some other error happened SignIn: ', error.code)
                 // some other error happened
             }
-        }
-    }
-
-    const isSignedIn = async () => {
-        const isSignedIn = await GoogleSignin.isSignedIn();
-
-        if (!!isSignedIn) {
-            getCurrentInfoAsync()
-        } else {
-            console.log('Please Login')
         }
     }
 

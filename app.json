@@ -11,7 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
-    "scheme": "com.entereza.client",
+    "scheme": ["com.entereza.client", "fb3933991310158655"],
     "platforms": [
       "ios",
       "android"
@@ -84,6 +84,15 @@
         {
           "icon": "./assets/IconEntereza.png",
           "color": "#ffffff"
+        }
+      ],
+      [
+        "react-native-fbsdk-next",
+        {
+          "appID": "3933991310158655",
+          "clientToken": "47cd7ede69e9864abccc78a2e946431a",
+          "displayName": "Entereza",
+          "scheme": ["com.entereza.client", "fb3933991310158655"]
         }
       ]
     ],
