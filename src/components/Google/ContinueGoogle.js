@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { _authLogin } from '../../redux/actions/authActions'
+import { __authGetInfo, _authLogin } from '../../redux/actions/authActions'
 import { Modal, ActivityIndicator } from 'react-native';
 import ViewStyled from '../ui/ViewStyled';
 import TextStyled from '../ui/TextStyled';
@@ -8,14 +8,28 @@ import { theme } from '../../utils/theme';
 
 import ButtonAuthentication from '../Btn/ButtonAuthentication';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { useDispatch } from 'react-redux';
+import { fetchWithoutToken } from '../../utils/fetchWithoutToken';
+import { codeErrors } from '../../utils/codeErrors';
+import AlertStyled from '../ui/AlertStyled';
 
 GoogleSignin.configure();
 export default function ContinueGoogle({ shadow }) {
 
-    const [text, setText] = React.useState('')
+    const dispatch = useDispatch()
+
+    const [text, setText] = React.useState("Continuar con Google")
     const [Loading, setLoading] = React.useState(false)
 
-    const [user, setUser] = React.useState({})
+    const [tokenId, setTokenId] = React.useState(null)
+
+    const [showAlert, setShowAlert] = React.useState(false)
+    const [alertText, setAlertText] = React.useState({
+        title: '',
+        message: '',
+        type: 'success',
+    })
+    const handleCloseAlert = () => setShowAlert(false)
 
     React.useEffect(() => {
         GoogleSignin.configure({
@@ -30,13 +44,19 @@ export default function ContinueGoogle({ shadow }) {
         });
     }, [])
 
-    const signIn = async () => {
+    React.useEffect(() => {
+        if (tokenId) {
+            RegisterGoogle()
+        }
+    }, [tokenId])
+
+    const signInGoogleTokenId = async () => {
         try {
             await GoogleSignin.hasPlayServices()
 
             const userInfo = await GoogleSignin.signIn();
-            console.log('due___', userInfo)
-            setUser(userInfo)
+            // console.log('userInfo: ', userInfo)
+            setTokenId(userInfo.idToken)
         } catch (error) {
             console.log('Error signIn: ', error.message)
             if (error.code === statusCodes.SIGN_IN_CANCELLED) {
@@ -57,83 +77,146 @@ export default function ContinueGoogle({ shadow }) {
         }
     }
 
-    const signOut = async () => {
+    const RegisterGoogle = async () => {
+        setLoading(true)
+        setText('Ingresando con Google...')
         try {
-            await GoogleSignin.revokeAccess();
-            await GoogleSignin.signOut();
-            setUser({}); // Remember to remove the user from your app's state as well
+            let dataRegister = {
+                token_id: tokenId,
+            }
+
+            const res = await fetchWithoutToken(`entereza/google_sign_up`, 'POST', dataRegister)
+
+            const { codeError, msgError } = await res.json()
+
+            if (codeError === 'COD200') {
+                console.log('Registro Exitoso: ', codeError, '- ', msgError)
+                LoginGoogle()
+            } else if (codeError === "COD056") {
+                console.log('Correo ya está en uso: ', codeError, '- ', msgError)
+                LoginGoogle()
+            } else {
+                setShowAlert(true)
+                setAlertText({
+                    title: 'Ha ocurrido un error.',
+                    message: msgError,
+                    type: 'error',
+                })
+
+                setTokenId(null)
+                setLoading(false)
+                setText('Continuar con Google')
+                console.log('Error on google_sign_up: ', codeError, '- ', msgError)
+            }
         } catch (error) {
-            console.error(error);
+            setShowAlert(true)
+            setAlertText({
+                title: 'Error al Continuar con Google',
+                message: 'Por favor intente nuevamente en unos minutos.',
+                type: 'error',
+            })
+
+            setTokenId(null)
+            setLoading(false)
+            setText('Continuar con Google')
+            console.log('Error RegisterGoogle: ', error)
         }
-    };
+    }
+
+    const LoginGoogle = async () => {
+        try {
+            let dataLogin = {
+                token_id: tokenId,
+            };
+
+            const res = await fetchWithoutToken("entereza/login_go", "POST", dataLogin)
+            console.log('Response of login_go: ', res)
+
+            const {
+                entereza,
+                mail,
+                codigoEntidad,
+                jwt,
+                rol,
+                ...rest
+            } = await res.json()
+
+            if (entereza.codeError === codeErrors.cod200) {
+                console.log('Inicio de sesión exitoso: ', entereza)
+
+                await Promise.all([
+                    AsyncStorage.setItem('ENT-EMAIL', mail),
+                    AsyncStorage.setItem('ENT-CODUSR', codigoEntidad),
+                    AsyncStorage.setItem('ENT-TKN', jwt),
+                ]);
+
+                await Promise.all([
+                    console.log('Starts __authGetInfo'),
+                    dispatch(__authGetInfo()),
+                ]).then(() => {
+                    setTimeout(() => {
+                        console.log('Starts _authLogin...')
+                        dispatch(_authLogin(dataLogin))
+                    }, 1000);
+                })
+            } else {
+                setShowAlert(true)
+                setAlertText({
+                    title: 'Ha ocurrido un error.',
+                    message: entereza.msgError,
+                    type: 'error',
+                })
+
+                console.log('Error on login_go: ', entereza)
+                setTokenId(null)
+                setLoading(false)
+                setText('Continuar con Google')
+            }
+        } catch (error) {
+            setShowAlert(true)
+            setAlertText({
+                title: 'Error al Continuar con Google',
+                message: 'Por favor intente nuevamente en unos minutos.',
+                type: 'error',
+            })
+
+            setTokenId(null)
+            setLoading(false)
+            setText('Continuar con Google')
+            console.log('Error LoginGoogle: ', error)
+        }
+    }
 
     return (
         <>
             {
-                !user.idToken
-                    ? <ButtonAuthentication
-                        disabled={false}
-                        shadow={false}
-                        title={"Continuar con Google"}
-                        onPress={signIn}
-                        backgroundColor={theme.dark}
-                        WithBorder={true}
-                        borderColor={theme.tertiary}
-                        colorText={theme.primary}
-                        image={require('./GoogleLogo.png')}
+                showAlert
+                && (
+                    <AlertStyled
+                        widthModal={70}
+                        heightModal={30}
+                        title={alertText.title}
+                        message={alertText.message}
+                        type={alertText.type}
+                        onConfirmPressed={handleCloseAlert}
+                        showCloseButton={false}
+                        showCancelButton={false}
                     />
-                    : <ButtonAuthentication
-                        disabled={false}
-                        shadow={false}
-                        title={"Cerrar Sesión de Google"}
-                        onPress={signOut}
-                        backgroundColor={theme.dark}
-                        WithBorder={true}
-                        borderColor={theme.tertiary}
-                        colorText={theme.primary}
-                        image={require('./GoogleLogo.png')}
-                    />
+                )
             }
 
-            <Modal
-                visible={Loading}
-                animationType="fade"
-                transparent={true}
-            >
-                <ViewStyled
-                    backgroundColor='#000000AA'
-                    style={{
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}
-                >
-                    <ViewStyled
-                        width={70}
-                        height={18}
-                        backgroundColor='#ffffff'
-                        borderRadius={2}
-
-                        style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <TextStyled
-                            fontSize={15}
-                            textAlign='center'
-                            color='#888cf3'
-                            style={{
-                                marginBottom: 20,
-                                width: '90%'
-                            }}
-                        >
-                            {text}
-                        </TextStyled>
-                        <ActivityIndicator size="large" color={theme.secondary} />
-                    </ViewStyled>
-                </ViewStyled>
-            </Modal>
+            <ButtonAuthentication
+                disabled={Loading}
+                shadow={false}
+                title={text}
+                onPress={signInGoogleTokenId}
+                backgroundColor={theme.dark}
+                WithBorder={true}
+                borderColor={theme.tertiary}
+                colorText={theme.primary}
+                image={require('./GoogleLogo.png')}
+                loading={Loading}
+            />
         </>
     )
 }
