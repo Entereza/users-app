@@ -21,7 +21,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { customStyles } from '../utils/customStyles'
 import { useSelector } from 'react-redux'
 import ButtonMenu from '../components/Btn/ButtonMenu'
-import Pdf from 'react-native-pdf'
+// import Pdf from 'react-native-pdf'
 
 export default function BusinessInfo({ route }) {
     const { data } = route.params;
@@ -385,82 +385,11 @@ export default function BusinessInfo({ route }) {
 
                         }
                     </ViewStyled>
-
-                    {/* <ViewStyled
-                        width={95}
-                        height={10}
-                        backgroundColor={theme.transparent}
-                        style={{
-                            justifyContent: 'center',
-                            alignItems: 'flex-start',
-                        }}
-                    >
-                        <ViewStyled
-                            width={30}
-                            height={9}
-                            marginLeft={8}
-                            backgroundColor={theme.transparent}
-                            style={{
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                flexDirection: 'row',
-                            }}
-                        >
-                            <ViewStyled
-                                backgroundColor={theme.transparent}
-                                width={13}
-                                height={8}
-                                marginHorizontal={2}
-                            >
-                                <TouchableOpacity
-                                    disabled={colorFb === '#818181'}
-                                    onPress={OpenFb}
-                                    style={
-                                        [
-                                            {
-                                                width: '100%',
-                                                height: '100%',
-
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                            }
-                                        ]
-                                    }
-                                >
-                                    <Entypo name="facebook-with-circle" size={adjustFontSize(40)} color={colorFb} />
-                                </TouchableOpacity>
-                            </ViewStyled>
-
-                            <ViewStyled
-                                backgroundColor={theme.transparent}
-                                width={13}
-                                height={8}
-                                marginHorizontal={2}
-                            >
-                                <TouchableOpacity
-                                    disabled={colorIg === '#818181'}
-                                    onPress={OpenIg}
-                                    style={
-                                        [
-                                            {
-                                                width: '100%',
-                                                height: '100%',
-
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                            }
-                                        ]
-                                    }
-                                >
-                                    <Entypo name="instagram-with-circle" size={adjustFontSize(40)} color={colorIg} />
-                                </TouchableOpacity>
-                            </ViewStyled>
-                        </ViewStyled>
-                    </ViewStyled> */}
                 </ViewStyled>
             </ScrollView>
 
-            <ButtonMenu onPress={openPdf} showButton={showMenu} />
+            {/* <ButtonMenu onPress={openPdf} showButton={showMenu} /> */}
+            <ButtonMenu onPress={() => null} showButton={showMenu} />
 
             <Modal
                 animationType="fade"
@@ -475,7 +404,7 @@ export default function BusinessInfo({ route }) {
                         alignItems: 'center'
                     }}
                 >
-                    <Pdf
+                    {/* <Pdf
                         source={onlineSource}
                         onLoadComplete={(numberOfPages, filePath) => {
                             console.log(`Number of pages: ${numberOfPages}`);
@@ -491,7 +420,7 @@ export default function BusinessInfo({ route }) {
                         }}
                         style={styles.pdf}
 
-                    />
+                    /> */}
                 </ViewStyled>
             </Modal>
         </>

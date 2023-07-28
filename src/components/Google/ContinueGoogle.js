@@ -1,14 +1,13 @@
 import * as React from 'react';
 
 import { _authLogin } from '../../redux/actions/authActions'
-import AlertStyled from '../ui/AlertStyled'
-import { Modal, ActivityIndicator, Platform, TouchableOpacity } from 'react-native';
+import { Modal, ActivityIndicator } from 'react-native';
 import ViewStyled from '../ui/ViewStyled';
 import TextStyled from '../ui/TextStyled';
 import { theme } from '../../utils/theme';
 
 import ButtonAuthentication from '../Btn/ButtonAuthentication';
-import { GoogleSignin, GoogleSigninButton, statusCodes } from '@react-native-google-signin/google-signin';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 
 GoogleSignin.configure();
 export default function ContinueGoogle({ shadow }) {
@@ -27,8 +26,6 @@ export default function ContinueGoogle({ shadow }) {
                 'profile',
                 'email',
                 'openid',
-                'https://www.googleapis.com/auth/user.phonenumbers.read',
-                'https://www.googleapis.com/auth/user.birthday.read',
             ]
         });
     }, [])

@@ -20,6 +20,16 @@
       "**/*"
     ],
     "ios": {
+      "CFBundleURLTypes": [
+        {
+          "CFBundleURLSchemes": [
+            "com.googleusercontent.apps.511900415351-ej15snog5mn00ikjcbuqeqa1pap18nkn"
+          ]
+        }
+      ],
+      "associatedDomains": [
+        "com.googleusercontent.apps.511900415351-ej15snog5mn00ikjcbuqeqa1pap18nkn"
+      ],
       "supportsTablet": true,
       "bundleIdentifier": "com.entereza.client",
       "buildNumber": "53",
