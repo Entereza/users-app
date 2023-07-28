@@ -59,7 +59,7 @@ export default function FloatingButton() {
                         position: 'absolute',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        bottom: heightPercentageToDP(8),
+                        bottom: 10,
                         marginBottom: 10,
                         right: 10,
                         zIndex: 2

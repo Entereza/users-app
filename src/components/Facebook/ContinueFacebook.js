@@ -38,46 +38,23 @@ export default function ContinueFacebook({ display }) {
         const userCredential = await signInWithCredential(auth, credential);
         const user = userCredential.user;
         const birthdayUser = await userCredential._tokenResponse.dateOfBirth;
-        const genderUser = userCredential.rawUserInfo.gender;
         console.log('Credential: ', userCredential);
-      
-       // Extract user information
+
+        // Extract user information
         const email = user.email || 'N/A';
-        const gender = genderUser || 'N/A';
         const birthday = birthdayUser || 'N/A';
         const firstName = user.providerData[0].displayName.split(' ')[0] || 'N/A';
         const lastName = user.providerData[0].displayName.split(' ')[1] || 'N/A';
-      
+
         // Display user information in an alert
         Alert.alert(
-          'User Information',
-          `Email: ${email}\nGender: ${gender}\nBirthday: ${birthday}\nFirst Name: ${firstName}\nLast Name: ${lastName}`
+            'User Information',
+            `Email: ${email}\nBirthday: ${birthday}\nFirst Name: ${firstName}\nLast Name: ${lastName}`
         );
     }
 
     return (
         <>
-            {/* <LoginButton
-                permissions={['public_profile', 'email']}
-                onLoginFinished={
-                    (error, result) => {
-                        console.log(result)
-                        if (error) {
-                            console.log("login has error: " + result.error);
-                        } else if (result.isCancelled) {
-                            console.log("login is cancelled.");
-                        } else {
-                            AccessToken.getCurrentAccessToken().then(
-                                (data) => {
-                                    console.log(data.accessToken.toString())
-                                }
-                            )
-                        }
-                    }
-                }
-                onLogoutFinished={() => console.log("logout.")}
-
-            /> */}
             <ButtonAuthentication
                 shadow={false}
                 title={"Continuar con Facebook"}

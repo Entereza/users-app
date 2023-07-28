@@ -11,7 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
-    "scheme": ["com.entereza.client", "fb3933991310158655"],
+    "scheme": "com.entereza.client",
     "platforms": [
       "ios",
       "android"

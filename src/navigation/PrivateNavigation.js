@@ -337,7 +337,6 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
 
       if (codeError === 'COD200') {
         dispatch(_authGetInfo())
-        alert('Token Guardado con éxito.')
         console.log('Token Guardado con éxito.')
       } else {
         console.log('SendTokenExpo: ', codeError, msgError)

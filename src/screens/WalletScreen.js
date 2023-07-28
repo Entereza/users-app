@@ -350,18 +350,18 @@ export default function WalletScreen({ route }) {
     <>
       <FloatingButton />
 
-      <Animated.ScrollView
-        scrollEnabled={false}
-        contentContainerStyle={{
-          flexGrow: 1,
-        }}
-        style={{
-          backgroundColor: backgroundScrollView,
-        }}
-        showsVerticalScrollIndicator={false}
-        scrollToOverflowEnabled={false}
-      >
-        <SafeAreaView style={{ backgroundColor: theme.transparent }}>
+      <SafeAreaView edges={['top']} style={{ backgroundColor: theme.transparent }}>
+        <Animated.ScrollView
+          scrollEnabled={false}
+          contentContainerStyle={{
+            flexGrow: 1,
+          }}
+          style={{
+            backgroundColor: backgroundScrollView,
+          }}
+          showsVerticalScrollIndicator={false}
+          scrollToOverflowEnabled={false}
+        >
           <Animated.ScrollView
             scrollEnabled={true}
             contentContainerStyle={{
@@ -603,14 +603,15 @@ export default function WalletScreen({ route }) {
               display: walletComponentsDisplay,
               alignItems: 'center',
               justifyContent: 'center',
+              marginTop: 5
               // borderColor: theme.danger,
               // borderWidth: 1,
             }}
           >
             <WalletSales reload={refreshing} handleRefresh={handleOnRefresh} />
           </Animated.View>
-        </SafeAreaView>
-      </Animated.ScrollView>
+        </Animated.ScrollView>
+      </SafeAreaView>
     </>
   )
 }

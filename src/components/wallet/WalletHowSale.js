@@ -134,8 +134,8 @@ export default function WalletHowSale() {
                         justifyContent: 'center',
                         shadowColor: theme.salmon,
                         shadowOffset: {
-                            width: 5,
-                            height: 8,
+                            width: 3,
+                            height: 5,
                         },
                         shadowOpacity: 1,
                         shadowRadius: 3.5,
