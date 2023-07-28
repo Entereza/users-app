@@ -9,31 +9,19 @@ import adjustFontSize from '../../utils/adjustText'
 import { useSelector } from 'react-redux'
 import TextStyled from '../ui/TextStyled'
 
-export default function BusinessInputRedirect({ city, loadingSkeleton }) {
+export default function BusinessInputRedirect({ cityCode, loadingSkeleton }) {
     const navigation = useNavigation()
     const { info } = useSelector(state => state.auth);
 
     const [value, setValue] = React.useState('')
-    const [location, setLocation] = React.useState('CB')
+    const [location, setLocation] = React.useState('')
 
     const RedirectSearchScreen = () => {
         navigation.navigate('SearchScreen', { nameUser: value, city: location })
     }
 
     const setNameUser = async () => {
-        if (city === "La Paz") {
-            setLocation('LP')
-
-        }
-        if (city === "Cochabamba") {
-            setLocation('CB')
-        }
-        if (city === "Santa Cruz") {
-            setLocation('SC')
-        }
-        if (city === "Oruro") {
-            setLocation('OR')
-        }
+        setLocation(cityCode)
         const nameUser = await info.usuarioBean?.nombres
 
         setValue(nameUser)

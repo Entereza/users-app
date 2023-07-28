@@ -188,7 +188,7 @@ export default function BusinessInfo({ route }) {
     }
 
     React.useEffect(() => {
-        if (location.address.state !== null) {
+        if (location.ubication !== null) {
             getInfoSucursals()
         }
     }, [location])

@@ -24,6 +24,7 @@ import { useNavigation } from "@react-navigation/native";
 import BusinessInputRedirect from "../components/business/BusinessRedirectInput";
 import BusinessPromotions from "../components/business/BusinessPromotions";
 import FloatingButton from "../components/Btn/FloatingButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function BusinessHome() {
   const [page, setPage] = useState(0);
@@ -33,11 +34,7 @@ export default function BusinessHome() {
   const [loadingMoreEmpresas, setLoadingMoreEmpresas] = useState(true)
 
   const { location } = useSelector(state => state.auth);
-  const navigation = useNavigation()
 
-  const RedirectUbication = () => {
-    navigation.navigate("ChangeUbication")
-  }
   const nextPage = () => {
     setPage(page + 1);
   };
@@ -51,7 +48,7 @@ export default function BusinessHome() {
 
   const [hasMore, setHasMore] = useState(false);
   const [startPromotions, setStartPromotions] = useState(0);
-  const [dataEmpresas, setDataEmpresas] = useState([]);
+  const [dataEmpresas, setDataEmpresas] = useState('');
 
   const SkeletonCategory = () => {
     return (
@@ -270,87 +267,101 @@ export default function BusinessHome() {
 
   const getInfo = async () => {
     try {
+      console.log('Starts Get Info of BusinessScreen')
+      const cityCode = await location.ubication?.cityCode
+      console.log('codeCity: ', cityCode)
       setStartPromotions(false)
       setLoadingSkeletonCategory(true)
       setLoadingSkeleton(true)
       setLoadingSkeletonEmpresas(true)
       setLoadingMoreEmpresas(true)
 
-      let ciudad = '';
-      if (location.address.state !== null) {
-        if (location.address.state == "La Paz") {
-          ciudad = 'LP'
 
-        }
-        if (location.address.state == "Cochabamba") {
-          ciudad = 'CB'
-        }
-        if (location.address.state == "Santa Cruz") {
-          ciudad = 'SC'
-        }
-        if (location.address.state == "Oruro") {
-          ciudad = 'OR'
-        }
+      let res = await fetchWithToken(`entereza/rubros`, "GET");
 
-        let res = await fetchWithToken(`entereza/rubros`, "GET");
+      const { entereza, rubros, imgRubros } = await res.json();
 
-        const { entereza, rubros, imgRubros } = await res.json();
+      if (entereza.codeError === "COD200") {
+        rubros.forEach(rubro => {
+          if (rubro.ciudad === cityCode) {
+            let imgCategory = imgRubros.find(
+              (image) => image.codigo_rubro === rubro.codigoRubro
+            )
+            rubro.image = imgCategory ? { uri: `${imgCategory.img_rubro}` } : require('../../assets/img/NoCategory.png')
 
-        if (entereza.codeError === "COD200") {
-          if (location.address?.state === "Cochabamba" || location.address?.state === "La Paz") {
-            rubros.forEach(rubro => {
-              if (rubro.ciudad === ciudad) {
-                let imgCategory = imgRubros.find(
-                  (image) => image.codigo_rubro === rubro.codigoRubro
-                )
-                rubro.image = imgCategory ? { uri: `${imgCategory.img_rubro}` } : require('../../assets/img/NoCategory.png')
-
-                arrayRubros.push(rubro)
-              }
-            });
-            setImg(arrayRubros);
-            getInfoEmpresas5()
-          } else {
-            setHasMore(false)
-            navigation.navigate("ChangeUbication")
+            arrayRubros.push(rubro)
+            console.log('Lenght Saved: ', arrayRubros.length)
           }
-        } else {
-          setHasMore(false)
-        }
-
+        });
+        console.log('Rubros: ', rubros)
+        setImg(arrayRubros);
+        getInfoPromotions()
+        getInfoEmpresas5()
       } else {
-        console.log("Error No Location");
+        setHasMore(false)
       }
     } catch (error) {
       console.log("Error entereza BusinessScreen", error);
     }
   };
 
+  const [promotionsImg, setPromotionsImg] = React.useState('')
+  const [linkWP, setLinkWP] = React.useState('')
+
+
+  const getInfoPromotions = async () => {
+    try {
+      const token = await AsyncStorage.getItem('ENT-TKN')
+
+      const cityCode = await location.ubication?.cityCode; // Asegúrate de que esto está definido
+
+      const formData = new FormData();
+      formData.append('opcion', '2');
+      formData.append('imagen', '');
+      formData.append('codigoEmpresa', '');
+      formData.append('fechaInicio', '');
+      formData.append('fechaFinal', '');
+      formData.append('ciudad', cityCode);
+
+      const res = await fetch("https://enterezabol.com:8443/entereza/promociones_operacion", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      const { entereza, promImg } = await res.json()
+
+      console.log('Entereza Response: ', entereza)
+      if (entereza.codeError === "COD200") {
+        setStartPromotions(true)
+
+        if (promImg.length > 0) {
+          const promImgArray = await promImg.sort((a, b) => a.posicion - b.posicion);
+
+          setPromotionsImg(promImgArray)
+        }
+      } else {
+        console.log('Error GettingPromotions: ', entereza)
+      }
+    } catch (error) {
+      console.log('getInfoPromotions: ', error)
+    }
+  }
+
   const getInfoEmpresas5 = async () => {
     try {
       setDataEmpresas([])
-
-      let city;
-      if (location.address.state == "La Paz") {
-        city = 'LP'
-      }
-      if (location.address.state == "Cochabamba") {
-        city = 'CB'
-      }
-      if (location.address.state == "Santa Cruz") {
-        city = 'SC'
-      }
-      if (location.address.state == "Oruro") {
-        city = 'OR'
-      }
-
+      const cityCode = await location.ubication?.cityCode
       const lat = await location.coords?.latitude
       const lng = await location.coords?.longitude
 
       console.log('Latitud: ', lat, '- Longitud: ', lng)
 
       let res = await fetchWithToken(
-        `entereza/emp_hub_filt?patron=Empresa&opcion=1&pageno=0&size=15&ciudad=${city}&categoria=COD-RUB-343&lat=${lat}&lng=${lng}`,
+        `entereza/emp_hub_filt?patron=Empresa&opcion=1&pageno=0&size=15&ciudad=${cityCode}&categoria=COD-RUB-343&lat=${lat}&lng=${lng}`,
         "GET"
       );
 
@@ -417,7 +428,6 @@ export default function BusinessHome() {
           setDataEmpresas((prev) => [...prev, ...newEmpresa]);
         }
 
-        setStartPromotions(true)
         setTimeout(() => {
           setLoadingSkeletonCategory(false)
         }, 100);
@@ -456,6 +466,7 @@ export default function BusinessHome() {
   const [refreshing, setRefreshing] = React.useState(false);
 
   const onRefresh = () => {
+    arrayRubros = ([])
     setRefreshing(true)
     setHasMore(false)
     setLoadingSkeletonCategory(true)
@@ -471,17 +482,16 @@ export default function BusinessHome() {
     setRefreshing(false)
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (location !== null) {
-      if (location.address !== null) {
-        setHasMore(true)
-        getInfo();
-      } else {
-        console.log('location is null')
-        RedirectUbication()
+      setHasMore(true)
+      if (location.ubication !== null) {
+        if (location.ubication.cityCode) {
+          getInfo()
+        } else {
+          console.log('Missing CodCity')
+        }
       }
-    } else {
-      return
     }
   }, [location]);
 
@@ -510,12 +520,13 @@ export default function BusinessHome() {
             paddingBottom: 50,
           }}
         >
-          <BusinessInputRedirect city={location !== null ? location.address.state : 'Cochabamba'} loadingSkeleton={!startPromotions} />
+          <BusinessInputRedirect cityCode={location !== null ? location.ubication.cityCode : 'Cochabamba'} loadingSkeleton={!startPromotions} />
 
           <BusinessPromotions
-            city={location ? location.address.state : 'Cochabamba'}
+            cityCode={location ? location.ubication.cityCode : 'Cochabamba'}
             reload={loadingSkeleton}
             start={startPromotions}
+            promotionsData={promotionsImg}
           />
 
           <ViewStyled
@@ -526,7 +537,7 @@ export default function BusinessHome() {
             marginLeftAuto
             marginRightAuto
           >
-            {/* <BusinessBubbles city={location !== null ? location.address.state : 'Cochabamba'} loadingSkeleton={loadingSkeleton} /> */}
+            {/* <BusinessBubbles city={location !== null ? location.ubication.cityCode : 'Cochabamba'} loadingSkeleton={loadingSkeleton} /> */}
 
             <ViewStyled
               backgroundColor={theme.transparent}

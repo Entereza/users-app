@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux';
 import { fetchWithoutToken } from '../../utils/fetchWithoutToken';
 import { codeErrors } from '../../utils/codeErrors';
 import AlertStyled from '../ui/AlertStyled';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 GoogleSignin.configure();
 export default function ContinueGoogle({ shadow }) {
@@ -46,6 +47,7 @@ export default function ContinueGoogle({ shadow }) {
 
     React.useEffect(() => {
         if (tokenId) {
+            console.log('Data For Send', tokenId)
             RegisterGoogle()
         }
     }, [tokenId])
@@ -130,7 +132,6 @@ export default function ContinueGoogle({ shadow }) {
             };
 
             const res = await fetchWithoutToken("entereza/login_go", "POST", dataLogin)
-            console.log('Response of login_go: ', res)
 
             const {
                 entereza,

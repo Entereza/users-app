@@ -22,29 +22,43 @@ export default function NavigationHeader() {
         navigation.navigate("ChangeUbication")
     }
 
+    const [finished, setFinished] = React.useState(false)
     const { location } = useSelector(state => state.auth);
+    const [cityImageUrl, setCityImageUrl] = React.useState(require('../../assets/business/backgroundCity.png'));
 
-    // function ProfileGo() {
-    //     navigation.navigate("Profile")
-    // }
+    const verifyInfo = (location) => {
+        console.log('Starts VerifyInto cities+user.')
+        const { cities, ubication, permissions, reloadScreen } = location;
 
-    const CheckUbication = () => {
-        if (location.address?.state === "Cochabamba" || location.address?.state === "La Paz") {
-            console.log('Location Conocida (CheckUbication): ', location.address?.state)
-            if (location.address?.neighbourhood === "") {
-                console.log('Location CheckUbication neighbourhood: ', location.address?.neighbourhood)
-                RedirectUbication()
+        // Verificamos si citieName coincide con state
+        const matchingCity = cities.find(city => city.citieName === ubication.state);
+
+        // Si matchingCity es nulo o permissions es falso, llamamos a RedirectUbication
+        if (!permissions) {
+            if (reloadScreen === true) {
+                RedirectUbication();
+                if (!matchingCity) {
+                    RedirectUbication();
+                    console.log("Ubicación Sin Entereza. - Permisos de Ubicación: ", permissions);
+                    return require('../../assets/business/backgroundCity.png');
+                }
             }
+            setFinished(false)
         } else {
-            console.log('Other Location: (CheckUbication): ', location.address?.state)
-            RedirectUbication()
+            setFinished(true)
         }
+
+        return { uri: matchingCity.urlCity };
     }
+
 
     React.useEffect(() => {
         if (location !== null) {
-            if (location.address !== null) {
-                CheckUbication()
+            if (location.ubication !== null) {
+                if (!finished) {
+                    const newImageUrl = verifyInfo(location);
+                    setCityImageUrl(newImageUrl);
+                }
             }
         }
     }, [location])
@@ -63,7 +77,7 @@ export default function NavigationHeader() {
                 }}
             >
                 <ImageBackground
-                    source={require('../../assets/business/backgroundCity.png')}
+                    source={cityImageUrl}
                     resizeMode={'stretch'}
                     style={{
                         width: '100%',
@@ -120,13 +134,13 @@ export default function NavigationHeader() {
                                             textDecorationLine: 'underline',
                                         }}
                                     >
-                                        {location ? location.address?.state : '.....'}
+                                        {location.ubication ? location.ubication.state : '.....'}
                                     </TextStyled>
                                     <TextStyled
                                         fontSize={adjustFontSize(14)}
                                         color={theme.secondary}
                                     >
-                                        {location ? ', ' : ' - '}
+                                        {location.ubication ? ', ' : ' - '}
                                     </TextStyled>
                                     <TextStyled
                                         fontSize={adjustFontSize(14)}
@@ -136,7 +150,7 @@ export default function NavigationHeader() {
                                             marginRight: 2
                                         }}
                                     >
-                                        {location ? location.address?.country : '.....'}
+                                        {location.ubication ? location.ubication.country : '.....'}
                                     </TextStyled>
                                     <Ionicons name="location-outline" size={adjustFontSize(14)} color={theme.secondary} />
                                 </ViewStyled>
@@ -145,29 +159,6 @@ export default function NavigationHeader() {
                     </SafeAreaView>
                 </ImageBackground>
             </ViewStyled>
-
-            {/* <ViewStyled
-                    backgroundColor={theme.transparent}
-                    width={30}
-                    height={8}
-                    style={{
-                        justifyContent: 'center',
-                        alignItems: 'flex-end',
-                    }}
-                    paddingRight={1}
-                >
-                    <Pressable onPress={ProfileGo}>
-                        <ImageStyled
-                            height={5.9}
-                            width={12.1}
-                            source={require('../../assets/profile/ProfileIcon.png')}
-                            borderRadius={6}
-                            style={{
-                                resizeMode: 'contain',
-                            }}
-                        />
-                    </Pressable>
-                </ViewStyled> */}
         </>
     )
 }

@@ -9,7 +9,7 @@ import { theme } from "../../utils/theme";
 import BusinessPromotionsItem from "./BusinessPromotionsItem";
 import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen";
 
-export default function BusinessPromotions({ city, reload, start }) {
+export default function BusinessPromotions({ cityCode, reload, start, promotionsData }) {
   const [page, setPage] = useState(0);
   const [loadingSkeleton, setLoadingSkeleton] = useState(true)
 
@@ -80,15 +80,6 @@ export default function BusinessPromotions({ city, reload, start }) {
     setPage(page + 1);
   };
 
-  const data = [
-    { nombre: '1', ciudad: 'CB' },
-    { nombre: '2', ciudad: 'CB' },
-    { nombre: '3', ciudad: 'CB' },
-    { nombre: '6', ciudad: 'LP' },
-    { nombre: '7', ciudad: 'LP' },
-    { nombre: '8', ciudad: 'LP' },
-  ]
-
   return (
     <ViewStyled
       width={95}
@@ -104,8 +95,8 @@ export default function BusinessPromotions({ city, reload, start }) {
           :
           <FlatList
             horizontal
-            data={data}
-            renderItem={({ item }) => <BusinessPromotionsItem city={city} item={item} />}
+            data={promotionsData}
+            renderItem={({ item }) => <BusinessPromotionsItem item={item} />}
             showsHorizontalScrollIndicator={false}
             onEndReached={nextPage}
             onEndReachedThreshold={0.7}

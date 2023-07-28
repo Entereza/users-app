@@ -8,7 +8,7 @@ export const fetchWithToken = async (path, method, body) => {
     const token = await AsyncStorage.getItem('ENT-TKN')
     // console.log(token)
 
-    let url = baseURL +"/"+ path;
+    let url = baseURL + "/" + path;
     if (method === 'GET') {
         return global.fetch(url, {
             method: method,
@@ -17,7 +17,7 @@ export const fetchWithToken = async (path, method, body) => {
                 'Authorization': `Bearer ${token}`
             }
         })
-    }else {
+    } else {
         return global.fetch(url, {
             method: method,
             headers: {
@@ -46,3 +46,30 @@ export const fetchWithToken2 = async (path, method, body) => {
 
     return global.fetch(url, requestOptions);
 };
+
+export const fetchWithToken3 = async (path, method, body) => {
+    const baseURL = 'http://35.238.246.148:8024';
+    const token = await AsyncStorage.getItem('ENT-TKN');
+
+    let url = baseURL + "/" + path;
+    console.log(url)
+    if (method === 'GET') {
+        return global.fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        })
+    } else {
+        return global.fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(body)
+        })
+    }
+};
+
