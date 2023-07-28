@@ -38,25 +38,22 @@ export default function BusinessPromotionsItem({ item, city }) {
             <ViewStyled
                 backgroundColor={theme.transparent}
                 width={60}
-                height={14}
+                height={13}
                 marginRight={3}
                 style={{
                     alignItems: 'center',
-                    justifyContent: 'flex-start',
-                    borderWidth: 1,
-                    borderColor: theme.tertiaryGradient,
+                    justifyContent: 'center',
                     borderRadius: 10,
                 }}
             >
                 <ImageStyled
-                    source={require('../../assets/business/Tropical.jpg')}
+                    source={require('../../assets/business/PromotionsTest3.png')}
                     style={{
                         width: '100%',
                         height: '100%',
                         borderRadius: 10,
-                        overflow: 'hidden',
-                        position: 'relative',
-                        resizeMode: 'cover',
+                        resizeMode: 'contain',
+                        alignItems: 'center',
                         justifyContent: 'center',
                     }}
                 />

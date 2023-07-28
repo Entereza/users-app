@@ -67,6 +67,8 @@
     "plugins": [
       "expo-apple-authentication",
       "@react-native-google-signin/google-signin",
+      "@config-plugins/react-native-blob-util",
+      "@config-plugins/react-native-pdf",
       [
         "expo-tracking-transparency",
         {

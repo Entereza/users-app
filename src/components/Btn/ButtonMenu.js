@@ -41,7 +41,7 @@ export default function ButtonMenu({ showButton = 'none', onPress }) {
                             borderWidth: 1,
                             width: '100%',
                             height: '100%',
-                            backgroundColor: theme.secondary,
+                            backgroundColor: theme.green,
                             borderRadius: 15,
                             flexDirection: 'row',
                             justifyContent: 'center',

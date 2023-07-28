@@ -21,6 +21,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { customStyles } from '../utils/customStyles'
 import { useSelector } from 'react-redux'
 import ButtonMenu from '../components/Btn/ButtonMenu'
+import Pdf from 'react-native-pdf'
 
 export default function BusinessInfo({ route }) {
     const { data } = route.params;
@@ -31,17 +32,24 @@ export default function BusinessInfo({ route }) {
     const { codigoEmpresa, ahorro, background, img } = data;
 
     const [loadingSkeleton, setLoadingSkeleton] = React.useState(true)
+    const [showMenu, setShowMenu] = React.useState('none')
 
-    const GetMenuPdf = async() => {
+    const GetMenuPdf = async () => {
         try {
-            
+            //http://35.238.246.148:8027
+
+            setShowMenu('flex')
         } catch (error) {
             console.log('Error on GetMenu: ', error)
         }
     }
 
+    const openPdf = () => {
+        setModal(!modal)
+    }
+
     React.useEffect(() => {
-        if(codigoEmpresa){
+        if (codigoEmpresa) {
             console.log('Codigo Empresa: ', codigoEmpresa)
             GetMenuPdf()
         }
@@ -190,6 +198,17 @@ export default function BusinessInfo({ route }) {
     const handleOnModal = async () => {
         setModal(!modal)
     };
+
+    const onlineSource = { uri: "http://samples.leanpub.com/thereactnativebook-sample.pdf", cache: true }
+
+    const [pdfSource, setPdfSource] = React.useState(onlineSource)
+
+    const styles = {
+        pdf: {
+            flex: 1,
+            alignSelf: "stretch"
+        }
+    }
 
     return (
         <>
@@ -441,7 +460,7 @@ export default function BusinessInfo({ route }) {
                 </ViewStyled>
             </ScrollView>
 
-            <ButtonMenu onPress={() => null} showButton='flex' />
+            <ButtonMenu onPress={openPdf} showButton={showMenu} />
 
             <Modal
                 animationType="fade"
@@ -449,7 +468,31 @@ export default function BusinessInfo({ route }) {
                 visible={modal}
                 onRequestClose={handleOnModal}
             >
+                <ViewStyled
+                    backgroundColor={theme.primary}
+                    style={{
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}
+                >
+                    <Pdf
+                        source={onlineSource}
+                        onLoadComplete={(numberOfPages, filePath) => {
+                            console.log(`Number of pages: ${numberOfPages}`);
+                        }}
+                        onPageChanged={(page, numberOfPages) => {
+                            console.log(`Current page: ${page}`);
+                        }}
+                        onError={(error) => {
+                            console.log(error);
+                        }}
+                        onPressLink={(uri) => {
+                            console.log(`Link pressed: ${uri}`);
+                        }}
+                        style={styles.pdf}
 
+                    />
+                </ViewStyled>
             </Modal>
         </>
 

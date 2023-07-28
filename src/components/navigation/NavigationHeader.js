@@ -105,17 +105,16 @@ export default function NavigationHeader() {
                                 </TextStyled>
                                 <ViewStyled
                                     width={52}
-                                    height={2.5}
+                                    height={3.5}
                                     backgroundColor={theme.transparent}
                                     style={{
                                         flexDirection: 'row',
                                         alignItems: 'center',
-                                        justifyContent: 'center'
+                                        justifyContent: 'flex-start'
                                     }}
                                 >
                                     <TextStyled
-                                        fontWeight='600'
-                                        fontSize={16}
+                                        fontSize={adjustFontSize(14)}
                                         color={theme.secondary}
                                         style={{
                                             textDecorationLine: 'underline',
@@ -124,14 +123,13 @@ export default function NavigationHeader() {
                                         {location ? location.address?.state : '.....'}
                                     </TextStyled>
                                     <TextStyled
-                                        fontWeight='600'
-                                        fontSize={16}
+                                        fontSize={adjustFontSize(14)}
                                         color={theme.secondary}
                                     >
                                         {location ? ', ' : ' - '}
                                     </TextStyled>
                                     <TextStyled
-                                        fontSize={16}
+                                        fontSize={adjustFontSize(14)}
                                         color={theme.secondary}
                                         style={{
                                             textDecorationLine: 'underline',
@@ -140,7 +138,7 @@ export default function NavigationHeader() {
                                     >
                                         {location ? location.address?.country : '.....'}
                                     </TextStyled>
-                                    <Ionicons name="location-outline" size={adjustFontSize(16)} color={theme.secondary} />
+                                    <Ionicons name="location-outline" size={adjustFontSize(14)} color={theme.secondary} />
                                 </ViewStyled>
                             </ViewStyled>
                         </Pressable>
