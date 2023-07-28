@@ -588,7 +588,6 @@ export default function WalletScreen({ route }) {
               </Animated.View>
             </ViewStyled>
           </Animated.ScrollView>
-
           <Animated.View
             style={{
               transform: [

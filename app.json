@@ -39,7 +39,7 @@
         "backgroundColor": "#000000"
       },
       "package": "com.entereza.client",
-      "versionCode": 50,
+      "versionCode": 51,
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.FOREGROUND_SERVICE",
@@ -67,8 +67,6 @@
     "plugins": [
       "expo-apple-authentication",
       "@react-native-google-signin/google-signin",
-      "@config-plugins/react-native-blob-util",
-      "@config-plugins/react-native-pdf",
       [
         "expo-tracking-transparency",
         {
@@ -86,15 +84,6 @@
         {
           "icon": "./assets/IconEntereza.png",
           "color": "#ffffff"
-        }
-      ],
-      [
-        "react-native-fbsdk-next",
-        {
-          "appID": "3933991310158655",
-          "clientToken": "47cd7ede69e9864abccc78a2e946431a",
-          "displayName": "Entereza",
-          "scheme": ["com.entereza.client", "fb3933991310158655"]
         }
       ]
     ],
