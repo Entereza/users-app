@@ -13,7 +13,7 @@ import { heightPercentageToDP } from 'react-native-responsive-screen';
 import { fetchWithToken } from '../../utils/fetchWithToken';
 import { useSelector } from 'react-redux';
 
-export default function FloatingButton() {
+export default function FloatingButton({ bottom = 0 }) {
     const [numberWpp, setNumberWpp] = React.useState('')
 
     const { info } = useSelector(state => state.auth);
@@ -59,7 +59,7 @@ export default function FloatingButton() {
                         position: 'absolute',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        bottom: 10,
+                        bottom: bottom,
                         marginBottom: 10,
                         right: 10,
                         zIndex: 2

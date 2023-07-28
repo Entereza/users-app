@@ -28,48 +28,24 @@ export default function BusinessInfo({ route }) {
 
     const navigation = useNavigation()
 
-    const { codigoEmpresa, ahorro, background, img, fb, insta, } = data;
+    const { codigoEmpresa, ahorro, background, img } = data;
 
     const [loadingSkeleton, setLoadingSkeleton] = React.useState(true)
 
-    // const [colorFb, setColorFb] = React.useState('#818181')
-    // const [colorIg, setColorIg] = React.useState('#818181')
-
-    // const OpenFb = () => {
-    //     Linking.openURL(fb)
-    // }
-    // const OpenIg = () => {
-    //     Linking.openURL(insta)
-    // }
-
-    // const SetColorsRedes = () => {
-    //     if (fb !== '') {
-    //         setColorFb('#4267B2')
-    //     }
-    //     if (insta !== '') {
-    //         setColorIg('#833AB4')
-    //     }
-    // }
-
-    // React.useEffect(() => {
-    //     SetColorsRedes()
-    // }, [])
-
-    const SkeletonButton = () => {
-        return (
-            <NativeBaseProvider>
-                <Box w="100%" alignItems={'center'} >
-                    <HStack marginTop={'0.5'} justifyContent={'center'} alignItems={'center'} backgroundColor={theme.primary} w={widthPercentageToDP(94)} h={heightPercentageToDP(8)} borderWidth="1" space={1} rounded="lg" _dark={{
-                        borderColor: "coolGray.500"
-                    }} _light={{
-                        borderColor: "coolGray.200"
-                    }} p="4">
-                        <Skeleton speed={1} w={widthPercentageToDP(88)} h={heightPercentageToDP(6)} rounded="lg" startColor={theme.skeleton} endColor={theme.secondary} />
-                    </HStack>
-                </Box>
-            </NativeBaseProvider>
-        )
+    const GetMenuPdf = async() => {
+        try {
+            
+        } catch (error) {
+            console.log('Error on GetMenu: ', error)
+        }
     }
+
+    React.useEffect(() => {
+        if(codigoEmpresa){
+            console.log('Codigo Empresa: ', codigoEmpresa)
+            GetMenuPdf()
+        }
+    }, [data])
 
     const SkeletonSucursals = () => {
         return (

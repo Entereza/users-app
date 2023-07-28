@@ -613,7 +613,7 @@ export default function BusinessHome() {
         </ViewStyled>
       </ScrollView>
 
-      <FloatingButton />
+      <FloatingButton bottom={60} />
     </>
   );
 }

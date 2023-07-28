@@ -60,22 +60,6 @@ export default function ContinueGoogle({ shadow }) {
         }
     }
 
-    const getCurrentInfoAsync = async () => {
-        try {
-            const userInfo = await GoogleSignin.signInSilently();
-            console.log('edit_____', userInfo)
-            setUser({ userInfo });
-        } catch (error) {
-            if (error.code === statusCodes.SIGN_IN_REQUIRED) {
-                console.log('user has not signed in yet ')
-                // user has not signed in yet
-            } else {
-                console.log('error total getCurrentUserInfo')
-                // some other error
-            }
-        }
-    };
-
     const signOut = async () => {
         try {
             await GoogleSignin.revokeAccess();

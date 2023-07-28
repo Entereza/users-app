@@ -348,7 +348,7 @@ export default function WalletScreen({ route }) {
 
   return (
     <>
-      <FloatingButton />
+      <FloatingButton bottom={10} />
 
       <SafeAreaView edges={['top']} style={{ backgroundColor: theme.transparent }}>
         <Animated.ScrollView
