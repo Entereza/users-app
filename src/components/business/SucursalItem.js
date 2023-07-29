@@ -111,7 +111,7 @@ export default function SucursalItem({ item }) {
 
     React.useEffect(() => {
         if (location.coords !== null) {
-            if (location.coords.permissions === false) {
+            if (location.coords.permissions !== false) {
                 VerifyState()
                 console.log('Permissions: ', location.coords.permissions)
             } else {
