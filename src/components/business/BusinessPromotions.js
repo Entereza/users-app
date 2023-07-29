@@ -9,9 +9,8 @@ import { theme } from "../../utils/theme";
 import BusinessPromotionsItem from "./BusinessPromotionsItem";
 import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen";
 
-export default function BusinessPromotions({ cityCode, reload, start, promotionsData }) {
+export default function BusinessPromotions({ reload, start, promotionsData }) {
   const [page, setPage] = useState(0);
-  const [loadingSkeleton, setLoadingSkeleton] = useState(true)
 
   const SkeletonBusiness = () => {
     return (
@@ -61,20 +60,6 @@ export default function BusinessPromotions({ cityCode, reload, start, promotions
       </NativeBaseProvider>
     )
   }
-
-  const getPromotions = async () => {
-    setLoadingSkeleton(true)
-
-    setTimeout(() => {
-      setLoadingSkeleton(false)
-    }, 2000);
-  }
-
-  useEffect(() => {
-    if (start === true) {
-      getPromotions()
-    }
-  }, [reload, start])
 
   const nextPage = () => {
     setPage(page + 1);

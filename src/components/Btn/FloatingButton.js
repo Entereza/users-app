@@ -45,7 +45,7 @@ export default function FloatingButton({ bottom = 0 }) {
 
     React.useEffect(() => {
         NumberWp()
-    }, [info])
+    }, [])
 
     return (
         <>
@@ -106,7 +106,7 @@ export default function FloatingButton({ bottom = 0 }) {
                         fontFamily='ArtegraBold'
                         textAlign='center'
                     >
-                        {'¿Conversemos?'}
+                        {'Cuéntanos algo'}
                     </TextStyled>
                 </Pressable >
             </ViewStyled>

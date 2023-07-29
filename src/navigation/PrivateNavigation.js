@@ -71,19 +71,6 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
     }
   }
 
-  const [permissionsUbication, setPermissionsUbication] = React.useState(null)
-  const [citiesData, setCitiesData] = React.useState('')
-
-  const [coordsUser, setCoordsUser] = React.useState({
-    latitude: '',
-    longitude: ''
-  })
-
-  const [locationUser, setLocationUser] = React.useState({
-    country: '',
-    state: '',
-    cityCode: ''
-  })
 
   const UbicationConPermisos = async () => {
     try {
@@ -99,16 +86,9 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
 
       SendUbicationUser(coords, json.address.state)
 
-      setCoordsUser({
-        latitude: coords.latitude,
-        longitude: coords.longitude
-      })
-
-      setLocationUser({
-        country: json.address.country,
-        state: json.address.state,
-      })
-
+      dispatch(_authSetLocation({ address: json.address, coords: coords }))
+      dispatch(_uiSetPermission(true))
+      dispatch(_uiSetPermissionGps(true))
     } catch (err) {
       console.log("Error Location: ", err)
       if (err.code === 'E_LOCATION_SETTINGS_UNSATISFIED') {
@@ -125,18 +105,30 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
 
   const UbicationSinPermisos = async () => {
     try {
-      setCoordsUser({
-        latitude: -17.393799834733354,
-        longitude: -66.1569548714268
-      })
+      console.log("Starts Setting UbicationSinPermisos Android / IOs")
 
-      setLocationUser({
-        country: 'Bolivia',
-        state: 'Cochabamba',
-        cityCode: 'CB'
-      })
+      let json = {
+        "address": {
+          "ISO3166-2-lvl4": "",
+          "city": "",
+          "country": "Bolivia",
+          "country_code": "",
+          "county": "",
+          "neighbourhood": "",
+          "road": "",
+          "state": "Cochabamba",
+        }
+      }
 
-      console.log("Ubicacion No Obtenida Android / IOs (Sin Permisos)")
+      let json2 = {
+        "coords": {
+          "latitude": -17.393799834733354,
+          "longitude": -66.1569548714268,
+          "permissions": false
+        }
+      }
+      console.log("Ubicacion Obtenida Android / IOs (Sin Permisos): ", json.address)
+      dispatch(_authSetLocation({ address: json.address, coords: json2.coords }))
     } catch (error) {
       console.log(error)
     }
@@ -147,12 +139,10 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
 
     if (status === 'granted') {
       console.log('Permisos de Ubicación (CheckPermisosUbication) Permitidos: ', status)
-      setPermissionsUbication(true)
       UbicationConPermisos()
     } else {
       console.log('Permisos de Ubicación (CheckPermisosUbication) Denegados: ', status)
       UbicationSinPermisos()
-      setPermissionsUbication(false)
     }
   }
 
@@ -164,8 +154,6 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
         CheckPermisosUbication()
       } else {
         UbicationSinPermisos()
-
-        setPermissionsUbication(false)
         console.log('Permisos de Rastreo (RequestPermissions) Denegados: ', status)
       }
     } catch (e) {
@@ -173,57 +161,6 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
     }
 
   }
-
-  const GetCities = async () => {
-    try {
-      const res = await fetchWithToken3('entereza-cities/obtener-ciudades-query?country=Bolivia&type=PROD', 'GET')
-
-      const { cityList, entereza } = await res.json()
-
-      console.log('Res of cities: ', entereza)
-      if (entereza.codeError === 'COD200') {
-        const sortedCities = cityList.sort((a, b) => a.citieName.localeCompare(b.citieName));
-
-        console.log('SortedCities: ', sortedCities)
-        setCitiesData(sortedCities)
-
-        // Buscar la ciudad que coincide con el estado del usuario
-        const matchingCity = await sortedCities.find(city => city.citieName === locationUser.state);
-
-        // Si se encuentra una ciudad que coincida, actualiza locationUser con el cityCode correcto
-        if (matchingCity) {
-          setLocationUser(prevLocation => ({
-            ...prevLocation,
-            cityCode: matchingCity.cityCode
-          }))
-        } else {
-          setLocationUser(prevLocation => ({
-            ...prevLocation,
-            cityCode: null
-          }))
-        }
-      } else {
-        console.log('GetCities Error: ', entereza)
-      }
-      // console.log('Res: ', res.json())
-    } catch (error) {
-      console.log('Error on GetCities: ', error)
-    }
-  }
-
-  React.useEffect(() => {
-    if (permissionsUbication !== null && locationUser.country !== '' && locationUser.state !== '') {
-      if(citiesData === ''){
-        GetCities()
-      }
-    }
-  }, [permissionsUbication, locationUser])
-
-  React.useEffect(() => {
-    if (permissionsUbication !== null && citiesData !== '' && coordsUser.latitude !== '' && coordsUser.longitude !== '' && locationUser.country !== '' && locationUser.state !== '' && locationUser.cityCode !== '') {
-      dispatch(_authSetLocation({ cities: citiesData, permissions: permissionsUbication, coords: coordsUser, ubication: locationUser, reloadScreen: true }))
-    }
-  }, [permissionsUbication, coordsUser, locationUser, citiesData])
 
   React.useEffect(() => {
     requestTrackingPermissions()

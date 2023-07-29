@@ -15,48 +15,124 @@ export default function ChangeUbicationScreen() {
     const dispatch = useDispatch();
     const navigation = useNavigation()
 
-    const { location } = useSelector(state => state.auth);
-
-    const cityList = useSelector(state => state.auth.location.cities);
-
     const [changingUbication, setChangingUbication] = React.useState(false)
 
-    const [locationUser, setLocationUser] = React.useState({
-        country: '',
-        state: '',
-        cityCode: ''
-    })
-
-    const [coordsUser, setCoordsUser] = React.useState({
-        latitude: '',
-        longitude: ''
-    })
-
-    const setUbication = (city) => {
+    const SetLaPaz = () => {
         setChangingUbication(true)
-        console.log('Data City: ', city)
-        setCoordsUser({
-            latitude: city.latitude,
-            longitude: city.longitude
-        });
+        try {
+            console.log("Setting Ubication La Paz")
 
-        setLocationUser({
-            country: city.citieCountry,
-            state: city.citieName,
-            cityCode: city.cityCode
-        });
+            let json = {
+                "address": {
+                    "ISO3166-2-lvl4": "",
+                    "city": "",
+                    "country": "Bolivia",
+                    "country_code": "",
+                    "county": "",
+                    "neighbourhood": "n",
+                    "road": "",
+                    "state": "La Paz",
+                }
+            }
 
-        console.log(`Ubicacion Seteada Android / IOs: `, city.citieName, '- ', locationUser, '-', coordsUser)
-    };
+            let json2 = {
+                "coords": {
+                    "latitude": -16.49565866175763,
+                    "longitude": -68.1335564420775,
+                    "permissions": false
+                }
+            }
 
-    React.useEffect(() => {
-        if (coordsUser.latitude !== '' && coordsUser.longitude !== '' && locationUser.country !== '' && locationUser.state !== '') {
-            dispatch(_authSetLocation({ cities: cityList, permissions: location.permissions, coords: coordsUser, ubication: locationUser, reloadScreen: false }));
+            console.log("Ubicacion Seteada Android / IOs La Paz: ", json.address, '-', json2.coords)
+            dispatch(_authSetLocation({ address: json.address, coords: json2.coords }))
 
-            navigation.goBack();
-            setChangingUbication(false)
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setTimeout(() => {
+                navigation.goBack()
+                setChangingUbication(false)
+            }, 1500);
         }
-    }, [coordsUser, locationUser])
+    }
+
+    const SetCbba = () => {
+        setChangingUbication(true)
+        try {
+            console.log("Setting Ubication Cbba")
+
+            let json = {
+                "address": {
+                    "ISO3166-2-lvl4": "",
+                    "city": "",
+                    "country": "Bolivia",
+                    "country_code": "",
+                    "county": "",
+                    "neighbourhood": "n",
+                    "road": "",
+                    "state": "Cochabamba",
+                }
+            }
+
+            let json2 = {
+                "coords": {
+                    "latitude": -17.393799834733354,
+                    "longitude": -66.1569548714268,
+                    "permissions": false
+                }
+            }
+
+            console.log("Ubicacion Seteada Android / IOs Cochabamba: ", json.address, '-', json2.coords)
+            dispatch(_authSetLocation({ address: json.address, coords: json2.coords }))
+
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setTimeout(() => {
+                navigation.goBack()
+                setChangingUbication(false)
+            }, 1500);
+        }
+    }
+
+    const SetTarija = () => {
+        setChangingUbication(true)
+        try {
+            console.log("Setting Ubication Tarija")
+
+            let json = {
+                "address": {
+                    "ISO3166-2-lvl4": "",
+                    "city": "",
+                    "country": "Bolivia",
+                    "country_code": "",
+                    "county": "",
+                    "neighbourhood": "n",
+                    "road": "",
+                    "state": "Tarija",
+                }
+            }
+
+            let json2 = {
+                "coords": {
+                    "latitude": -21.5339198,
+                    "longitude": -64.7343096,
+                    "permissions": false
+                }
+            }
+
+            console.log("Ubicacion Seteada Android / IOs Cochabamba: ", json.address, '-', json2.coords)
+            dispatch(_authSetLocation({ address: json.address, coords: json2.coords }))
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setTimeout(() => {
+                setChangingUbication(false)
+                navigation.goBack()
+            }, 1500);
+        }
+    }
+
 
     return (
         <>
@@ -72,7 +148,7 @@ export default function ChangeUbicationScreen() {
                 <ViewStyled
                     backgroundColor={theme.transparent}
                     width={100}
-                    height={10 + (cityList.length * 9)}
+                    height={10 + (3 * 9)}
                 >
                     <ViewStyled
                         width={100}
@@ -106,44 +182,103 @@ export default function ChangeUbicationScreen() {
                         </TextStyled>
                     </ViewStyled>
 
-                    {
-                        cityList.map((city, index) => (
-                            <TouchableOpacity disabled={changingUbication} key={index} onPress={() => setUbication(city)}>
-                                <ViewStyled
-                                    width={100}
-                                    height={8}
-                                    backgroundColor={theme.transparent}
-                                    paddingLeft={12}
-                                    marginBottom={1}
-                                    style={[
-                                        {
-                                            justifyContent: 'flex-start',
-                                            alignItems: 'center',
-                                            flexDirection: 'row'
-                                        }
-                                    ]}
-                                >
-                                    <Ionicons
-                                        name="business"
-                                        size={30}
-                                        color={theme.secondary}
-                                        style={{
-                                            marginRight: 15
-                                        }}
-                                    />
-                                    <TextStyled
-                                        fontSize={16}
-                                        color={theme.quaternary}
-                                        style={{
-                                            marginBottom: 3,
-                                        }}
-                                    >
-                                        {city.citieName}
-                                    </TextStyled>
-                                </ViewStyled>
-                            </TouchableOpacity>
-                        ))
-                    }
+                    <TouchableOpacity onPress={SetLaPaz}>
+                        <ViewStyled
+                            width={100}
+                            height={8}
+                            backgroundColor={theme.transparent}
+                            paddingLeft={12}
+                            style={[
+                                {
+                                    justifyContent: 'flex-start',
+                                    alignItems: 'center',
+                                    flexDirection: 'row'
+                                }
+                            ]}
+                        >
+                            <Ionicons
+                                name="business"
+                                size={30}
+                                color={theme.secondary}
+                                style={{
+                                    marginRight: 15
+                                }}
+                            />
+                            <TextStyled
+                                fontSize={16}
+                                color={theme.quaternary}
+                                style={{
+                                    marginBottom: 3,
+                                }}
+                            >
+                                La Paz
+                            </TextStyled>
+                        </ViewStyled>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={SetCbba}>
+                        <ViewStyled
+                            width={100}
+                            height={6}
+                            backgroundColor={theme.transparent}
+                            paddingLeft={12}
+                            style={{
+                                justifyContent: 'flex-start',
+                                alignItems: 'center',
+                                flexDirection: 'row',
+                            }}
+                        >
+                            <Ionicons
+                                name="business"
+                                size={30}
+                                color={theme.secondary}
+                                style={{
+                                    marginRight: 15
+                                }}
+                            />
+                            <TextStyled
+                                fontSize={16}
+                                color={theme.quaternary}
+                                style={{
+                                    marginBottom: 3,
+                                }}
+                            >
+                                Cochabamba
+                            </TextStyled>
+                        </ViewStyled>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={SetTarija}>
+                        <ViewStyled
+                            width={100}
+                            height={6}
+                            backgroundColor={theme.transparent}
+                            paddingLeft={12}
+                            style={{
+                                justifyContent: 'flex-start',
+                                alignItems: 'center',
+                                flexDirection: 'row',
+                            }}
+                        >
+                            <Ionicons
+                                name="business"
+                                size={30}
+                                color={theme.secondary}
+                                style={{
+                                    marginRight: 15
+                                }}
+                            />
+                            <TextStyled
+                                fontSize={16}
+                                color={theme.quaternary}
+                                style={{
+                                    marginBottom: 3,
+                                }}
+                            >
+                                Tarija
+                            </TextStyled>
+                        </ViewStyled>
+                    </TouchableOpacity>
 
                     {
                         changingUbication

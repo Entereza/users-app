@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { __authGetInfo, _authLogin } from '../../redux/actions/authActions'
-import { Modal, ActivityIndicator } from 'react-native';
+import { Modal, ActivityIndicator, Alert } from 'react-native';
 import ViewStyled from '../ui/ViewStyled';
 import TextStyled from '../ui/TextStyled';
 import { theme } from '../../utils/theme';
@@ -14,7 +14,6 @@ import { codeErrors } from '../../utils/codeErrors';
 import AlertStyled from '../ui/AlertStyled';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-GoogleSignin.configure();
 export default function ContinueGoogle({ shadow }) {
 
     const dispatch = useDispatch()
@@ -57,23 +56,20 @@ export default function ContinueGoogle({ shadow }) {
             await GoogleSignin.hasPlayServices()
 
             const userInfo = await GoogleSignin.signIn();
-            // console.log('userInfo: ', userInfo)
             setTokenId(userInfo.idToken)
         } catch (error) {
             console.log('Error signIn: ', error.message)
+            Alert.alert('ErrorsignIn: ', `${error}`)
             if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-                console.log('Cancelled SignIn: ', error.code)
+                console.log('Cancelled SignIn: ', error.message)
                 // user cancelled the login flow
             } else if (error.code === statusCodes.IN_PROGRESS) {
-                console.log('InPorgress SignIn: ', error.code)
-
+                console.log('InPorgress SignIn: ', error.message)
                 // operation (e.g. sign in) is in progress already
             } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-                console.log('Cancelled PLAY_SERVICES_NOT_AVAILABLE: ', error.code)
-
-                // play services not available or outdated
+                console.log('Cancelled PLAY_SERVICES_NOT_AVAILABLE: ', error.message)
             } else {
-                console.log('some other error happened SignIn: ', error.code)
+                console.log('some other error happened SignIn: ', error.message)
                 // some other error happened
             }
         }

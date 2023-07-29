@@ -13,11 +13,10 @@ import AlertStyled from './AlertStyled';
 import * as Location from 'expo-location'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { _authSetLocation, __authGetInfo, _authGetInfo } from '../../redux/actions/authActions';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { _uiSetPermission, _uiSetPermissionGps } from '../../redux/actions/uiActions';
 import ButtonNext from '../Btn/ButtonNext';
 import ImageStyled from './ImageStyled';
-import { fetchWithToken } from '../../utils/fetchWithToken';
 
 export default function HeaderStyled({
     title,
@@ -25,6 +24,7 @@ export default function HeaderStyled({
     routeName,
     reloadEmp
 }) {
+    console.log('NeimFirst: ', routeName)
     const dispatch = useDispatch()
 
     const [showButton, setShowButton] = React.useState(false)
@@ -44,10 +44,6 @@ export default function HeaderStyled({
         confirmText: '',
         adjust: false
     })
-
-    const { location } = useSelector(state => state.auth);
-
-    const cityList = useSelector(state => state.auth.location.cities);
 
     AppState.addEventListener('change', (nextAppState) => {
         console.log('Status App Has Change', nextAppState)
@@ -103,6 +99,7 @@ export default function HeaderStyled({
         //     cancelText: 'Cancelar',
         //     confirmText: 'Permitir'
         // })
+
     }
 
     const openAdjusts = () => {
@@ -122,46 +119,43 @@ export default function HeaderStyled({
             if (routeName === 'BusinessCategory' || routeName === 'BusinessCashbacks' || routeName === 'BusinessRelevant') {
                 reloadEmp()
             }
-
             console.log("Starts Searching UbicationConPermisos Android / IOs")
-            const { coords, ...rest } = await Location.getLastKnownPositionAsync({})
+            const { coords } = await Location.getLastKnownPositionAsync()
+            console.log('CurrentRoute: ', coords, routeName);
 
             let res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.latitude}&lon=${coords.longitude}&addressdetails=1&format=json`, {
                 method: 'GET'
             })
+            setShowButton(false)
 
             const json = await res.json();
             console.log("Ubicacion Obtenida Android / IOs (Con Permisos): ", coords, '- ', json.address)
 
-            SendUbicationUser(coords, json.address.state)
+            dispatch(_authSetLocation({ address: json.address, coords: coords }))
 
-            setCoordsUser({
-                latitude: coords.latitude,
-                longitude: coords.longitude
-            })
+            setTimeout(() => {
+                if (routeName !== 'ChangeUbication') {
+                    if (routeName !== 'SearchScreen') {
+                        if (routeName === 'BusinessCategory' || routeName === 'BusinessCashbacks' || routeName === 'BusinessRelevant') {
+                            console.log(`Reseting ${routeName}...`)
+                        } else {
+                            navigation.reset({
+                                index: 0,
+                                routes: [{ name: routeName }]
+                            })
+                        }
+                    } else {
+                        navigation.goBack()
+                    }
+                } else {
+                    navigation.navigate('BusinessHome')
+                }
+            }, 500);
 
-            setLocationUser({
-                country: json.address.country,
-                state: json.address.state,
-            })
-            const matchingCity = await location.cities.find(city => city.citieName === json.address.state);
-
-            console.log('CityMatch: ', matchingCity)
-            // Si se encuentra una ciudad que coincida, actualiza locationUser con el cityCode correcto
-            if (matchingCity) {
-                setLocationUser(prevLocation => ({
-                    ...prevLocation,
-                    cityCode: matchingCity.cityCode
-                }))
-            } else {
-                setLocationUser(prevLocation => ({
-                    ...prevLocation,
-                    cityCode: null
-                }))
-            }
-
+            dispatch(_uiSetPermission(true))
+            dispatch(_uiSetPermissionGps(true))
         } catch (err) {
-            console.log("Error Location: ", err)
+            console.log("Error Location (UbicationConPermisos): ", err)
             if (err.code === 'E_LOCATION_SETTINGS_UNSATISFIED') {
                 setShowAlert(true)
                 setAlertText({
@@ -170,8 +164,11 @@ export default function HeaderStyled({
                     type: 'error',
                 })
                 console.log("Code Error Location Off")
+                dispatch(_uiSetPermission(false))
+                dispatch(_uiSetPermissionGps(false))
             }
         }
+        setLoadingModal(false)
     }
 
     const PermissionsStatusUbication = async () => {
@@ -231,75 +228,6 @@ export default function HeaderStyled({
             }
         }
     }
-
-    const SendUbicationUser = async (coords, city) => {
-        try {
-            const Email = await AsyncStorage.getItem('ENT-EMAIL')
-
-            let data = {
-                codigoUsuario: Email,
-                ciudad: city,
-                latidud: coords.latitude,
-                longitud: coords.longitude
-            }
-
-            console.log('Data Coords: ', data)
-
-            await fetchWithToken("entereza/posicion_usuario", "POST", data)
-
-            console.log('Data Coords Almacenado')
-
-        } catch (error) {
-            console.log('Error SendUbicationUser: ', error)
-        }
-    }
-
-    const [coordsUser, setCoordsUser] = React.useState({
-        latitude: '',
-        longitude: ''
-    })
-
-    const [locationUser, setLocationUser] = React.useState({
-        country: '',
-        state: '',
-        cityCode: ''
-    })
-
-    const [finishedSetting, setFinishedSetting] = React.useState(false)
-
-    React.useEffect(() => {
-        const fetchData = async () => {
-            if (coordsUser.latitude !== '' && coordsUser.longitude !== '' && locationUser.country !== '' && locationUser.state !== '' && locationUser.cityCode !== '') {
-                await Promise.all([
-                    dispatch(_authSetLocation({ cities: cityList, permissions: location.permissions, coords: coordsUser, ubication: locationUser, reloadScreen: false })),
-                ]).then(() => {
-                    setFinishedSetting(true)
-                    console.log('routeName: ', routeName)
-                    if (routeName !== 'ChangeUbication') {
-                        if (routeName !== 'SearchScreen') {
-                            if (routeName === 'BusinessCategory') {
-                                console.log(`Reseting ${routeName}...`)
-                            } else {
-                                navigation.reset({
-                                    index: 0,
-                                    routes: [{ name: routeName }]
-                                })
-                            }
-                        } else {
-                            navigation.goBack()
-                        }
-                    } else {
-                        navigation.goBack()
-                    }
-                    setLoadingModal(false)
-                })
-            }
-        };
-
-        if (!finishedSetting) {
-            fetchData();
-        }
-    }, [finishedSetting, coordsUser, locationUser]);
 
     React.useEffect(() => {
         getPermissionsStatus()
@@ -547,6 +475,9 @@ export default function HeaderStyled({
                             alignItems: 'center',
                         }}
                     >
+                        {/* //Omitir como linea y boton permitir */}
+
+
                         <ButtonNext
                             fontSize={20}
                             width={80}

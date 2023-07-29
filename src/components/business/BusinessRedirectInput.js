@@ -9,19 +9,35 @@ import adjustFontSize from '../../utils/adjustText'
 import { useSelector } from 'react-redux'
 import TextStyled from '../ui/TextStyled'
 
-export default function BusinessInputRedirect({ cityCode, loadingSkeleton }) {
+export default function BusinessInputRedirect({ city, loadingSkeleton }) {
     const navigation = useNavigation()
     const { info } = useSelector(state => state.auth);
 
     const [value, setValue] = React.useState('')
-    const [location, setLocation] = React.useState('')
+    const [location, setLocation] = React.useState('CB')
 
     const RedirectSearchScreen = () => {
         navigation.navigate('SearchScreen', { nameUser: value, city: location })
     }
 
     const setNameUser = async () => {
-        setLocation(cityCode)
+        if (city === "La Paz") {
+            setLocation('LP')
+
+        }
+        if (city === "Cochabamba") {
+            setLocation('CB')
+        }
+        if (city === "Santa Cruz") {
+            setLocation('SC')
+        }
+        if (city === "Oruro") {
+            setLocation('OR')
+            
+        } if (city === "Tarija") {
+            setLocation('TJ')
+        }
+
         const nameUser = await info.usuarioBean?.nombres
 
         setValue(nameUser)
@@ -73,8 +89,8 @@ export default function BusinessInputRedirect({ cityCode, loadingSkeleton }) {
                         >
                             {
                                 loadingSkeleton
-                                ? `Buscando Empresas...`
-                                : `¿Qué estás buscando ${value}?`
+                                    ? `Buscando Empresas...`
+                                    : `¿Qué estás buscando ${value}?`
                             }
                         </TextStyled>
                         <Ionicons

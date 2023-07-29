@@ -20,19 +20,12 @@
       "**/*"
     ],
     "ios": {
-      "CFBundleURLTypes": [
-        {
-          "CFBundleURLSchemes": [
-            "com.googleusercontent.apps.511900415351-ej15snog5mn00ikjcbuqeqa1pap18nkn"
-          ]
-        }
-      ],
       "associatedDomains": [
         "com.googleusercontent.apps.511900415351-ej15snog5mn00ikjcbuqeqa1pap18nkn"
       ],
       "supportsTablet": true,
       "bundleIdentifier": "com.entereza.client",
-      "buildNumber": "54",
+      "buildNumber": "55",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Requerimos tu ubicación para poder darte información sobre las empresas afiliadas de tu ciudad.",
         "NSUserTrackingUsageDescription": "Esto permite a Entereza ofrecerte la mejor experiencia y mayor información sobre las empresas afiliadas que están en tu ciudad.",
@@ -49,11 +42,15 @@
         "backgroundColor": "#000000"
       },
       "package": "com.entereza.client",
-      "versionCode": 51,
+      "versionCode": 54,
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.FOREGROUND_SERVICE",
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.DOWNLOAD_WITHOUT_NOTIFICATION",
+        "android.permission.ACCESS_NETWORK_STATE"
       ],
       "googleServicesFile": "./google-services.json",
       "intentFilters": [
@@ -109,6 +106,7 @@
     },
     "updates": {
       "url": "https://u.expo.dev/7f0e7cbd-8088-4569-94bd-21702f3afe04"
-    }
+    },
+    "owner": "intirraptor"
   }
 }

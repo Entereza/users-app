@@ -397,7 +397,7 @@ export default function LoginComponent({ display = 'flex', loginOpacity, outputR
                                 onChangeText={text => formik.setFieldValue("password", text)}
                                 errorMessage={error ? errorMessage : formik.errors.password}
                                 errorStyle={{ fontSize: error ? 14 : 12, color: errorTotal ? theme.danger : theme.salmon }}
-                                onSubmitEditing={delayFormik}
+                                onSubmitEditing={(formik.dirty && formik.isValid) ? delayFormik : null}
                             />
 
                             <ForgotPassword />

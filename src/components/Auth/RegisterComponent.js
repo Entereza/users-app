@@ -740,7 +740,7 @@ export default function RegisterComponent({ display = 'none', registerOpacity, r
                                 value={formik.values.passwordConfirm}
                                 onChangeText={text => formik.setFieldValue("passwordConfirm", text)}
                                 errorMessage={error ? errorMessage : formik.errors.passwordConfirm}
-                                onSubmitEditing={delayFormik}
+                                onSubmitEditing={(formik.dirty && formik.isValid) ? delayFormik : null}
                                 errorStyle={{ fontSize: error ? 14 : 12, color: errorTotal ? theme.danger : theme.salmon }}
                                 ref={inputPasswordConfirm}
                                 onFocus={() => setFocusedInput('confirmPassword')}

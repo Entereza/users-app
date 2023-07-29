@@ -268,14 +268,28 @@ export default function BusinessHome() {
   const getInfo = async () => {
     try {
       console.log('Starts Get Info of BusinessScreen')
-      const cityCode = await location.ubication?.cityCode
-      console.log('codeCity: ', cityCode)
       setStartPromotions(false)
       setLoadingSkeletonCategory(true)
       setLoadingSkeleton(true)
       setLoadingSkeletonEmpresas(true)
       setLoadingMoreEmpresas(true)
 
+      let city;
+      if (location.address.state == "La Paz") {
+        city = 'LP'
+      }
+      if (location.address.state == "Cochabamba") {
+        city = 'CB'
+      }
+      if (location.address.state == "Santa Cruz") {
+        city = 'SC'
+      }
+      if (location.address.state == "Oruro") {
+        city = 'OR'
+      } 
+      if (location.address.state == "Tarija") {
+        city = 'TJ'
+      } 
 
       let res = await fetchWithToken(`entereza/rubros`, "GET");
 
@@ -283,17 +297,15 @@ export default function BusinessHome() {
 
       if (entereza.codeError === "COD200") {
         rubros.forEach(rubro => {
-          if (rubro.ciudad === cityCode) {
+          if (rubro.ciudad === city) {
             let imgCategory = imgRubros.find(
               (image) => image.codigo_rubro === rubro.codigoRubro
             )
             rubro.image = imgCategory ? { uri: `${imgCategory.img_rubro}` } : require('../../assets/img/NoCategory.png')
 
             arrayRubros.push(rubro)
-            console.log('Lenght Saved: ', arrayRubros.length)
           }
         });
-        console.log('Rubros: ', rubros)
         setImg(arrayRubros);
         getInfoPromotions()
         getInfoEmpresas5()
@@ -306,14 +318,27 @@ export default function BusinessHome() {
   };
 
   const [promotionsImg, setPromotionsImg] = React.useState('')
-  const [linkWP, setLinkWP] = React.useState('')
 
 
   const getInfoPromotions = async () => {
     try {
       const token = await AsyncStorage.getItem('ENT-TKN')
-
-      const cityCode = await location.ubication?.cityCode; // Asegúrate de que esto está definido
+      let city;
+      if (location.address.state == "La Paz") {
+        city = 'LP'
+      }
+      if (location.address.state == "Cochabamba") {
+        city = 'CB'
+      }
+      if (location.address.state == "Santa Cruz") {
+        city = 'SC'
+      }
+      if (location.address.state == "Oruro") {
+        city = 'OR'
+      } 
+      if (location.address.state == "Tarija") {
+        city = 'TJ'
+      } 
 
       const formData = new FormData();
       formData.append('opcion', '2');
@@ -321,7 +346,7 @@ export default function BusinessHome() {
       formData.append('codigoEmpresa', '');
       formData.append('fechaInicio', '');
       formData.append('fechaFinal', '');
-      formData.append('ciudad', cityCode);
+      formData.append('ciudad', city);
 
       const res = await fetch("https://enterezabol.com:8443/entereza/promociones_operacion", {
         method: 'POST',
@@ -354,14 +379,31 @@ export default function BusinessHome() {
   const getInfoEmpresas5 = async () => {
     try {
       setDataEmpresas([])
-      const cityCode = await location.ubication?.cityCode
+
+      let city;
+      if (location.address.state == "La Paz") {
+        city = 'LP'
+      }
+      if (location.address.state == "Cochabamba") {
+        city = 'CB'
+      }
+      if (location.address.state == "Santa Cruz") {
+        city = 'SC'
+      }
+      if (location.address.state == "Oruro") {
+        city = 'OR'
+      } 
+      if (location.address.state == "Tarija") {
+        city = 'TJ'
+      } 
+
       const lat = await location.coords?.latitude
       const lng = await location.coords?.longitude
 
       console.log('Latitud: ', lat, '- Longitud: ', lng)
 
       let res = await fetchWithToken(
-        `entereza/emp_hub_filt?patron=Empresa&opcion=1&pageno=0&size=15&ciudad=${cityCode}&categoria=COD-RUB-343&lat=${lat}&lng=${lng}`,
+        `entereza/emp_hub_filt?patron=Empresa&opcion=1&pageno=0&size=15&ciudad=${city}&categoria=COD-RUB-343&lat=${lat}&lng=${lng}`,
         "GET"
       );
 
@@ -484,14 +526,15 @@ export default function BusinessHome() {
 
   React.useEffect(() => {
     if (location !== null) {
-      setHasMore(true)
-      if (location.ubication !== null) {
-        if (location.ubication.cityCode) {
-          getInfo()
-        } else {
-          console.log('Missing CodCity')
-        }
+      if (location.address !== null) {
+        setHasMore(true)
+        getInfo();
+      } else {
+        console.log('location is null')
+        RedirectUbication()
       }
+    } else {
+      return
     }
   }, [location]);
 
@@ -520,10 +563,10 @@ export default function BusinessHome() {
             paddingBottom: 50,
           }}
         >
-          <BusinessInputRedirect cityCode={location !== null ? location.ubication.cityCode : 'Cochabamba'} loadingSkeleton={!startPromotions} />
+          <BusinessInputRedirect cityCode={location !== null ? location.address.state : 'Cochabamba'} loadingSkeleton={!startPromotions} />
 
           <BusinessPromotions
-            cityCode={location ? location.ubication.cityCode : 'Cochabamba'}
+            cityCode={location ? location.address.state : 'Cochabamba'}
             reload={loadingSkeleton}
             start={startPromotions}
             promotionsData={promotionsImg}
@@ -537,7 +580,7 @@ export default function BusinessHome() {
             marginLeftAuto
             marginRightAuto
           >
-            {/* <BusinessBubbles city={location !== null ? location.ubication.cityCode : 'Cochabamba'} loadingSkeleton={loadingSkeleton} /> */}
+            {/* <BusinessBubbles city={location !== null ? location.address.state : 'Cochabamba'} loadingSkeleton={loadingSkeleton} /> */}
 
             <ViewStyled
               backgroundColor={theme.transparent}

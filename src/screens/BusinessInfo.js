@@ -180,6 +180,7 @@ export default function BusinessInfo({ route }) {
                     }
                 });
 
+                console.log('List: ', lista_empresas)
                 setSucursalData((prev) => [...prev, ...newSucursal]);
             } else {
                 console.log("Error entereza BusinessInfo");
@@ -198,7 +199,7 @@ export default function BusinessInfo({ route }) {
     }
 
     React.useEffect(() => {
-        if (location.ubication !== null) {
+        if (location.address.state !== null) {
             getInfoSucursals()
         }
     }, [location])
