@@ -13,7 +13,6 @@ import ProfileStack from './ProfileStack';
 import BusinessStack from '../navigation/BusinessStack';
 import { _uiSetPermission, _uiSetPermissionGps } from '../redux/actions/uiActions';
 import { _authSetLocation, __authGetInfo, _authGetInfo } from '../redux/actions/authActions';
-import InitialModals from '../components/Modals/InitialModals';
 import * as Location from 'expo-location'
 import * as Tracking from 'expo-tracking-transparency';
 import AsyncStorage from '@react-native-async-storage/async-storage';

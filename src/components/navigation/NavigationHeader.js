@@ -48,8 +48,7 @@ export default function NavigationHeader() {
             setFinished(true)
         }
 
-        return require('../../assets/business/backgroundCity.png');
-
+        return { uri: matchingCity.urlCity };
     }
 
 

@@ -7,13 +7,13 @@ import { Linking, Pressable } from 'react-native';
 export default function BusinessPromotionsItem({ item }) {
 
     const RedirectWhatsapp = () => {
-        Linking.openURL(item.recargaDinero)
+        Linking.openURL(item.url)
     }
 
     const [disabled, setDisabled] = React.useState(true)
 
     const SeeLinkWp = () => {
-        if(item.recargaDinero){
+        if(item.url){
             setDisabled(false)
         }
     }

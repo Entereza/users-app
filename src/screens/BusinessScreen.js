@@ -334,7 +334,7 @@ export default function BusinessHome() {
 
       const { entereza, promImg } = await res.json()
 
-      console.log('Entereza Response: ', entereza)
+      console.log('Entereza Response getInfoPromotions: ', entereza, promImg)
       if (entereza.codeError === "COD200") {
         setStartPromotions(true)
 

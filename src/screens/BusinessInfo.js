@@ -1,27 +1,24 @@
 import * as React from 'react'
 
-import { ScrollView, TouchableOpacity, RefreshControl, Pressable, Modal, } from 'react-native'
+import { ScrollView, RefreshControl, Modal, } from 'react-native'
 
 import ViewStyled from '../components/ui/ViewStyled'
 import { theme } from '../utils/theme'
 import ImageStyled from '../components/ui/ImageStyled'
 import TextStyled from '../components/ui/TextStyled'
-import { Ionicons, Entypo } from '@expo/vector-icons'
+import { Ionicons } from '@expo/vector-icons'
 import { _authSetLocation } from '../redux/actions/authActions';
 import { useNavigation } from '@react-navigation/native'
 import adjustFontSize from '../utils/adjustText'
 import { ImageBackground } from 'react-native'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import SucursalItem from '../components/business/SucursalItem'
-import { Linking } from 'react-native'
 import { codeErrors } from '../utils/codeErrors'
-import { fetchWithToken } from '../utils/fetchWithToken'
+import { fetchWithToken, fetchWithToken4 } from '../utils/fetchWithToken'
 import { Skeleton, Box, HStack, NativeBaseProvider } from "native-base";
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { customStyles } from '../utils/customStyles'
 import { useSelector } from 'react-redux'
 import ButtonMenu from '../components/Btn/ButtonMenu'
-// import Pdf from 'react-native-pdf'
+import Pdf from 'react-native-pdf'
 
 export default function BusinessInfo({ route }) {
     const { data } = route.params;
@@ -29,16 +26,29 @@ export default function BusinessInfo({ route }) {
 
     const navigation = useNavigation()
 
-    const { codigoEmpresa, ahorro, background, img } = data;
+    const { codigoEmpresa, ahorro, background, img, nombre } = data;
 
     const [loadingSkeleton, setLoadingSkeleton] = React.useState(true)
     const [showMenu, setShowMenu] = React.useState('none')
 
+    const [urlMenu, setUrlMenu] = React.useState('')
+
     const GetMenuPdf = async () => {
         try {
-            //http://35.238.246.148:8027
+            console.log(data)
+            const res = await fetchWithToken4(`menus-ms/menu-get?codigoEmpresa=${codigoEmpresa}`, 'GET')
 
-            setShowMenu('flex')
+            const { urlMenu, entereza } = await res.json()
+
+            console.log('Entereza Response: ', entereza, '- ', urlMenu)
+
+            if (entereza.codeError === 'COD200' && urlMenu.length > 0) {
+                setUrlMenu(urlMenu[0])
+                setShowMenu('flex')
+            } else {
+                setShowMenu('none')
+                setUrlMenu('')
+            }
         } catch (error) {
             console.log('Error on GetMenu: ', error)
         }
@@ -199,14 +209,12 @@ export default function BusinessInfo({ route }) {
         setModal(!modal)
     };
 
-    const onlineSource = { uri: "http://samples.leanpub.com/thereactnativebook-sample.pdf", cache: true }
-
-    const [pdfSource, setPdfSource] = React.useState(onlineSource)
-
     const styles = {
         pdf: {
-            flex: 1,
-            alignSelf: "stretch"
+            width: widthPercentageToDP(100),
+            height: heightPercentageToDP(92),
+            justifyContent: 'center',
+            alignItems: 'center',
         }
     }
 
@@ -388,12 +396,11 @@ export default function BusinessInfo({ route }) {
                 </ViewStyled>
             </ScrollView>
 
-            {/* <ButtonMenu onPress={openPdf} showButton={showMenu} /> */}
-            <ButtonMenu onPress={() => null} showButton={showMenu} />
+            <ButtonMenu onPress={openPdf} showButton={showMenu} />
 
             <Modal
-                animationType="fade"
-                transparent={true}
+                animationType="slide"
+                transparent={false}
                 visible={modal}
                 onRequestClose={handleOnModal}
             >
@@ -401,11 +408,50 @@ export default function BusinessInfo({ route }) {
                     backgroundColor={theme.primary}
                     style={{
                         justifyContent: 'center',
-                        alignItems: 'center'
+                        alignItems: 'flex-start'
                     }}
                 >
-                    {/* <Pdf
-                        source={onlineSource}
+                    <ViewStyled
+                        backgroundColor={theme.transparent}
+                        paddingHorizontal={4}
+                        height={7}
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderTopRightRadius: 20,
+                            borderTopLeftRadius: 20,
+                        }}
+                    >
+                        <Ionicons
+                            name="arrow-back-outline"
+                            size={adjustFontSize(28)}
+                            color={theme.quaternary}
+                            style={{
+                                marginRight: 'auto',
+                            }}
+                            onPress={handleOnModal}
+                        />
+
+                        <TextStyled
+                            textAlign={'center'}
+                            fontFamily='ArtegraBold'
+                            fontSize={18}
+                            style={{
+                                marginRight: 'auto'
+                            }}
+                            fontWeight='500'
+                            color={theme.quaternary}
+                        >
+                            {
+                                `Menú de ${nombre}`
+                            }
+                        </TextStyled>
+                    </ViewStyled>
+
+                    <Pdf
+                        trustAllCerts={false}
+                        source={{ uri: urlMenu, cache: true }}
                         onLoadComplete={(numberOfPages, filePath) => {
                             console.log(`Number of pages: ${numberOfPages}`);
                         }}
@@ -420,7 +466,7 @@ export default function BusinessInfo({ route }) {
                         }}
                         style={styles.pdf}
 
-                    /> */}
+                    />
                 </ViewStyled>
             </Modal>
         </>

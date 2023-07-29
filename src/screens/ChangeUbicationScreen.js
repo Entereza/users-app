@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { TouchableOpacity } from 'react-native'
+import { ActivityIndicator, TouchableOpacity } from 'react-native'
 
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -19,6 +19,8 @@ export default function ChangeUbicationScreen() {
 
     const cityList = useSelector(state => state.auth.location.cities);
 
+    const [changingUbication, setChangingUbication] = React.useState(false)
+
     const [locationUser, setLocationUser] = React.useState({
         country: '',
         state: '',
@@ -31,6 +33,7 @@ export default function ChangeUbicationScreen() {
     })
 
     const setUbication = (city) => {
+        setChangingUbication(true)
         console.log('Data City: ', city)
         setCoordsUser({
             latitude: city.latitude,
@@ -51,6 +54,7 @@ export default function ChangeUbicationScreen() {
             dispatch(_authSetLocation({ cities: cityList, permissions: location.permissions, coords: coordsUser, ubication: locationUser, reloadScreen: false }));
 
             navigation.goBack();
+            setChangingUbication(false)
         }
     }, [coordsUser, locationUser])
 
@@ -68,7 +72,7 @@ export default function ChangeUbicationScreen() {
                 <ViewStyled
                     backgroundColor={theme.transparent}
                     width={100}
-                    height={5 + (cityList.length * 9)}
+                    height={10 + (cityList.length * 9)}
                 >
                     <ViewStyled
                         width={100}
@@ -104,7 +108,7 @@ export default function ChangeUbicationScreen() {
 
                     {
                         cityList.map((city, index) => (
-                            <TouchableOpacity key={index} onPress={() => setUbication(city)}>
+                            <TouchableOpacity disabled={changingUbication} key={index} onPress={() => setUbication(city)}>
                                 <ViewStyled
                                     width={100}
                                     height={8}
@@ -139,6 +143,12 @@ export default function ChangeUbicationScreen() {
                                 </ViewStyled>
                             </TouchableOpacity>
                         ))
+                    }
+
+                    {
+                        changingUbication
+                            ? <ActivityIndicator size="large" color={theme.secondary} />
+                            : <></>
                     }
                 </ViewStyled>
                 <ViewStyled

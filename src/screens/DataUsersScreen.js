@@ -13,7 +13,7 @@ import CiUser from '../components/Users/CiUser';
 import DateUser from '../components/Users/DateUser';
 import NumberUser from '../components/Users/NumberUser';
 import GenderUser from '../components/Users/GenderUser';
-import { fetchWithToken, fetchWithToken2 } from '../utils/fetchWithToken';
+import { fetchWithToken } from '../utils/fetchWithToken';
 
 export default function DataUsers() {
     const navigation = useNavigation()
@@ -236,7 +236,7 @@ export default function DataUsers() {
 
             console.log('Datos para la petición: ', dataSend)
 
-            const res = await fetchWithToken2('entereza/user_data_modal', 'POST', dataSend)
+            const res = await fetchWithToken('entereza/user_data_modal', 'POST', dataSend)
             const {
                 codeError,
                 msgError

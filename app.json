@@ -2,7 +2,7 @@
   "expo": {
     "name": "Entereza",
     "slug": "enterezaClient",
-    "version": "1.1.6",
+    "version": "1.1.7",
     "orientation": "portrait",
     "icon": "./assets/IconEntereza.png",
     "userInterfaceStyle": "light",
@@ -32,7 +32,7 @@
       ],
       "supportsTablet": true,
       "bundleIdentifier": "com.entereza.client",
-      "buildNumber": "53",
+      "buildNumber": "54",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Requerimos tu ubicación para poder darte información sobre las empresas afiliadas de tu ciudad.",
         "NSUserTrackingUsageDescription": "Esto permite a Entereza ofrecerte la mejor experiencia y mayor información sobre las empresas afiliadas que están en tu ciudad.",
@@ -77,6 +77,8 @@
     "plugins": [
       "expo-apple-authentication",
       "@react-native-google-signin/google-signin",
+      "@config-plugins/react-native-blob-util",
+      "@config-plugins/react-native-pdf",
       [
         "expo-tracking-transparency",
         {

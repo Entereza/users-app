@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { _uiSetPermission, _uiSetPermissionGps } from '../../redux/actions/uiActions';
 import ButtonNext from '../Btn/ButtonNext';
 import ImageStyled from './ImageStyled';
-import { fetchWithToken, fetchWithToken3 } from '../../utils/fetchWithToken';
+import { fetchWithToken } from '../../utils/fetchWithToken';
 
 export default function HeaderStyled({
     title,
