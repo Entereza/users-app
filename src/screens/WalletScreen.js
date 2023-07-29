@@ -350,267 +350,267 @@ export default function WalletScreen({ route }) {
     <>
       <FloatingButton bottom={10} />
 
-      <SafeAreaView edges={['top']} style={{ backgroundColor: theme.transparent }}>
+      <Animated.ScrollView
+        scrollEnabled={false}
+        contentContainerStyle={{
+          flexGrow: 1,
+        }}
+        style={{
+          backgroundColor: backgroundScrollView,
+        }}
+        showsVerticalScrollIndicator={false}
+        scrollToOverflowEnabled={false}
+      >
         <Animated.ScrollView
-          scrollEnabled={false}
+          scrollEnabled={true}
           contentContainerStyle={{
-            flexGrow: 1,
+            width: '100%',
+            height: '100%',
+            backgroundColor: theme.transparent,
+            justifyContent: 'flex-start',
+            alignItems: 'center',
           }}
           style={{
-            backgroundColor: backgroundScrollView,
+            paddingTop: marginTopValue
           }}
           showsVerticalScrollIndicator={false}
           scrollToOverflowEnabled={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={walletComponentsDisplay === 'flex' ? onRefresh : null} />
+          }
         >
-          <Animated.ScrollView
-            scrollEnabled={true}
-            contentContainerStyle={{
-              width: '100%',
-              height: '100%',
-              backgroundColor: theme.transparent,
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-            }}
+          <Animated.View
             style={{
-              paddingTop: marginTopValue
+              transform: [
+                {
+                  translateX: AnimatedTittle.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, -450],
+                  }),
+                },
+              ],
+              opacity: FirstTextOpacity,
+              width: widthPercentageToDP(95),
+              height: heightPercentageToDP(10),
+              marginBottom: heightPercentageToDP(2),
+              justifyContent: 'center',
+              alignItems: 'center',
+              display: animatedComponentsDisplay,
+              backgroundColor: theme.transparent,
+              // borderColor: theme.secondary,
+              // borderWidth: 1,
             }}
-            showsVerticalScrollIndicator={false}
-            scrollToOverflowEnabled={false}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={walletComponentsDisplay === 'flex' ? onRefresh : null} />
-            }
           >
-            <Animated.View
+            <ViewStyled
+              backgroundColor={theme.transparent}
               style={{
-                transform: [
-                  {
-                    translateX: AnimatedTittle.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, -450],
-                    }),
-                  },
-                ],
-                opacity: FirstTextOpacity,
-                width: widthPercentageToDP(95),
-                height: heightPercentageToDP(10),
-                marginBottom: heightPercentageToDP(2),
+                width: '100%',
+                height: '100%',
                 justifyContent: 'center',
                 alignItems: 'center',
-                display: animatedComponentsDisplay,
-                backgroundColor: theme.transparent,
-                // borderColor: theme.secondary,
-                // borderWidth: 1,
               }}
             >
-              <ViewStyled
-                backgroundColor={theme.transparent}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
+              <TextStyled
+                textAlign='center'
+                fontFamily='ArtegraBold'
+                fontSize={adjustFontSize(22)}
+                color={theme.primary}
               >
-                <TextStyled
-                  textAlign='center'
-                  fontFamily='ArtegraBold'
-                  fontSize={adjustFontSize(22)}
-                  color={theme.primary}
-                >
-                  {`¡Tu tarjeta está lista!`}
-                </TextStyled>
-              </ViewStyled>
-            </Animated.View>
+                {`¡Tu tarjeta está lista!`}
+              </TextStyled>
+            </ViewStyled>
+          </Animated.View>
 
+          <SafeAreaView edges={['top']} style={{ backgroundColor: theme.transparent }}>
             <WalletCard
               reload={refreshing}
               WalletCardOpacity={WalletCardAnimation}
               CardOpacity={WalletCardOpacity}
             />
+          </SafeAreaView>
 
-            <Animated.View
-              style={{
-                transform: [
-                  {
-                    translateX: AnimatedTextButton.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, 450],
-                    }),
-                  },
-                ],
-                opacity: SecondTextOpacity,
-                width: widthPercentageToDP(95),
-                height: heightPercentageToDP(24),
-                marginTop: heightPercentageToDP(4),
-                marginBottom: heightPercentageToDP(2),
-                justifyContent: 'center',
-                alignItems: 'center',
-                display: animatedComponentsDisplay,
-                backgroundColor: theme.transparent,
-                // borderColor: theme.secondary,
-                // borderWidth: 1,
-              }}
-            >
-              <ViewStyled
-                backgroundColor={theme.transparent}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                }}
-              >
-                <Animated.Text
-                  style={{ fontSize: adjustFontSize(16), color: theme.primary, fontFamily: 'BRFirma', textAlign: 'center', lineHeight: 25 }}
-                >
-                  {animatingText}
-                </Animated.Text>
-              </ViewStyled>
-            </Animated.View>
-
-            <Animated.View
-              style={{
-                transform: [
-                  {
-                    translateX: AnimatedTextButton.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, 450],
-                    }),
-                  },
-                ],
-                opacity: buttonOpacity,
-                width: widthPercentageToDP(100),
-                height: heightPercentageToDP(8),
-                justifyContent: 'center',
-                alignItems: 'center',
-                display: animatedComponentsDisplay,
-                backgroundColor: theme.transparent,
-                // borderColor: theme.secondary,
-                // borderWidth: 1,
-              }}
-            >
-              <ViewStyled
-                backgroundColor={theme.transparent}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <TouchableOpacity onPress={() => StartTextAnimations()} disabled={false}>
-                  <ViewStyled
-                    width={90}
-                    height={7}
-                    backgroundColor={
-                      refreshing
-                        ? theme.tertiaryGradient
-                        : theme.dark
-                    }
-                    borderRadius={2}
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      borderColor: refreshing ? theme.tertiary : theme.primary,
-                      borderWidth: 1,
-                    }}
-                  >
-                    <TextStyled
-                      fontSize={20}
-                      color={
-                        refreshing
-                          ? theme.tertiary
-                          : theme.primary
-                      }
-                      fontFamily='ArtegraBold'
-                    >
-                      Empezar
-                    </TextStyled>
-                  </ViewStyled>
-                </TouchableOpacity>
-              </ViewStyled>
-            </Animated.View>
-
-            <ViewStyled
-              width={92}
-              height={13}
-              marginVertical={1.5}
-              marginLeftAuto
-              marginRightAuto
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                display: walletComponentsDisplay,
-                // borderColor: theme.info,
-                // borderWidth: 1,
-              }}
-              backgroundColor={theme.transparent}
-            >
-              <Animated.View
-                style={{
-                  transform: [
-                    {
-                      translateX: AnimatedWalletButtonOne.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [-450, 0],
-                      }),
-                    },
-                  ],
-                  // borderColor: theme.facebook,
-                  // borderWidth: 1,
-                  backgroundColor: theme.transparent,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <WalletHowSale />
-              </Animated.View>
-
-              <Animated.View
-                style={{
-                  transform: [
-                    {
-                      translateX: AnimatedWalletButtonTwo.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [450, 0],
-                      }),
-                    },
-                  ],
-                  // borderColor: theme.danger,
-                  // borderWidth: 1,
-                  backgroundColor: theme.transparent,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <WalletSavingButton />
-              </Animated.View>
-            </ViewStyled>
-          </Animated.ScrollView>
           <Animated.View
             style={{
               transform: [
                 {
-                  translateY: AnimatedWalletTransactions.interpolate({
+                  translateX: AnimatedTextButton.interpolate({
                     inputRange: [0, 1],
-                    outputRange: [600, 0],
+                    outputRange: [0, 450],
                   }),
                 },
               ],
-              backgroundColor: theme.transparent,
-              display: walletComponentsDisplay,
-              alignItems: 'center',
+              opacity: SecondTextOpacity,
+              width: widthPercentageToDP(95),
+              height: heightPercentageToDP(24),
+              marginTop: heightPercentageToDP(4),
+              marginBottom: heightPercentageToDP(2),
               justifyContent: 'center',
-              marginTop: 5
-              // borderColor: theme.danger,
+              alignItems: 'center',
+              display: animatedComponentsDisplay,
+              backgroundColor: theme.transparent,
+              // borderColor: theme.secondary,
               // borderWidth: 1,
             }}
           >
-            <WalletSales reload={refreshing} handleRefresh={handleOnRefresh} />
+            <ViewStyled
+              backgroundColor={theme.transparent}
+              style={{
+                width: '100%',
+                height: '100%',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+              }}
+            >
+              <Animated.Text
+                style={{ fontSize: adjustFontSize(16), color: theme.primary, fontFamily: 'BRFirma', textAlign: 'center', lineHeight: 25 }}
+              >
+                {animatingText}
+              </Animated.Text>
+            </ViewStyled>
           </Animated.View>
+
+          <Animated.View
+            style={{
+              transform: [
+                {
+                  translateX: AnimatedTextButton.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, 450],
+                  }),
+                },
+              ],
+              opacity: buttonOpacity,
+              width: widthPercentageToDP(100),
+              height: heightPercentageToDP(8),
+              justifyContent: 'center',
+              alignItems: 'center',
+              display: animatedComponentsDisplay,
+              backgroundColor: theme.transparent,
+              // borderColor: theme.secondary,
+              // borderWidth: 1,
+            }}
+          >
+            <ViewStyled
+              backgroundColor={theme.transparent}
+              style={{
+                width: '100%',
+                height: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <TouchableOpacity onPress={() => StartTextAnimations()} disabled={false}>
+                <ViewStyled
+                  width={90}
+                  height={7}
+                  backgroundColor={
+                    refreshing
+                      ? theme.tertiaryGradient
+                      : theme.dark
+                  }
+                  borderRadius={2}
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderColor: refreshing ? theme.tertiary : theme.primary,
+                    borderWidth: 1,
+                  }}
+                >
+                  <TextStyled
+                    fontSize={20}
+                    color={
+                      refreshing
+                        ? theme.tertiary
+                        : theme.primary
+                    }
+                    fontFamily='ArtegraBold'
+                  >
+                    Empezar
+                  </TextStyled>
+                </ViewStyled>
+              </TouchableOpacity>
+            </ViewStyled>
+          </Animated.View>
+
+          <ViewStyled
+            width={92}
+            height={13}
+            marginVertical={1.5}
+            marginLeftAuto
+            marginRightAuto
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              display: walletComponentsDisplay,
+              // borderColor: theme.info,
+              // borderWidth: 1,
+            }}
+            backgroundColor={theme.transparent}
+          >
+            <Animated.View
+              style={{
+                transform: [
+                  {
+                    translateX: AnimatedWalletButtonOne.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [-450, 0],
+                    }),
+                  },
+                ],
+                // borderColor: theme.facebook,
+                // borderWidth: 1,
+                backgroundColor: theme.transparent,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <WalletHowSale />
+            </Animated.View>
+
+            <Animated.View
+              style={{
+                transform: [
+                  {
+                    translateX: AnimatedWalletButtonTwo.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [450, 0],
+                    }),
+                  },
+                ],
+                // borderColor: theme.danger,
+                // borderWidth: 1,
+                backgroundColor: theme.transparent,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <WalletSavingButton />
+            </Animated.View>
+          </ViewStyled>
         </Animated.ScrollView>
-      </SafeAreaView>
+        <Animated.View
+          style={{
+            transform: [
+              {
+                translateY: AnimatedWalletTransactions.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [600, 0],
+                }),
+              },
+            ],
+            backgroundColor: theme.transparent,
+            display: walletComponentsDisplay,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: 5
+            // borderColor: theme.danger,
+            // borderWidth: 1,
+          }}
+        >
+          <WalletSales reload={refreshing} handleRefresh={handleOnRefresh} />
+        </Animated.View>
+      </Animated.ScrollView>
     </>
   )
 }

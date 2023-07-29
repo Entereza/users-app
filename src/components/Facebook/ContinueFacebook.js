@@ -24,7 +24,7 @@ export default function ContinueFacebook({ display }) {
                 borderColor={theme.tertiary}
                 colorText={theme.primary}
                 image={require('./FacebookLogo.png')}
-                showButton={display}
+                showButton={'none'}
             />
 
             <Modal
