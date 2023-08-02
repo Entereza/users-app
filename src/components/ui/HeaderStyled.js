@@ -102,15 +102,21 @@ export default function HeaderStyled({
 
     }
 
-    const openAdjusts = () => {
+    const openAdjusts = async() => {
         setAdjustOpen(true)
-        console.log('android or ios')
-        if (Platform.OS === 'android') {
-            Linking.openSettings();
-        } else {
-            Linking.openURL(`app-settings:${packageName}`);
+        try {
+            if (Platform.OS === 'ios') {
+                console.log('ios')
+                await Linking.openURL('app-settings:');
+            } else {
+                console.log('android')
+                await Linking.openSettings();
+            }
+            handleCloseAlert()
+
+        } catch (e) {
+            console.error('Failed to open app settings.', e);
         }
-        handleCloseAlert()
     };
 
     const UbicationConPermisos = async () => {

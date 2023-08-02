@@ -16,7 +16,7 @@ import { _authSetLocation, __authGetInfo, _authGetInfo } from '../redux/actions/
 import * as Location from 'expo-location'
 import * as Tracking from 'expo-tracking-transparency';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { fetchWithToken, fetchWithToken3 } from '../utils/fetchWithToken';
+import { fetchWithToken } from '../utils/fetchWithToken';
 // import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import NotificacionWallet from '../components/Notifications/NotificationsWallet';

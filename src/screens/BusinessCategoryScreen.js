@@ -137,6 +137,7 @@ export default function BusinessCategoryScreen({ route }) {
         setDataItems([])
         console.log('reloadEmp Starts')
         setHasMore(true)
+        getInfo3()
     }
 
     const [refreshing, setRefreshing] = React.useState(false);
@@ -148,6 +149,7 @@ export default function BusinessCategoryScreen({ route }) {
         console.log('Starts onRefresh: ', page, dataItems.length)
         setHasMore(true)
         setRefreshing(true)
+        getInfo3()
     }
 
     React.useEffect(() => {

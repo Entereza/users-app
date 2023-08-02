@@ -20,12 +20,17 @@ export default function ImageProfile() {
 
     const packageName = 'com.entereza.client'; // Reemplaza con el nombre del paquete de la aplicación
 
-    const openSettings = () => {
-        console.log('android or ios')
-        if (Platform.OS === 'android') {
-            Linking.openSettings();
-        } else {
-            Linking.openURL(`app-settings:${packageName}`);
+    const openSettings = async () => {
+        try {
+            if (Platform.OS === 'ios') {
+                console.log('ios')
+                await Linking.openURL('app-settings:');
+            } else {
+                console.log('android')
+                await Linking.openSettings();
+            }
+        } catch (e) {
+            console.error('Failed to open app settings.', e);
         }
     };
 

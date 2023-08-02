@@ -16,13 +16,13 @@ import { useSelector } from 'react-redux';
 export default function SucursalItem({ item }) {
     const { location } = useSelector(state => state.auth);
 
-    // console.log('Horario Sucursal: ', item.horarios)
-    // console.log('Wpp: ', item.wpp)
+    // console.log('Item: ', item)
+    console.log('Wpp: ', item.wpp.wpp)
 
     const [colorWp, setColorWp] = React.useState('#818181')
 
     const OpenWp = () => {
-        Linking.openURL(item.wpp)
+        Linking.openURL(item.wpp.wpp)
     }
 
 

@@ -41,8 +41,6 @@ export default function AppNavigation() {
         await Updates.fetchUpdateAsync();
 
         await Updates.reloadAsync();
-
-        return;
       } else {
         console.log('No hay updates disponibles')
       }

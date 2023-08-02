@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { ScrollView, RefreshControl, Modal, } from 'react-native'
+import { ScrollView, RefreshControl, Modal, Alert, } from 'react-native'
 
 import ViewStyled from '../components/ui/ViewStyled'
 import { theme } from '../utils/theme'
@@ -19,6 +19,7 @@ import { Skeleton, Box, HStack, NativeBaseProvider } from "native-base";
 import { useSelector } from 'react-redux'
 import ButtonMenu from '../components/Btn/ButtonMenu'
 import Pdf from 'react-native-pdf'
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 
 export default function BusinessInfo({ route }) {
     const { data } = route.params;
@@ -35,16 +36,15 @@ export default function BusinessInfo({ route }) {
 
     const GetMenuPdf = async () => {
         try {
-            console.log(data)
-            const res = await fetchWithToken4(`menus-ms/menu-get?codigoEmpresa=${codigoEmpresa}`, 'GET')
+            const res = await fetchWithToken(`entereza/menus_get?codigoEmpresa=${codigoEmpresa}`, 'GET')
 
             const { urlMenu, entereza } = await res.json()
 
             console.log('Entereza Response: ', entereza, '- ', urlMenu)
 
-            if (entereza.codeError === 'COD200' && urlMenu.length > 0) {
-                setUrlMenu(urlMenu[0])
+            if (entereza.codeError === 'COD200') {
                 setShowMenu('flex')
+                setUrlMenu(urlMenu[0])
             } else {
                 setShowMenu('none')
                 setUrlMenu('')
@@ -144,15 +144,15 @@ export default function BusinessInfo({ route }) {
                 "GET"
             );
 
-            const { entereza, lista_empresas, lista_empresas_img, horarios, codKilometros } = await res.json();
+            const { entereza, lista_empresas, horarios, codKilometros, linksResumeBean } = await res.json();
 
             if (entereza.codeError === codeErrors.cod200) {
                 let newSucursal = lista_empresas.map((sucursal) => {
-                    let imgBusiness = lista_empresas_img.find((img) => img.codigoEmpresa === sucursal.codigoEmpresa);
+                    let wppBusiness = linksResumeBean.find((link) => link.codigoEmpresa === sucursal.codigoEmpresa);
                     let horariosEmpresa = horarios.find((h) => h.codigoEmpresa === sucursal.codigoEmpresa);
                     let codKm = codKilometros.find((k) => k.codigoEmpresa === sucursal.codigoEmpresa);
 
-                    sucursal.img = imgBusiness ? { uri: `${imgBusiness.imgEmpresa}` } : require('../assets/business/01.png');
+                    sucursal.wpp = wppBusiness ? wppBusiness : '';
                     sucursal.horarios = horariosEmpresa ? horariosEmpresa.estado : 'empty';
                     sucursal.codKm = codKm ? codKm.km : Number.MAX_SAFE_INTEGER;
 
@@ -213,7 +213,7 @@ export default function BusinessInfo({ route }) {
     const styles = {
         pdf: {
             width: widthPercentageToDP(100),
-            height: heightPercentageToDP(92),
+            height: heightPercentageToDP(85),
             justifyContent: 'center',
             alignItems: 'center',
         }
@@ -394,82 +394,86 @@ export default function BusinessInfo({ route }) {
 
                         }
                     </ViewStyled>
+                    <ButtonMenu onPress={openPdf} showButton={showMenu} />
                 </ViewStyled>
             </ScrollView>
 
-            <ButtonMenu onPress={openPdf} showButton={showMenu} />
-
-            <Modal
-                animationType="slide"
-                transparent={false}
-                visible={modal}
-                onRequestClose={handleOnModal}
-            >
-                <ViewStyled
-                    backgroundColor={theme.primary}
-                    style={{
-                        justifyContent: 'center',
-                        alignItems: 'flex-start'
-                    }}
+            <SafeAreaProvider>
+                <Modal
+                    animationType="slide"
+                    transparent={false}
+                    visible={modal}
+                    onRequestClose={handleOnModal}
                 >
-                    <ViewStyled
-                        backgroundColor={theme.transparent}
-                        paddingHorizontal={4}
-                        height={7}
-                        style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderTopRightRadius: 20,
-                            borderTopLeftRadius: 20,
-                        }}
-                    >
-                        <Ionicons
-                            name="arrow-back-outline"
-                            size={adjustFontSize(28)}
-                            color={theme.quaternary}
-                            style={{
-                                marginRight: 'auto',
-                            }}
-                            onPress={handleOnModal}
-                        />
+                    <SafeAreaView style={{ backgroundColor: theme.transparent, flex: 1 }}>
 
-                        <TextStyled
-                            textAlign={'center'}
-                            fontFamily='ArtegraBold'
-                            fontSize={18}
+                        <ViewStyled
+                            backgroundColor={theme.primary}
                             style={{
-                                marginRight: 'auto'
+                                justifyContent: 'center',
+                                alignItems: 'flex-start'
                             }}
-                            fontWeight='500'
-                            color={theme.quaternary}
                         >
-                            {
-                                `Menú de ${nombre}`
-                            }
-                        </TextStyled>
-                    </ViewStyled>
+                            <ViewStyled
+                                backgroundColor={theme.transparent}
+                                paddingHorizontal={4}
+                                height={7}
+                                style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    borderTopRightRadius: 20,
+                                    borderTopLeftRadius: 20,
+                                }}
+                            >
+                                <Ionicons
+                                    name="arrow-back-outline"
+                                    size={adjustFontSize(28)}
+                                    color={theme.quaternary}
+                                    style={{
+                                        marginRight: 'auto',
+                                    }}
+                                    onPress={handleOnModal}
+                                />
 
-                    <Pdf
-                        trustAllCerts={false}
-                        source={{ uri: urlMenu, cache: true }}
-                        onLoadComplete={(numberOfPages, filePath) => {
-                            console.log(`Number of pages: ${numberOfPages}`);
-                        }}
-                        onPageChanged={(page, numberOfPages) => {
-                            console.log(`Current page: ${page}`);
-                        }}
-                        onError={(error) => {
-                            console.log(error);
-                        }}
-                        onPressLink={(uri) => {
-                            console.log(`Link pressed: ${uri}`);
-                        }}
-                        style={styles.pdf}
+                                <TextStyled
+                                    textAlign={'center'}
+                                    fontFamily='ArtegraBold'
+                                    fontSize={18}
+                                    style={{
+                                        marginRight: 'auto'
+                                    }}
+                                    fontWeight='500'
+                                    color={theme.quaternary}
+                                >
+                                    {
+                                        `Menú de ${nombre}`
+                                    }
+                                </TextStyled>
+                            </ViewStyled>
 
-                    />
-                </ViewStyled>
-            </Modal>
+                            <Pdf
+                                trustAllCerts={false}
+                                source={{ uri: urlMenu, cache: true }}
+                                onLoadComplete={(numberOfPages, filePath) => {
+                                    console.log(`Number of pages: ${numberOfPages}`);
+                                }}
+                                onPageChanged={(page, numberOfPages) => {
+                                    console.log(`Current page: ${page}`);
+                                }}
+                                onError={(error) => {
+                                    console.log(error);
+                                }}
+                                onPressLink={(uri) => {
+                                    console.log(`Link pressed: ${uri}`);
+                                }}
+                                style={styles.pdf}
+
+                            />
+                        </ViewStyled>
+                    </SafeAreaView>
+                </Modal >
+            </SafeAreaProvider>
         </>
 
     )

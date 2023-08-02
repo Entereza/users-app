@@ -59,7 +59,6 @@ export default function ContinueGoogle({ shadow }) {
             setTokenId(userInfo.idToken)
         } catch (error) {
             console.log('Error signIn: ', error.message)
-            Alert.alert('ErrorsignIn: ', `${error}`)
             if (error.code === statusCodes.SIGN_IN_CANCELLED) {
                 console.log('Cancelled SignIn: ', error.message)
                 // user cancelled the login flow
@@ -70,6 +69,7 @@ export default function ContinueGoogle({ shadow }) {
                 console.log('Cancelled PLAY_SERVICES_NOT_AVAILABLE: ', error.message)
             } else {
                 console.log('some other error happened SignIn: ', error.message)
+                Alert.alert('ErrorsignIn: ', `${error}`)
                 // some other error happened
             }
         }
