@@ -40,7 +40,7 @@ export default function BusinessInfo({ route }) {
 
             const { urlMenu, entereza } = await res.json()
 
-            console.log('Entereza Response: ', entereza, '- ', urlMenu)
+            console.log('Entereza Response: ', entereza, '- ', urlMenu, '- ', codigoEmpresa)
 
             if (entereza.codeError === 'COD200') {
                 setShowMenu('flex')
@@ -394,9 +394,9 @@ export default function BusinessInfo({ route }) {
 
                         }
                     </ViewStyled>
-                    <ButtonMenu onPress={openPdf} showButton={showMenu} />
                 </ViewStyled>
             </ScrollView>
+            <ButtonMenu onPress={openPdf} showButton={showMenu} />
 
             <SafeAreaProvider>
                 <Modal
