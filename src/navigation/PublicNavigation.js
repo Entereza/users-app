@@ -4,10 +4,7 @@ import React from "react";
 // CUSTOM
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import ModalHowSale from "../components/Modals/ModalHowSale";
 import AuthenticationScreen from "../screens/AuthenticationScreen";
-import LoginEnterezaScreen from "../screens/LoginEnterezaScreen";
-import RegisterEnterezaScreen from "../screens/RegisterEnterezaScreen";
 import ModalExplications from "../components/Modals/ModalExplications";
 import { theme } from "../utils/theme";
 
@@ -20,7 +17,8 @@ export default function PublicNavigation() {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-          navigationBarColor: theme.primary
+          navigationBarHidden: false,
+          navigationBarColor: theme.transparent
         }}
         initialRouteName="ModalExplications"
       >
@@ -32,26 +30,10 @@ export default function PublicNavigation() {
           }}
         />
         <Stack.Screen
-          name="LoginEnterezaScreen"
-          component={LoginEnterezaScreen}
-          options={{
-            animation: 'slide_from_right', // Animación personalizada para la pantalla LoginEnterezaScreen
-          }}
-        />
-        <Stack.Screen
-          name="RegisterEnterezaScreen"
-          component={RegisterEnterezaScreen}
-          options={{
-            animation: 'slide_from_left', // Animación personalizada para la pantalla RegisterEnterezaScreen
-          }}
-        />
-
-        <Stack.Screen
           name="ModalExplications"
           component={ModalExplications}
           options={{
             animation: 'fade',
-            navigationBarColor: theme.dark
           }}
         />
       </Stack.Navigator>

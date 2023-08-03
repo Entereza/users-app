@@ -17,7 +17,7 @@ export default function HeaderStyledWalletProfile({
 
     return (
         <>
-            <SafeAreaView style={{ backgroundColor: theme.background }} >
+            <SafeAreaView edges={['top']} style={{ backgroundColor: theme.transparent }} >
                 <ViewStyled
                     backgroundColor={theme.primary}
                     paddingHorizontal={4}

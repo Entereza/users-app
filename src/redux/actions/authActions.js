@@ -28,9 +28,9 @@ export const __authLogout = () => {
                 email: email
             }
             console.log('Logout data: ', data)
-            
+
             var close = {
-                
+
             }
             let res = await fetchWithToken("entereza/logout", "POST", data)
 
@@ -62,46 +62,55 @@ export const _authGetInfo = (payload) => ({
 
 export const __authGetInfo = () => {
     return async (dispatch) => {
-        try {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const mail = await AsyncStorage.getItem('ENT-EMAIL')
+                console.log('Starts Searching Info of User: ', mail)
 
-            const mail = await AsyncStorage.getItem('ENT-EMAIL')
-
-            const response = await fetchWithToken(`entereza/usuarios_list?code=${mail}`)
-
-            const {
-                entereza,
-                lista_usuarios,
-                modales,
-                token,
-                tiempo_faltante,
-                codigo_transacciones,
-                creado_entereza,
-                expo
-            } = await response.json()
-
-            if (entereza.codeError === codeErrors.cod526) {
-                let data = {
-                    ahorro: tiempo_faltante.ahorro,
-                    disponible: tiempo_faltante.fecha,
-                    ...lista_usuarios[0],
+                const response = await fetchWithToken(`entereza/usuarios_list?code=${mail}`)
+    
+                const {
+                    entereza,
+                    lista_usuarios,
                     modales,
                     token,
-                    codigo: codigo_transacciones,
-                    entereza: creado_entereza,
-                    expoToken: expo
-                }
-                await Promise.all([
-                    await AsyncStorage.setItem('CODE-NOMBRE', lista_usuarios[0].usuarioBean?.nombres),
-                    await AsyncStorage.setItem('CODE-SALDO', tiempo_faltante.ahorro),
-                ])
-                dispatch(_authGetInfo(data))
-            } else {
-                dispatch(_authLogout())
-            }
+                    tiempo_faltante,
+                    codigo_transacciones,
+                    creado_entereza,
+                    expo
+                } = await response.json()
+    
 
-        } catch (err) {
-            console.log('Error authGetInfo: ', err)
-        }
+                if (entereza.codeError === codeErrors.cod526) {
+                    let data = {
+                        ahorro: tiempo_faltante.ahorro,
+                        disponible: tiempo_faltante.fecha,
+                        ...lista_usuarios[0],
+                        modales,
+                        token,
+                        codigo: codigo_transacciones,
+                        entereza: creado_entereza,
+                        expoToken: expo
+                    }
+
+                    await Promise.all([
+                        await AsyncStorage.setItem('CODE-NOMBRE', lista_usuarios[0].usuarioBean?.nombres),
+                        await AsyncStorage.setItem('CODE-SALDO', tiempo_faltante.ahorro),
+                    ])
+                    dispatch(_authGetInfo(data))
+
+                    resolve();
+                } else {
+                    console.log('Logout by token caducado.', entereza)
+                    dispatch(_authLogout())
+                }
+            } catch (err) {
+                console.log('Error authGetInfo: ', err)
+            } finally {
+                console.log('Finished AuthGetInfo')
+                dispatch(_uiFinishChecking())
+            }
+        });
     }
 }
 
@@ -132,11 +141,10 @@ export const __authValidate = () => {
                 // console.log("No hay nada")
             }
         } catch (err) {
-            console.log("EROR VALIDATE")
-            console.log(err)
+            console.log('EROR VALIDATE', err)
         } finally {
             console.log('Close LoginScreen.')
-            dispatch(_uiFinishChecking())
+            dispatch(__authGetInfo())
         }
     }
 }

@@ -7,24 +7,20 @@ import AppIntroSlider from 'react-native-app-intro-slider';
 import { Ionicons } from '@expo/vector-icons';
 import { fetchWithoutToken } from '../../utils/fetchWithoutToken';
 
-// CUSTOM 
-import How1 from '../../assets/gif/Gif1Pasos.png';
-import How2 from '../../assets/gif/Gif2Pasos.png';
-import How3 from '../../assets/gif/Gif3Pasos.png';
-
 import ViewStyled from '../ui/ViewStyled'
 import TextStyled from '../ui/TextStyled';
 import { theme } from '../../utils/theme';
 import ImageStyled from '../ui/ImageStyled';
-import adjustFontSize from '../../utils/adjustText';
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
 import { useNavigation } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import Img1 from '../../assets/modal/im1.png'
 import Img2 from '../../assets/modal/im3.png'
 import Img3 from '../../assets/modal/im2.png'
 import Img4 from '../../assets/modal/im4.png'
 import Img5 from '../../assets/modal/im5.png'
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 
@@ -60,8 +56,6 @@ const slides = [
 export default function ModalExplications() {
 
     const navigation = useNavigation()
-
-    const [modal, setModal] = useState(true);
 
     const handleOnDone = () => {
         send2()
@@ -105,11 +99,12 @@ export default function ModalExplications() {
                     <>
                         <ViewStyled
                             width={100}
-                            height={88}
+                            height={100}
                             backgroundColor={theme.transparent}
+                            paddingTop={3}
                             style={{
                                 alignItems: 'center',
-                                justifyContent: 'flex-end',
+                                justifyContent: 'flex-start',
                             }}
                         >
                             <ViewStyled
@@ -156,8 +151,8 @@ export default function ModalExplications() {
                             <ViewStyled
                                 width={100}
                                 height={16}
-                                marginTop={3}
-                                marginBottom={1}
+                                marginTop={1}
+                                marginBottom={3}
                                 backgroundColor={theme.transparent}
                                 style={{
                                     justifyContent: 'center',
@@ -169,10 +164,9 @@ export default function ModalExplications() {
                                 <TextStyled
                                     textAlign='center'
                                     fontFamily='ArtegraBold'
-                                    fontSize={32}
+                                    fontSize={30}
                                     color={theme.primary}
                                     style={{
-                                        marginBottom: '3%',
                                         width: '95%'
                                     }}
                                 >
@@ -194,7 +188,7 @@ export default function ModalExplications() {
                         style={{
                             justifyContent: 'center',
                             alignItems: 'center',
-                            top: -55
+                            top: heightPercentageToDP(-6)
                         }}
                     >
                         <ViewStyled
@@ -210,8 +204,9 @@ export default function ModalExplications() {
                             }}
                         >
                             <TextStyled
-                                fontSize={16}
+                                fontSize={20}
                                 color={theme.primary}
+                                fontFamily='ArtegraBold'
                             >
                                 Continuar
                             </TextStyled>
@@ -229,28 +224,31 @@ export default function ModalExplications() {
                         style={{
                             justifyContent: 'center',
                             alignItems: 'center',
-                            top: -55
+                            top: heightPercentageToDP(-6)
                         }}
                     >
-                        <ViewStyled
-                            width={90}
-                            height={7}
-                            backgroundColor={theme.primary}
-                            borderRadius={2}
+                        <LinearGradient
+                            colors={[theme.green3, theme.secondary, theme.salmon]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
                             style={{
+                                width: widthPercentageToDP(90),
+                                height: heightPercentageToDP(7),
+                                borderRadius: heightPercentageToDP(2),
                                 justifyContent: 'center',
                                 alignItems: 'center',
                                 borderWidth: 1,
                             }}
                         >
                             <TextStyled
-                                fontSize={16}
+                                fontSize={20}
                                 color={theme.dark}
+                                fontFamily='ArtegraBold'
                             >
                                 Empezar
                             </TextStyled>
-                        </ViewStyled>
-                    </ViewStyled>
+                        </LinearGradient>
+                    </ViewStyled >
                 )}
 
                 showSkipButton={false}
@@ -258,11 +256,11 @@ export default function ModalExplications() {
                 dotClickEnabled={true}
                 activeDotStyle={{
                     backgroundColor: theme.primary,
-                    top: -100
+                    top: heightPercentageToDP(-11)
                 }}
                 dotStyle={{
                     backgroundColor: theme.tertiary,
-                    top: -100
+                    top: heightPercentageToDP(-11)
                 }}
             />
         </>

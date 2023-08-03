@@ -1,25 +1,25 @@
 import * as React from 'react'
 
-import { ScrollView, TouchableOpacity, RefreshControl, } from 'react-native'
+import { ScrollView, RefreshControl, Modal, Alert, } from 'react-native'
 
 import ViewStyled from '../components/ui/ViewStyled'
 import { theme } from '../utils/theme'
 import ImageStyled from '../components/ui/ImageStyled'
 import TextStyled from '../components/ui/TextStyled'
-import { Ionicons, Entypo } from '@expo/vector-icons'
+import { Ionicons } from '@expo/vector-icons'
 import { _authSetLocation } from '../redux/actions/authActions';
 import { useNavigation } from '@react-navigation/native'
 import adjustFontSize from '../utils/adjustText'
 import { ImageBackground } from 'react-native'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import SucursalItem from '../components/business/SucursalItem'
-import { Linking } from 'react-native'
 import { codeErrors } from '../utils/codeErrors'
-import { fetchWithToken } from '../utils/fetchWithToken'
+import { fetchWithToken, fetchWithToken4 } from '../utils/fetchWithToken'
 import { Skeleton, Box, HStack, NativeBaseProvider } from "native-base";
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { customStyles } from '../utils/customStyles'
 import { useSelector } from 'react-redux'
+import ButtonMenu from '../components/Btn/ButtonMenu'
+import Pdf from 'react-native-pdf'
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 
 export default function BusinessInfo({ route }) {
     const { data } = route.params;
@@ -27,38 +27,49 @@ export default function BusinessInfo({ route }) {
 
     const navigation = useNavigation()
 
-    const { codigoEmpresa, ahorro, background, img, fb, insta, } = data;
+    const { codigoEmpresa, ahorro, background, img, nombre } = data;
 
     const [loadingSkeleton, setLoadingSkeleton] = React.useState(true)
+    const [showMenu, setShowMenu] = React.useState('none')
 
-    const [colorFb, setColorFb] = React.useState('#818181')
-    const [colorIg, setColorIg] = React.useState('#818181')
+    const [urlMenu, setUrlMenu] = React.useState('')
 
-    const OpenFb = () => {
-        Linking.openURL(fb)
-    }
-    const OpenIg = () => {
-        Linking.openURL(insta)
-    }
+    const GetMenuPdf = async () => {
+        try {
+            const res = await fetchWithToken(`entereza/menus_get?codigoEmpresa=${codigoEmpresa}`, 'GET')
 
-    const SetColorsRedes = () => {
-        if (fb !== '') {
-            setColorFb('#4267B2')
+            const { urlMenu, entereza } = await res.json()
+
+            console.log('Entereza Response: ', entereza, '- ', urlMenu, '- ', codigoEmpresa)
+
+            if (entereza.codeError === 'COD200') {
+                setShowMenu('flex')
+                setUrlMenu(urlMenu[0])
+            } else {
+                setShowMenu('none')
+                setUrlMenu('')
+            }
+        } catch (error) {
+            console.log('Error on GetMenu: ', error)
         }
-        if (insta !== '') {
-            setColorIg('#833AB4')
-        }
+    }
+
+    const openPdf = () => {
+        setModal(!modal)
     }
 
     React.useEffect(() => {
-        SetColorsRedes()
-    }, [])
+        if (codigoEmpresa) {
+            console.log('Codigo Empresa: ', codigoEmpresa)
+            GetMenuPdf()
+        }
+    }, [data])
 
     const SkeletonSucursals = () => {
         return (
             <NativeBaseProvider>
                 <Box w="100%" alignItems={'center'} >
-                    <HStack marginBottom={heightPercentageToDP(1)} backgroundColor={theme.primary} w={widthPercentageToDP(94)} h={heightPercentageToDP(11)} borderWidth="1" space={1} rounded="lg" _dark={{
+                    <HStack marginBottom={heightPercentageToDP(0.5)} backgroundColor={theme.primary} w={widthPercentageToDP(94)} h={heightPercentageToDP(11)} borderWidth="1" space={1} rounded="lg" _dark={{
                         borderColor: "coolGray.500"
                     }} _light={{
                         borderColor: "coolGray.200"
@@ -68,7 +79,7 @@ export default function BusinessInfo({ route }) {
                         <Skeleton.Text speed={1} lines={2} alignItems="center" px="12" marginLeft={"-2"} />
                     </HStack>
 
-                    <HStack marginBottom={heightPercentageToDP(1)} backgroundColor={theme.primary} w={widthPercentageToDP(94)} h={heightPercentageToDP(11)} borderWidth="1" space={1} rounded="lg" _dark={{
+                    <HStack marginBottom={heightPercentageToDP(0.5)} backgroundColor={theme.primary} w={widthPercentageToDP(94)} h={heightPercentageToDP(11)} borderWidth="1" space={1} rounded="lg" _dark={{
                         borderColor: "coolGray.500"
                     }} _light={{
                         borderColor: "coolGray.200"
@@ -78,7 +89,7 @@ export default function BusinessInfo({ route }) {
                         <Skeleton.Text speed={1} lines={2} alignItems="center" px="12" marginLeft={"-2"} />
                     </HStack>
 
-                    <HStack marginBottom={heightPercentageToDP(1)} backgroundColor={theme.primary} w={widthPercentageToDP(94)} h={heightPercentageToDP(11)} borderWidth="1" space={1} rounded="lg" _dark={{
+                    <HStack marginBottom={heightPercentageToDP(0.5)} backgroundColor={theme.primary} w={widthPercentageToDP(94)} h={heightPercentageToDP(11)} borderWidth="1" space={1} rounded="lg" _dark={{
                         borderColor: "coolGray.500"
                     }} _light={{
                         borderColor: "coolGray.200"
@@ -120,19 +131,6 @@ export default function BusinessInfo({ route }) {
 
     const [sucursalData, setSucursalData] = React.useState([])
 
-    // newSucursal.sort((a, b) => {
-    //     // Busca los objetos "codKilometros" que corresponden a cada empresa
-    //     const kilomA = empHorariosSuc.codKilometros.find((k) => k.codigoEmpresa === a.codigoEmpresa);
-    //     const kilomB = empHorariosSuc.codKilometros.find((k) => k.codigoEmpresa === b.codigoEmpresa);
-
-    //     // Si ambos objetos existen, compara sus propiedades "km"
-    //     if (kilomA && kilomB) {
-    //         return kilomA.km - kilomB.km;
-    //     }
-    //     // Si falta uno de los objetos, deja la comparación a cargo del sort anterior
-    //     return 0;
-    // });
-
     const getInfoSucursals = async () => {
         setLoadingSkeleton(true)
         try {
@@ -146,15 +144,15 @@ export default function BusinessInfo({ route }) {
                 "GET"
             );
 
-            const { entereza, lista_empresas, lista_empresas_img, horarios, codKilometros } = await res.json();
+            const { entereza, lista_empresas, horarios, codKilometros, linksResumeBean } = await res.json();
 
             if (entereza.codeError === codeErrors.cod200) {
                 let newSucursal = lista_empresas.map((sucursal) => {
-                    let imgBusiness = lista_empresas_img.find((img) => img.codigoEmpresa === sucursal.codigoEmpresa);
+                    let wppBusiness = linksResumeBean.find((link) => link.codigoEmpresa === sucursal.codigoEmpresa);
                     let horariosEmpresa = horarios.find((h) => h.codigoEmpresa === sucursal.codigoEmpresa);
                     let codKm = codKilometros.find((k) => k.codigoEmpresa === sucursal.codigoEmpresa);
 
-                    sucursal.img = imgBusiness ? { uri: `${imgBusiness.imgEmpresa}` } : require('../assets/business/01.png');
+                    sucursal.wpp = wppBusiness ? wppBusiness : '';
                     sucursal.horarios = horariosEmpresa ? horariosEmpresa.estado : 'empty';
                     sucursal.codKm = codKm ? codKm.km : Number.MAX_SAFE_INTEGER;
 
@@ -182,6 +180,7 @@ export default function BusinessInfo({ route }) {
                     }
                 });
 
+                console.log('List: ', lista_empresas)
                 setSucursalData((prev) => [...prev, ...newSucursal]);
             } else {
                 console.log("Error entereza BusinessInfo");
@@ -205,6 +204,21 @@ export default function BusinessInfo({ route }) {
         }
     }, [location])
 
+    const [modal, setModal] = React.useState(false);
+
+    const handleOnModal = async () => {
+        setModal(!modal)
+    };
+
+    const styles = {
+        pdf: {
+            width: widthPercentageToDP(100),
+            height: heightPercentageToDP(85),
+            justifyContent: 'center',
+            alignItems: 'center',
+        }
+    }
+
     return (
         <>
             <ScrollView
@@ -222,7 +236,7 @@ export default function BusinessInfo({ route }) {
                 <ViewStyled
                     backgroundColor={theme.transparent}
                     width={100}
-                    height={sucursalData.length > 4 ? 60 + (12.5 * sucursalData.length) : 106}
+                    height={sucursalData.length > 4 ? 65 + (12.5 * sucursalData.length) : 110}
                     style={{
                         justifyContent: 'flex-start',
                         alignItems: 'center',
@@ -380,80 +394,86 @@ export default function BusinessInfo({ route }) {
 
                         }
                     </ViewStyled>
+                </ViewStyled>
+            </ScrollView>
+            <ButtonMenu onPress={openPdf} showButton={showMenu} />
 
-                    <ViewStyled
-                        width={95}
-                        height={10}
-                        backgroundColor={theme.transparent}
-                        style={{
-                            justifyContent: 'center',
-                            alignItems: 'flex-start',
-                        }}
-                    >
+            <SafeAreaProvider>
+                <Modal
+                    animationType="slide"
+                    transparent={false}
+                    visible={modal}
+                    onRequestClose={handleOnModal}
+                >
+                    <SafeAreaView style={{ backgroundColor: theme.transparent, flex: 1 }}>
+
                         <ViewStyled
-                            width={30}
-                            height={9}
-                            marginLeft={8}
-                            backgroundColor={theme.transparent}
+                            backgroundColor={theme.primary}
                             style={{
                                 justifyContent: 'center',
-                                alignItems: 'center',
-                                flexDirection: 'row',
+                                alignItems: 'flex-start'
                             }}
                         >
                             <ViewStyled
                                 backgroundColor={theme.transparent}
-                                width={13}
-                                height={8}
-                                marginHorizontal={2}
+                                paddingHorizontal={4}
+                                height={7}
+                                style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    borderTopRightRadius: 20,
+                                    borderTopLeftRadius: 20,
+                                }}
                             >
-                                <TouchableOpacity
-                                    disabled={colorFb === '#818181'}
-                                    onPress={OpenFb}
-                                    style={
-                                        [
-                                            {
-                                                width: '100%',
-                                                height: '100%',
+                                <Ionicons
+                                    name="arrow-back-outline"
+                                    size={adjustFontSize(28)}
+                                    color={theme.quaternary}
+                                    style={{
+                                        marginRight: 'auto',
+                                    }}
+                                    onPress={handleOnModal}
+                                />
 
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                            }
-                                        ]
-                                    }
+                                <TextStyled
+                                    textAlign={'center'}
+                                    fontFamily='ArtegraBold'
+                                    fontSize={18}
+                                    style={{
+                                        marginRight: 'auto'
+                                    }}
+                                    fontWeight='500'
+                                    color={theme.quaternary}
                                 >
-                                    <Entypo name="facebook-with-circle" size={adjustFontSize(40)} color={colorFb} />
-                                </TouchableOpacity>
+                                    {
+                                        `Menú de ${nombre}`
+                                    }
+                                </TextStyled>
                             </ViewStyled>
 
-                            <ViewStyled
-                                backgroundColor={theme.transparent}
-                                width={13}
-                                height={8}
-                                marginHorizontal={2}
-                            >
-                                <TouchableOpacity
-                                    disabled={colorIg === '#818181'}
-                                    onPress={OpenIg}
-                                    style={
-                                        [
-                                            {
-                                                width: '100%',
-                                                height: '100%',
+                            <Pdf
+                                trustAllCerts={false}
+                                source={{ uri: urlMenu, cache: true }}
+                                onLoadComplete={(numberOfPages, filePath) => {
+                                    console.log(`Number of pages: ${numberOfPages}`);
+                                }}
+                                onPageChanged={(page, numberOfPages) => {
+                                    console.log(`Current page: ${page}`);
+                                }}
+                                onError={(error) => {
+                                    console.log(error);
+                                }}
+                                onPressLink={(uri) => {
+                                    console.log(`Link pressed: ${uri}`);
+                                }}
+                                style={styles.pdf}
 
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                            }
-                                        ]
-                                    }
-                                >
-                                    <Entypo name="instagram-with-circle" size={adjustFontSize(40)} color={colorIg} />
-                                </TouchableOpacity>
-                            </ViewStyled>
+                            />
                         </ViewStyled>
-                    </ViewStyled>
-                </ViewStyled>
-            </ScrollView>
+                    </SafeAreaView>
+                </Modal >
+            </SafeAreaProvider>
         </>
 
     )

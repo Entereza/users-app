@@ -82,63 +82,38 @@ export default function WalletSavingButton() {
                 onPress={RedirectCode}
             >
                 <ViewStyled
-                    width={40}
-                    height={25 / 2}
+                    width={44}
+                    height={13}
                     style={{
                         alignItems: 'center',
                         justifyContent: 'center',
                         shadowColor: theme.secondary,
                         shadowOffset: {
-                            width: 5,
-                            height: 8,
+                            width: 3,
+                            height: 5,
                         },
                         shadowOpacity: 1,
                         shadowRadius: 3.5,
                         elevation: 15,
                     }}
-                    marginHorizontal={2}
                     borderRadius={2}
+                    paddingHorizontal={2}
                 >
-                    <Animated.View
-                        style={{
-                            backgroundColor: theme.secondary,
-                            height: heightInterpolation2,
-                            width: widthInterpolation,
-                            display: buttonOpen,
-                            position: 'absolute',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            borderRadius: 100,
-                            bottom: heightPercentageToDP(11),
-                            right: widthPercentageToDP(-1),
-                            transform: [{ translateY: heightInterpolation }, { translateX: translateXInterpolation },],
-                        }}
-                    />
                     <TextStyled
                         textAlign='center'
-                        fontSize={17}
-                        numberOfLines={4}
+                        fontSize={18}
                         color={theme.quaternary}
-                        style={{
-                            // marginBottom: 6,
-                            width: "95%",
-                        }}
                     >
                         {
-                            '¿Cómo usar mi'
+                            '¿Cómo '
                         }
                         <TextStyled
-                            fontWeight='700'
+                            fontWeight='bold'
                             textAlign='center'
-                            fontSize={17}
-                            numberOfLines={4}
+                            fontSize={18}
                             color={theme.secondary}
-                            style={{
-                                // marginBottom: 6,
-                                width: "95%",
-                            }}
                         >
-                            {' SALDO'}
+                            {'PAGAR'}
                         </TextStyled>
                         {'?'}
                     </TextStyled>

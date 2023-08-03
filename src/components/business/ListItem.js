@@ -18,7 +18,6 @@ import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP, heightPercentageToDP } from 'react-native-responsive-screen';
 
 export default function ListItem({ item }) {
-
     const navigation = useNavigation()
 
     const Consola = () => {

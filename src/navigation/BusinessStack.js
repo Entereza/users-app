@@ -16,8 +16,6 @@ const Stack = createNativeStackNavigator();
 export default function ProfileStack() {
     return (
         <>
-            <FloatingButton />
-
             <Stack.Navigator
                 screenOptions={{
                     headerShown: false,
@@ -26,7 +24,6 @@ export default function ProfileStack() {
                 }}
                 initialRouteName="BusinessHome"
             >
-
                 <Stack.Screen
                     name="BusinessHome"
                     component={BusinessHome}

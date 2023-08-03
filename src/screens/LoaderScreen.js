@@ -4,8 +4,10 @@ import { ActivityIndicator } from 'react-native';
 import ViewStyled from '../components/ui/ViewStyled';
 import { theme } from '../utils/theme';
 import ImageStyled from '../components/ui/ImageStyled';
+import TextStyled from '../components/ui/TextStyled';
+import adjustFontSize from '../utils/adjustText';
 
-export default function LoaderScreen() {
+export default function LoaderScreen({ textUpdates, updateAvailable }) {
     return (
         <ViewStyled
             width={100}
@@ -16,15 +18,40 @@ export default function LoaderScreen() {
                 alignItems: 'center',
             }}
         >
-            <ImageStyled
+            <ViewStyled
                 width={50}
                 height={30}
-                source={require('../../assets/img/EnterezaLogoColors.png')}
+                backgroundColor={theme.transparent}
                 style={{
-                    resizeMode: 'contain',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                 }}
-            />
-            <ActivityIndicator size="large" color={theme.primary} style={{ marginTop: 15 }} />
+            >
+                <ImageStyled
+                    source={require('../../assets/img/EnterezaLogoColors.png')}
+                    style={{
+                        resizeMode: 'contain',
+                        width: '100%',
+                        height: '100%'
+                    }}
+                />
+            </ViewStyled>
+
+            <TextStyled
+                fontFamily='ArtegraBold'
+                fontSize={adjustFontSize(16)}
+                color={theme.primary}
+            >
+                {
+                    textUpdates
+                        ? updateAvailable
+                            ? `Actualizando Entereza...`
+                            : `Verificando Actualizaciones...`
+                        : `Cargando Datos...`
+                }
+            </TextStyled>
+
+            <ActivityIndicator size="large" color={theme.secondary} style={{ marginTop: 15 }} />
         </ViewStyled>
     );
 }

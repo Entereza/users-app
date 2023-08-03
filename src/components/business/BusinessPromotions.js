@@ -9,9 +9,8 @@ import { theme } from "../../utils/theme";
 import BusinessPromotionsItem from "./BusinessPromotionsItem";
 import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen";
 
-export default function BusinessPromotions({ city, reload, start }) {
+export default function BusinessPromotions({ reload, start, promotionsData }) {
   const [page, setPage] = useState(0);
-  const [loadingSkeleton, setLoadingSkeleton] = useState(true)
 
   const SkeletonBusiness = () => {
     return (
@@ -62,52 +61,27 @@ export default function BusinessPromotions({ city, reload, start }) {
     )
   }
 
-  const getPromotions = async () => {
-    setLoadingSkeleton(true)
-
-    setTimeout(() => {
-      setLoadingSkeleton(false)
-    }, 2000);
-  }
-
-  useEffect(() => {
-    if (start === true) {
-      getPromotions()
-    }
-  }, [reload, start])
-
   const nextPage = () => {
     setPage(page + 1);
   };
 
-  const data = [
-    { nombre: '1', ciudad: 'CB' },
-    { nombre: '2', ciudad: 'CB' },
-    { nombre: '3', ciudad: 'CB' },
-    { nombre: '4', ciudad: 'CB' },
-    { nombre: '5', ciudad: 'LP' },
-    { nombre: '6', ciudad: 'LP' },
-    { nombre: '7', ciudad: 'LP' },
-    { nombre: '8', ciudad: 'LP' },
-  ]
-
   return (
     <ViewStyled
       width={95}
-      height={12}
-      marginTop={0.9}
+      height={14}
+      marginTop={1}
       marginLeftAuto
       marginRightAuto
       backgroundColor={theme.transparent}
     >
       {
-        loadingSkeleton
+        !start
           ? SkeletonBusiness()
           :
           <FlatList
             horizontal
-            data={data}
-            renderItem={({ item }) => <BusinessPromotionsItem city={city} item={item} />}
+            data={promotionsData}
+            renderItem={({ item }) => <BusinessPromotionsItem item={item} />}
             showsHorizontalScrollIndicator={false}
             onEndReached={nextPage}
             onEndReachedThreshold={0.7}

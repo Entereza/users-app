@@ -8,7 +8,7 @@ export const fetchWithToken = async (path, method, body) => {
     const token = await AsyncStorage.getItem('ENT-TKN')
     // console.log(token)
 
-    let url = baseURL +"/"+ path;
+    let url = baseURL + "/" + path;
     if (method === 'GET') {
         return global.fetch(url, {
             method: method,
@@ -17,7 +17,7 @@ export const fetchWithToken = async (path, method, body) => {
                 'Authorization': `Bearer ${token}`
             }
         })
-    }else {
+    } else {
         return global.fetch(url, {
             method: method,
             headers: {

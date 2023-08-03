@@ -2,65 +2,53 @@ import * as React from 'react';
 import { theme } from '../../utils/theme';
 import ImageStyled from '../ui/ImageStyled';
 import ViewStyled from '../ui/ViewStyled';
+import { Linking, Pressable } from 'react-native';
 
-export default function BusinessPromotionsItem({ item, city }) {
-    const [location, setLocation] = React.useState('')
+export default function BusinessPromotionsItem({ item }) {
 
-    const getInfo5 = async () => {
-        try {
-            let ciudad;
-            if (city === "La Paz") {
-                ciudad = 'LP'
-            }
-            if (city === "Cochabamba") {
-                ciudad = 'CB'
-            }
-            if (city === "Santa Cruz") {
-                ciudad = 'SC'
-            }
-            if (city === "Oruro") {
-                ciudad = 'OR'
-            }
+    const RedirectWhatsapp = () => {
+        Linking.openURL(item.url)
+    }
 
-            setLocation(ciudad)
-        } catch (err) {
-            console.log("Error entereza BusinessCategoryItem: ", err)
+    const [disabled, setDisabled] = React.useState(true)
+
+    const SeeLinkWp = () => {
+        if(item.url){
+            setDisabled(false)
         }
     }
+
     React.useEffect(() => {
-        if (location !== null) {
-            getInfo5()
-        }
-    }, [location])
+        SeeLinkWp()
+    }, [])
 
     return (
         <>
-            <ViewStyled
-                backgroundColor={theme.transparent}
-                width={46}
-                height={12}
-                marginRight={3}
-                style={{
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                    borderWidth: 1,
-                    borderColor: theme.tertiaryGradient,
-                    borderRadius: 10,
-                }}
-            >
-                <ImageStyled
-                    source={require('../../assets/business/Tropical.jpg')}
+            <Pressable onPress={RedirectWhatsapp} disabled={disabled}>
+                <ViewStyled
+                    backgroundColor={theme.transparent}
+                    width={60}
+                    height={13}
+                    marginRight={3}
                     style={{
-                        width: '100%',
-                        height: '100%',
-                        borderRadius: 10,
-                        overflow: 'hidden',
-                        position: 'relative',
-                        resizeMode: 'cover',
+                        alignItems: 'center',
                         justifyContent: 'center',
+                        borderRadius: 10,
                     }}
-                />
-            </ViewStyled>
+                >
+                    <ImageStyled
+                        source={{ uri: item.img }}
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            borderRadius: 10,
+                            resizeMode: 'contain',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
+                    />
+                </ViewStyled>
+            </Pressable>
         </>
     )
 }

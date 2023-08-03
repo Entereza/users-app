@@ -7,13 +7,11 @@ import ImageStyled from '../components/ui/ImageStyled';
 
 //import styles
 import { theme } from '../utils/theme'
-import AuthComponent from '../components/Login/AuthComponent';
-import LoginComponent from '../components/Login/LoginComponent';
-import RegisterComponent from '../components/Login/RegisterComponent';
+import AuthComponent from '../components/Auth/AuthComponent';
+import LoginComponent from '../components/Auth/LoginComponent';
+import RegisterComponent from '../components/Auth/RegisterComponent';
 import { Ionicons } from '@expo/vector-icons';
 import adjustFontSize from '../utils/adjustText';
-import { heightPercentageToDP } from 'react-native-responsive-screen';
-import ModalExplications from '../components/Modals/ModalExplications';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AuthenticationScreen() {
@@ -168,7 +166,7 @@ export default function AuthenticationScreen() {
     };
 
     return (
-        <SafeAreaView style={{ backgroundColor: theme.transparent, flex: 1 }}>
+        <SafeAreaView style={{ backgroundColor: theme.dark }}>
             <ViewStyled
                 backgroundColor={theme.dark}
                 width={100}
@@ -232,7 +230,8 @@ export default function AuthenticationScreen() {
                         >
                             <ViewStyled
                                 width={100}
-                                height={23}
+                                height={16}
+                                marginBottom={auth === 'flex' ?  8 : 4}
                                 backgroundColor={theme.transparent}
                                 style={{
                                     justifyContent: 'center',
@@ -264,39 +263,32 @@ export default function AuthenticationScreen() {
                 }
 
                 <Pressable onPress={Keyboard.dismiss} >
-                    <KeyboardAvoidingView
-                        behavior={Platform.OS === "ios" ? "padding" : "position"}
-                        style={{
-                            justifyContent: 'flex-end'
-                        }}
-                    >
-                        <AuthComponent
-                            outputRange={outputRangeAuth}
-                            outputRange2={outputRangeAuth2}
-                            showButton={showButton}
-                            authOpacity={authOpacity}
-                            display={auth}
-                            goLogin={GoLogin}
-                            shadow={shadow}
-                        />
+                    <AuthComponent
+                        outputRange={outputRangeAuth}
+                        outputRange2={outputRangeAuth2}
+                        showButton={showButton}
+                        authOpacity={authOpacity}
+                        display={auth}
+                        goLogin={GoLogin}
+                        shadow={shadow}
+                    />
 
-                        <LoginComponent
-                            loginOpacity={loginOpacity}
-                            outputRange={outputRangeLogin}
-                            outputRange2={outputRangeLogin2}
-                            display={login}
-                            goBack={GoBackAuth}
-                            goRegisterScreen={GoRegister}
-                        />
+                    <LoginComponent
+                        loginOpacity={loginOpacity}
+                        outputRange={outputRangeLogin}
+                        outputRange2={outputRangeLogin2}
+                        display={login}
+                        goBack={GoBackAuth}
+                        goRegisterScreen={GoRegister}
+                    />
 
-                        <RegisterComponent
-                            registerOpacity={registerOpacity}
-                            registerRef={registerRef}
-                            outputRange={outputRangeRegister}
-                            display={register}
-                            goBack={GoBackLogin}
-                        />
-                    </KeyboardAvoidingView>
+                    <RegisterComponent
+                        registerOpacity={registerOpacity}
+                        registerRef={registerRef}
+                        outputRange={outputRangeRegister}
+                        display={register}
+                        goBack={GoBackLogin}
+                    />
                 </Pressable>
             </ViewStyled>
         </SafeAreaView>

@@ -7,15 +7,12 @@ import HeaderStyledWalletProfile from '../components/ui/HeaderStyledWalletProfil
 import WalletSalesScreen from '../components/wallet/WalletSalesScreen';
 import { theme } from '../utils/theme';
 import FloatingButton from '../components/Btn/FloatingButton';
-import NotificacionWallet from '../components/Notifications/NotificationsWallet';
 
 const Stack = createNativeStackNavigator();
 
 export default function WalletStack() {
     return (
-        <>
-            <FloatingButton />
-            
+        <>            
             <Stack.Navigator
                 screenOptions={{
                     headerShown: false,

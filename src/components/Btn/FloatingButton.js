@@ -11,10 +11,12 @@ import { Ionicons } from '@expo/vector-icons';
 import adjustFontSize from '../../utils/adjustText';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
 import { fetchWithToken } from '../../utils/fetchWithToken';
+import { useSelector } from 'react-redux';
 
-export default function FloatingButton() {
+export default function FloatingButton({ bottom = 0 }) {
     const [numberWpp, setNumberWpp] = React.useState('')
 
+    const { info } = useSelector(state => state.auth);
 
     const RedirectWhatsapp = () => {
         Linking.openURL(numberWpp)
@@ -22,14 +24,20 @@ export default function FloatingButton() {
 
     const NumberWp = async () => {
         try {
-            const res = await fetchWithToken(`entereza/numero_entereza`, 'GET')
+            const CI = await info.usuarioBean?.carnet_identidad
+            if (CI !== null) {
+                console.log('Valores Completos.')
+                const res = await fetchWithToken(`entereza/numero_entereza`, 'GET')
 
-            const { codeError, msgError } = await res.json()
-
-            console.log('Número Disponible para: ', msgError)
-            if (codeError === 'COD200') {
-                setNumberWpp(msgError)
-            }
+                const { codeError, msgError } = await res.json()
+    
+                console.log('Número Disponible para: ', msgError)
+                if (codeError === 'COD200') {
+                    setNumberWpp(msgError)
+                }
+              } else {
+                console.log('Valores Incompletos... Aún no se muestra el boton conversemos.')
+              }
         } catch (error) {
             console.log('NumberWp Error: ', error)
         }
@@ -47,10 +55,11 @@ export default function FloatingButton() {
                 backgroundColor={theme.transparent}
                 style={[
                     {
+                        display: numberWpp !== '' ? 'flex' : 'none',
                         position: 'absolute',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        bottom: heightPercentageToDP(8),
+                        bottom: bottom,
                         marginBottom: 10,
                         right: 10,
                         zIndex: 2
@@ -97,7 +106,7 @@ export default function FloatingButton() {
                         fontFamily='ArtegraBold'
                         textAlign='center'
                     >
-                        {'¿Conversemos?'}
+                        {'Cuéntanos algo'}
                     </TextStyled>
                 </Pressable >
             </ViewStyled>

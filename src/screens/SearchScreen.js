@@ -1,22 +1,15 @@
-import React, { useRef } from "react";
-import { FlatList, ActivityIndicator, ScrollView, Keyboard, TextInput } from "react-native";
+import React from "react";
+import { FlatList, ActivityIndicator, ScrollView, TextInput } from "react-native";
 
 import { theme } from "../utils/theme";
 import { fetchWithToken } from "../utils/fetchWithToken";
 import ViewStyled from "../components/ui/ViewStyled";
 import TextStyled from "../components/ui/TextStyled";
-import BusinessHeaderSecondary from "../components/business/BusinessHeaderSecondary";
 import { codeErrors } from "../utils/codeErrors";
-import BusinessSearchInput from "../components/business/BusinessSearchInput";
-import { RefreshControl } from "react-native-web";
-import { SafeAreaView } from "react-native-safe-area-context";
-import HeaderStyled from "../components/ui/HeaderStyled";
-import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import adjustFontSize from "../utils/adjustText";
 import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen";
 import ListItem from "../components/business/ListItem";
-import ButtonNext from "../components/Btn/ButtonNext";
 import { customStyles } from "../utils/customStyles";
 import { useSelector } from "react-redux";
 
@@ -135,12 +128,6 @@ export default function SearchScreen({ route }) {
     };
   }, [searchValue]);
 
-  // const inputRef = useRef();
-
-  // React.useEffect(() => {
-  //   inputRef.current.focus();
-  // }, [])
-
   return (
     <>
       <ViewStyled
@@ -165,7 +152,7 @@ export default function SearchScreen({ route }) {
             marginTop={1}
             backgroundColor={theme.transparent}
             width={100}
-            height={8}
+            height={7}
             style={{
               alignItems: 'center',
               justifyContent: 'center',
@@ -173,7 +160,7 @@ export default function SearchScreen({ route }) {
           >
             <ViewStyled
               width={96}
-              height={7}
+              height={6}
               backgroundColor={theme.primary}
               borderRadius={2}
               paddingHorizontal={3}

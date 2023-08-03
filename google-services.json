@@ -14,7 +14,23 @@
       },
       "oauth_client": [
         {
-          "client_id": "511900415351-b1g7213gfgt8ur96qqfnlinf9rjardj8.apps.googleusercontent.com",
+          "client_id": "511900415351-o4h1055kmlku12n50vn9vrto3k04jls2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.entereza.client",
+            "certificate_hash": "4808ac4727cd332424cd39eef0e3d98e9fcf5f71"
+          }
+        },
+        {
+          "client_id": "511900415351-p0cjj8q5g1l9ngip8v47a8mtipfvie5i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.entereza.client",
+            "certificate_hash": "341e17d3a402f80350fce531b675527268c43e27"
+          }
+        },
+        {
+          "client_id": "511900415351-u8a9qj8q91nc2d6jan3vvhoqhajir6v8.apps.googleusercontent.com",
           "client_type": 3
         }
       ],

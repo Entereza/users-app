@@ -1,31 +1,27 @@
 import * as React from 'react';
 
-import { _authLogin } from '../../redux/actions/authActions'
-import AlertStyled from '../ui/AlertStyled'
-import { Modal, ActivityIndicator, Platform } from 'react-native';
+import { __authGetInfo, _authLogin } from '../../redux/actions/authActions'
+import { Modal, ActivityIndicator, Alert } from 'react-native';
 import ViewStyled from '../ui/ViewStyled';
 import TextStyled from '../ui/TextStyled';
 import { theme } from '../../utils/theme';
 
-import { makeRedirectUri, startAsync, useAuthRequest } from 'expo-auth-session';
-import * as Random from 'expo-random';
-import * as WebBrowser from 'expo-web-browser';
-
 import ButtonAuthentication from '../Btn/ButtonAuthentication';
-
-WebBrowser.maybeCompleteAuthSession();
-
-// Endpoint
-const discovery = {
-    authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
-    tokenEndpoint: 'https://oauth2.googleapis.com/token',
-    revocationEndpoint: 'https://oauth2.googleapis.com/revoke',
-};
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { useDispatch } from 'react-redux';
+import { fetchWithoutToken } from '../../utils/fetchWithoutToken';
+import { codeErrors } from '../../utils/codeErrors';
+import AlertStyled from '../ui/AlertStyled';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ContinueGoogle({ shadow }) {
-    const [text, setText] = React.useState('')
+
+    const dispatch = useDispatch()
+
+    const [text, setText] = React.useState("Continuar con Google")
     const [Loading, setLoading] = React.useState(false)
 
+    const [tokenId, setTokenId] = React.useState(null)
 
     const [showAlert, setShowAlert] = React.useState(false)
     const [alertText, setAlertText] = React.useState({
@@ -35,57 +31,158 @@ export default function ContinueGoogle({ shadow }) {
     })
     const handleCloseAlert = () => setShowAlert(false)
 
-    const [nonce, setNonce] = React.useState(null);
+    React.useEffect(() => {
+        GoogleSignin.configure({
+            webClientId: '511900415351-u8a9qj8q91nc2d6jan3vvhoqhajir6v8.apps.googleusercontent.com',
+            offlineAccess: true,
+            forceCodeForRefreshToken: true,
+            scopes: [
+                'profile',
+                'email',
+                'openid',
+            ]
+        });
+    }, [])
 
     React.useEffect(() => {
-        generateNonce();
-    }, []);
+        if (tokenId) {
+            console.log('Data For Send', tokenId)
+            RegisterGoogle()
+        }
+    }, [tokenId])
 
-    const generateNonce = async () => {
-        const buffer = await Random.getRandomBytesAsync(16);
-        const generatedNonce = [...new Uint8Array(buffer)].map(b => String.fromCharCode(b)).join('');
-        setNonce(generatedNonce);
+    const signInGoogleTokenId = async () => {
+        try {
+            await GoogleSignin.hasPlayServices()
+
+            const userInfo = await GoogleSignin.signIn();
+            setTokenId(userInfo.idToken)
+        } catch (error) {
+            console.log('Error signIn: ', error.message)
+            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+                console.log('Cancelled SignIn: ', error.message)
+                // user cancelled the login flow
+            } else if (error.code === statusCodes.IN_PROGRESS) {
+                console.log('InPorgress SignIn: ', error.message)
+                // operation (e.g. sign in) is in progress already
+            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+                console.log('Cancelled PLAY_SERVICES_NOT_AVAILABLE: ', error.message)
+            } else {
+                console.log('some other error happened SignIn: ', error.message)
+                Alert.alert('ErrorsignIn: ', `${error}`)
+                // some other error happened
+            }
+        }
     }
 
-    const [request, response, promptAsync] = useAuthRequest(
-        {
-            clientId: Platform.OS === 'ios' ? '511900415351-ej15snog5mn00ikjcbuqeqa1pap18nkn.apps.googleusercontent.com' : '511900415351-o4h1055kmlku12n50vn9vrto3k04jls2.apps.googleusercontent.com',
-            scopes: ['openid', 'profile', 'email'],
-            // Debes reemplazar 'my.redirect.uri' con tu propia URI de redireccionamiento
-            redirectUri: makeRedirectUri({
-                native: 'com.entereza.client',
-                useProxy: true,
-                projectNameForProxy: '@intirraptor/enterezaClient'
-            }),
-            nonce,
-        },
-        discovery
-    );
-
-    const handleSignIn = async () => {
+    const RegisterGoogle = async () => {
+        setLoading(true)
+        setText('Ingresando con Google...')
         try {
-            const result = await startAsync({ authUrl: request.url, projectNameForProxy: '@intirraptor/enterezaClient' });
-            if (result.type === 'success') {
-                // Aquí puedes manejar la respuesta exitosa
-                console.log(result);
+            let dataRegister = {
+                token_id: tokenId,
+            }
+
+            const res = await fetchWithoutToken(`entereza/google_sign_up`, 'POST', dataRegister)
+
+            const { codeError, msgError } = await res.json()
+
+            if (codeError === 'COD200') {
+                console.log('Registro Exitoso: ', codeError, '- ', msgError)
+                LoginGoogle()
+            } else if (codeError === "COD056") {
+                console.log('Correo ya está en uso: ', codeError, '- ', msgError)
+                LoginGoogle()
+            } else {
+                setShowAlert(true)
+                setAlertText({
+                    title: 'Ha ocurrido un error.',
+                    message: msgError,
+                    type: 'error',
+                })
+
+                setTokenId(null)
+                setLoading(false)
+                setText('Continuar con Google')
+                console.log('Error on google_sign_up: ', codeError, '- ', msgError)
             }
         } catch (error) {
-            // Aquí puedes manejar errores de inicio de sesión
-            console.log(error);
+            setShowAlert(true)
+            setAlertText({
+                title: 'Error al Continuar con Google',
+                message: 'Por favor intente nuevamente en unos minutos.',
+                type: 'error',
+            })
+
+            setTokenId(null)
+            setLoading(false)
+            setText('Continuar con Google')
+            console.log('Error RegisterGoogle: ', error)
         }
-    };
+    }
 
-    React.useEffect(() => {
-        console.log('Response Google: ', response)
+    const LoginGoogle = async () => {
+        try {
+            let dataLogin = {
+                token_id: tokenId,
+            };
 
-        if (response?.type === 'success') {
-            console.log('Response Exitosa.')
-            // const { code } = response.params;
-            // Aquí puedes manejar el código de autorización que se obtuvo después de un inicio de sesión exitoso.
-            // Normalmente, enviarías este código a tu servidor, que lo cambiaría por un token de acceso.
+            const res = await fetchWithoutToken("entereza/login_go", "POST", dataLogin)
+
+            const {
+                entereza,
+                mail,
+                codigoEntidad,
+                jwt,
+                rol,
+                ...rest
+            } = await res.json()
+
+            if (entereza.codeError === codeErrors.cod200) {
+                console.log('Inicio de sesión exitoso: ', entereza)
+
+                await Promise.all([
+                    AsyncStorage.setItem('ENT-EMAIL', mail),
+                    AsyncStorage.setItem('ENT-CODUSR', codigoEntidad),
+                    AsyncStorage.setItem('ENT-TKN', jwt),
+                ]);
+
+                await Promise.all([
+                    console.log('Starts __authGetInfo'),
+                    dispatch(__authGetInfo()),
+                ]).then(() => {
+                    setTimeout(() => {
+                        console.log('Starts _authLogin...')
+                        dispatch(_authLogin(dataLogin))
+                    }, 1000);
+                })
+            } else {
+                setShowAlert(true)
+                setAlertText({
+                    title: 'Ha ocurrido un error.',
+                    message: entereza.msgError,
+                    type: 'error',
+                })
+
+                console.log('Error on login_go: ', entereza)
+                setTokenId(null)
+                setLoading(false)
+                setText('Continuar con Google')
+            }
+        } catch (error) {
+            setShowAlert(true)
+            setAlertText({
+                title: 'Error al Continuar con Google',
+                message: 'Por favor intente nuevamente en unos minutos.',
+                type: 'error',
+            })
+
+            setTokenId(null)
+            setLoading(false)
+            setText('Continuar con Google')
+            console.log('Error LoginGoogle: ', error)
         }
-    }, [response]);
-
+    }
 
     return (
         <>
@@ -98,64 +195,25 @@ export default function ContinueGoogle({ shadow }) {
                         title={alertText.title}
                         message={alertText.message}
                         type={alertText.type}
-                        showCancelButton={false}
                         onConfirmPressed={handleCloseAlert}
                         showCloseButton={false}
+                        showCancelButton={false}
                     />
                 )
             }
 
             <ButtonAuthentication
-                disabled={!request || !nonce}
-                shadow={shadow}
-                title={"Continuar con Google"}
-                onPress={() => {
-                    promptAsync();
-                }}
-                backgroundColor={theme.primary}
+                disabled={Loading}
+                shadow={false}
+                title={text}
+                onPress={signInGoogleTokenId}
+                backgroundColor={theme.dark}
+                WithBorder={true}
+                borderColor={theme.tertiary}
+                colorText={theme.primary}
                 image={require('./GoogleLogo.png')}
-                colorText={theme.dark}
+                loading={Loading}
             />
-
-            <Modal
-                visible={Loading}
-                animationType="fade"
-                transparent={true}
-            >
-                <ViewStyled
-                    backgroundColor='#000000AA'
-                    style={{
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}
-                >
-                    <ViewStyled
-                        width={70}
-                        height={18}
-                        backgroundColor='#ffffff'
-                        borderRadius={2}
-
-                        style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <TextStyled
-                            fontSize={15}
-                            textAlign='center'
-                            color='#888cf3'
-                            style={{
-                                marginBottom: 20,
-                                width: '90%'
-                            }}
-                        >
-                            {text}
-                        </TextStyled>
-                        <ActivityIndicator size="large" color={theme.secondary} />
-                    </ViewStyled>
-                </ViewStyled>
-            </Modal>
         </>
     )
 }

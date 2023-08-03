@@ -8,6 +8,16 @@ import { fetchWithToken } from '../utils/fetchWithToken'
 import { codeErrors } from '../utils/codeErrors'
 import ListItem from '../components/business/ListItem'
 import { useSelector } from 'react-redux'
+import { RefreshControl } from 'react-native'
+
+const DEFAULT_IMAGE = require('../assets/business/01.png');
+const DEFAULT_BACKGROUND = require('../assets/business/GradientBackground.png');
+const HORARIO_STATUS = {
+    OPEN: 0,
+    CLOSED: 1,
+    EMPTY: 2,
+    OTHER: 3,
+};
 
 export default function BusinessCategoryScreen({ route }) {
     const { location } = useSelector(state => state.auth);
@@ -25,9 +35,64 @@ export default function BusinessCategoryScreen({ route }) {
 
     const nextPage = () => {
         setPage(page + 1);
+
+        getInfo3()
+        setHasMore(true)
     };
 
+    function processEmpresa(empresa, images, horarios, sucursales, codKilometros) {
+        const imgEmpresa = images[empresa.codigoEmpresa];
+        const horarioEmpresa = horarios[empresa.codigoEmpresa];
+        const sucursalEmpresa = sucursales[empresa.codigoEmpresa];
+        const codKmEmpresa = codKilometros[empresa.codigoEmpresa];
+
+        empresa.img = imgEmpresa ? { uri: `${imgEmpresa.imgEmpresa}` } : DEFAULT_IMAGE;
+        empresa.background = imgEmpresa ? { uri: `${imgEmpresa.imgPortadaEmpresa}` } : DEFAULT_BACKGROUND;
+        empresa.horario = horarioEmpresa ? horarioEmpresa.estado : 'empty';
+        empresa.numeroSucursales = sucursalEmpresa ? sucursalEmpresa.numeroSucursales : 0;
+        empresa.codKm = codKmEmpresa ? codKmEmpresa.km : Number.MAX_SAFE_INTEGER;
+
+        switch (empresa.horario) {
+            case true:
+                empresa.horarioOrden = HORARIO_STATUS.OPEN;
+                break;
+            case false:
+                empresa.horarioOrden = HORARIO_STATUS.CLOSED;
+                break;
+            case 'empty':
+                empresa.horarioOrden = HORARIO_STATUS.EMPTY;
+                break;
+            default:
+                empresa.horarioOrden = HORARIO_STATUS.OTHER;
+        }
+
+        newEmpresaArray.push(empresa);
+    }
+
+    function createLookup(array, key) {
+        return array.reduce((lookup, item) => {
+            lookup[item[key]] = item;
+            return lookup;
+        }, {});
+    }
+
+    function sortEmpresas(a, b) {
+        if (a.horarioOrden < b.horarioOrden) return -1;
+        if (a.horarioOrden > b.horarioOrden) return 1;
+
+        if (a.codKm < b.codKm) return -1;
+        if (a.codKm > b.codKm) return 1;
+
+        return 0;
+    }
+
+    const [isProcessing, setIsProcessing] = React.useState(false);
+
+    const newEmpresaArray = [];
+
     const getInfo3 = async () => {
+        if (isProcessing) return;
+        setIsProcessing(true);
         try {
             const lat = await location.coords?.latitude
             const lng = await location.coords?.longitude
@@ -39,85 +104,59 @@ export default function BusinessCategoryScreen({ route }) {
 
             const { entereza, empresasHUBWColors, empresasImages, empHorariosSuc } = await res.json();
 
+            // console.log("dataTam: ", empresasHUBWColors)
+
             if (entereza.codeError === codeErrors.cod200) {
-                let empresasLenght = empresasHUBWColors.empresasHUBLinks.length
-                console.log('Lenght Empresas On Category: ', empresasLenght)
+                const imagesLookup = createLookup(empresasImages.lista_empresas_img, 'codigoEmpresa');
+                const horariosLookup = createLookup(empHorariosSuc.horariosEmpresa, 'codigoEmpresa');
+                const sucursalesLookup = createLookup(empHorariosSuc.noSucursales, 'codigoEmpresaHub');
+                const codKilometrosLookup = createLookup(empHorariosSuc.codKilometros, 'codigoEmpresa');
 
-                if (empresasLenght === 0) {
-                    setFinalEmpresas(true)
-                    if (page === 0) {
-                        setNotFound(true)
-                    }
-                    setHasMore(false)
-                }
+                empresasHUBWColors.empresasHUBLinks.forEach((empresa) => {
+                    processEmpresa(empresa, imagesLookup, horariosLookup, sucursalesLookup, codKilometrosLookup)
+                })
 
-                let newEmpresa = empresasHUBWColors.empresasHUBLinks.map((empresa) => {
-                    let imgEmpresa = empresasImages.lista_empresas_img.find((img) => img.codigoEmpresa === empresa.codigoEmpresa);
-                    let backgroundEmpresa = empresasImages.lista_empresas_img.find((background) => background.codigoEmpresa === empresa.codigoEmpresa);
-                    let horariosEmpresa = empHorariosSuc.horariosEmpresa.find((horario) => horario.codigoEmpresa === empresa.codigoEmpresa);
-                    let noSucursales = empHorariosSuc.noSucursales.find((sucursal) => sucursal.codigoEmpresaHub === empresa.codigoEmpresa);
-                    let codKm = empHorariosSuc.codKilometros.find((k) => k.codigoEmpresa === empresa.codigoEmpresa);
+                newEmpresaArray.sort(sortEmpresas)
 
-                    empresa.img = imgEmpresa ? { uri: `${imgEmpresa.imgEmpresa}` } : require('../assets/business/01.png')
-                    empresa.background = backgroundEmpresa ? { uri: `${backgroundEmpresa.imgPortadaEmpresa}` } : require('../assets/business/GradientBackground.png')
-                    empresa.horario = horariosEmpresa ? horariosEmpresa.estado : 'empty';
-                    empresa.numeroSucursales = noSucursales ? noSucursales.numeroSucursales : 0;
-                    empresa.codKm = codKm ? codKm.km : Number.MAX_SAFE_INTEGER;
-
-                    // asignar un valor numérico a cada estado de horario para el ordenamiento
-                    switch (empresa.horario) {
-                        case true:
-                            empresa.horarioOrden = 0; // abierta
-                            break;
-                        case false:
-                            empresa.horarioOrden = 1; // cerrada
-                            break;
-                        case 'empty':
-                            empresa.horarioOrden = 2; // vacía
-                            break;
-                        default:
-                            empresa.horarioOrden = 3; // cualquier otro caso
-                    }
-
-                    return empresa;
-                });
-
-                // ordenar las empresas por estado de horario y luego por km
-                newEmpresa.sort((a, b) => {
-                    if (a.horarioOrden < b.horarioOrden) return -1;
-                    if (a.horarioOrden > b.horarioOrden) return 1;
-
-                    // si el estado de horario es el mismo, se ordena por km
-                    if (a.codKm < b.codKm) return -1;
-                    if (a.codKm > b.codKm) return 1;
-
-                    return 0;
-                });
-
-                setDataItems((prev) => [...prev, ...newEmpresa]);
-
+                setDataItems((prev) => [...prev, ...newEmpresaArray]);
             } else {
                 console.log("Error Entereza Business");
             }
         } catch (err) {
             console.log("Error entereza BusinessCategoryItem: ", err)
+        } finally {
+            setHasMore(false)
+            setIsProcessing(false);
+            setRefreshing(false)
         }
     }
 
     const reloadEmp = async () => {
+        setPage(0)
         setFinalEmpresas(false)
         setDataItems([])
-        console.log('reloadEmp')
+        console.log('reloadEmp Starts')
         setHasMore(true)
+        getInfo3()
+    }
+
+    const [refreshing, setRefreshing] = React.useState(false);
+
+    const onRefresh = async () => {
+        setPage(0)
+        setFinalEmpresas(false)
+        setDataItems([])
+        console.log('Starts onRefresh: ', page, dataItems.length)
+        setHasMore(true)
+        setRefreshing(true)
+        getInfo3()
     }
 
     React.useEffect(() => {
-        if (location.address.state !== null) {
-            if (finalEmpresas !== true) {
-                getInfo3()
-            }
+        if (location.ubication !== null) {
+            getInfo3()
         }
-    }, [location, page])
+    }, [location])
 
     return (
         <>
@@ -133,7 +172,6 @@ export default function BusinessCategoryScreen({ route }) {
                     title={data.nombre}
                     routeName={"BusinessCategory"}
                     reloadEmp={reloadEmp}
-                    reset={getInfo3}
                 />
 
                 <ViewStyled
@@ -156,10 +194,19 @@ export default function BusinessCategoryScreen({ route }) {
                                 showsVerticalScrollIndicator={false}
                                 horizontal={false}
                                 data={dataItems}
-                                renderItem={({ item }) => <ListItem item={item} key={item.codigoEmpresa} />}
+                                initialNumToRender={dataItems.length}
+                                keyExtractor={(item) => item.codigoEmpresa.toString()}
+                                renderItem={({ item }) => <ListItem item={item} />}
                                 numColumns={1}
-                                onEndReachedThreshold={0.7}
-                                onEndReached={nextPage}
+                                // onEndReachedThreshold={0.5}
+                                // onEndReached={() => {
+                                //     if (!isProcessing) {
+                                //         nextPage()
+                                //     }
+                                // }}
+                                refreshControl={
+                                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                                }
                                 ListFooterComponent={() =>
                                     notFound
                                         ? <ViewStyled

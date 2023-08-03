@@ -16,13 +16,13 @@ import { useSelector } from 'react-redux';
 export default function SucursalItem({ item }) {
     const { location } = useSelector(state => state.auth);
 
-    // console.log('Horario Sucursal: ', item.horarios)
-    // console.log('Wpp: ', item.wpp)
+    // console.log('Item: ', item)
+    console.log('Wpp: ', item.wpp.wpp)
 
     const [colorWp, setColorWp] = React.useState('#818181')
 
     const OpenWp = () => {
-        Linking.openURL(item.wpp)
+        Linking.openURL(item.wpp.wpp)
     }
 
 
@@ -50,19 +50,7 @@ export default function SucursalItem({ item }) {
 
     const [envio, setEnvio] = React.useState('0')
 
-    const ranges = {
-        0: '7',
-        1: '8',
-        2: '10',
-        3: '12',
-        4: '14',
-        5: '16',
-        6: '18',
-        7: '20',
-        8: '22',
-        9: '25',
-        10: '30',
-    };
+    let ranges;
 
     const PricesEnvios = () => {
         const codKm = item.codKm;
@@ -81,11 +69,51 @@ export default function SucursalItem({ item }) {
         setEnvio(selectedEnvio);
     }
 
+    const VerifyState = () => {
+        try {
+            if (location.address.state === 'La Paz') {
+                setEnvio(false);
+                return;
+            } else if (location.address.state === 'Cochabamba') {
+                ranges = {
+                    0: '7',
+                    1: '8',
+                    2: '10',
+                    3: '12',
+                    4: '14',
+                    5: '16',
+                    6: '18',
+                    7: '20',
+                    8: '22',
+                    9: '25',
+                    10: '30',
+                };
+            } else if (location.address.state === 'Tarija') {
+                ranges = {
+                    0: '5',
+                    1.5: '6',
+                    2: '7',
+                    3: '8',
+                    4: '9',
+                    5: '10',
+                    6: '11',
+                    7: '12',
+                    8: '14',
+                    10: '15',
+                };
+            }
+        } catch (error) {
+            console.log('Err: ', error)
+        } finally {
+            PricesEnvios()
+        }
+    }
+
     React.useEffect(() => {
         if (location.coords !== null) {
             if (location.coords.permissions !== false) {
+                VerifyState()
                 console.log('Permissions: ', location.coords.permissions)
-                PricesEnvios()
             } else {
                 console.log('Permissions: ', location.coords.permissions)
                 setEnvio(false)

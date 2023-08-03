@@ -181,11 +181,10 @@ export default function WalletSales({ reload, handleRefresh }) {
     return (
         <ViewStyled
             width={100}
-            height={57}
+            height={60}
             backgroundColor={theme.primary}
             paddingTop={2.5}
             style={{
-                // ...customStyles.shadowStyle,
                 borderTopRightRadius: 30,
                 borderTopLeftRadius: 30,
             }}
@@ -234,7 +233,7 @@ export default function WalletSales({ reload, handleRefresh }) {
 
             <ViewStyled
                 width={95}
-                height={45}
+                height={50}
                 marginLeftAuto
                 marginRightAuto
                 backgroundColor={theme.background}
@@ -247,7 +246,7 @@ export default function WalletSales({ reload, handleRefresh }) {
             >
                 <ScrollView
                     horizontal={true}
-                    scrollEnabled={false}
+                    scrollEnabled={true}
                     contentContainerStyle={{
                         width: '100%',
                         height: '100%',
