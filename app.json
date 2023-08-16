@@ -25,7 +25,7 @@
       ],
       "supportsTablet": true,
       "bundleIdentifier": "com.entereza.client",
-      "buildNumber": "59",
+      "buildNumber": "61",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Requerimos tu ubicación para poder darte información sobre las empresas afiliadas de tu ciudad.",
         "NSUserTrackingUsageDescription": "Esto permite a Entereza ofrecerte la mejor experiencia y mayor información sobre las empresas afiliadas que están en tu ciudad.",
