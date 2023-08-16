@@ -9,39 +9,50 @@ import adjustFontSize from '../../utils/adjustText'
 import { useSelector } from 'react-redux'
 import TextStyled from '../ui/TextStyled'
 
-export default function BusinessInputRedirect({ city, loadingSkeleton }) {
+export default function BusinessInputRedirect({ cityCode, loadingSkeleton }) {
     const navigation = useNavigation()
     const { info } = useSelector(state => state.auth);
+    const { location } = useSelector(state => state.auth);
 
     const [value, setValue] = React.useState('')
-    const [location, setLocation] = React.useState('CB')
+    const [locationCity, setLocationCity] = React.useState('CB')
 
     const RedirectSearchScreen = () => {
-        navigation.navigate('SearchScreen', { nameUser: value, city: location })
+        navigation.navigate('SearchScreen', { nameUser: value, city: locationCity })
     }
 
     const setNameUser = async () => {
-        if (city === "La Paz") {
-            setLocation('LP')
-
-        }
-        if (city === "Cochabamba") {
-            setLocation('CB')
-        }
-        if (city === "Santa Cruz") {
-            setLocation('SC')
-        }
-        if (city === "Oruro") {
-            setLocation('OR')
-            
-        } if (city === "Tarija") {
-            setLocation('TJ')
-        }
-
         const nameUser = await info.usuarioBean?.nombres
 
         setValue(nameUser)
     }
+
+    const setCityCode = async () => {
+        console.log('City', cityCode)
+        if (cityCode === "La Paz") {
+            setLocationCity('LP')
+        }
+        if (cityCode === "Cochabamba") {
+            setLocationCity('CB')
+        }
+        if (cityCode === "Santa Cruz") {
+            setLocationCity('SC')
+        }
+        if (cityCode === "Oruro") {
+            setLocationCity('OR')
+
+        } if (cityCode === "Tarija") {
+            setLocationCity('TJ')
+        }
+    }
+
+    React.useEffect(() => {
+        if (location !== null) {
+            if (location.address !== null) {
+                setCityCode()
+            }
+        }
+    }, [location])
 
     React.useEffect(() => {
         if (info !== null) {

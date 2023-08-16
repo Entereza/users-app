@@ -17,20 +17,19 @@ export default function SucursalItem({ item }) {
     const { location } = useSelector(state => state.auth);
 
     // console.log('Item: ', item)
-    console.log('Wpp: ', item.wpp.wpp)
+    // console.log('Wpp: ', item)
 
-    const [colorWp, setColorWp] = React.useState('#818181')
+    const [colorWp, setColorWp] = React.useState(theme.disabledBg)
 
     const OpenWp = () => {
         Linking.openURL(item.wpp.wpp)
     }
 
-
     const SetColors = () => {
-        if (item.wpp !== '' || item.wpp === null) {
-            setColorWp('#4CD236')
+        if (item.wpp.wpp !== '' && item.wpp.wpp !== null) {
+            setColorWp(theme.wpp)
         } else {
-            setColorWp('#Empty')
+            setColorWp(theme.disabledBg)
         }
     }
 
@@ -41,6 +40,8 @@ export default function SucursalItem({ item }) {
             } else {
                 SetColors()
             }
+        } else {
+            setColorWp(theme.disabledBg)
         }
     }
 
@@ -153,7 +154,7 @@ export default function SucursalItem({ item }) {
                         paddingLeft={2}
                         backgroundColor={theme.transparent}
                         style={{
-                            width: colorWp !== '#Empty' ? '70%' : '100%',
+                            width: colorWp !== theme.disabledBg ? '70%' : '100%',
                             alignItems: 'center',
                             justifyContent: 'center',
                             // borderWidth: 1,
@@ -227,13 +228,13 @@ export default function SucursalItem({ item }) {
                             marginBottom={envio !== false ? 1 : 0}
                             backgroundColor={theme.transparent}
                             style={{
-                                display: colorWp !== '#Empty' ? 'flex' : 'none',
+                                display: colorWp !== theme.disabledBg ? 'flex' : 'none',
                                 justifyContent: 'center',
                                 alignItems: 'center',
                             }}
                         >
                             <TouchableOpacity
-                                disabled={colorWp === theme.dangerDark}
+                                disabled={colorWp === theme.dangerDark || colorWp === theme.disabledBg}
                                 onPress={OpenWp}
                                 style={
                                     [
@@ -242,7 +243,6 @@ export default function SucursalItem({ item }) {
                                             height: '100%',
                                             backgroundColor: colorWp,
                                             borderRadius: 10,
-
                                             flexDirection: 'row',
                                             justifyContent: 'center',
                                             alignItems: 'center',
@@ -287,7 +287,7 @@ export default function SucursalItem({ item }) {
                             height={3}
                             backgroundColor={theme.transparent}
                             style={{
-                                display: envio !== false && colorWp !== theme.dangerDark && colorWp !== '#Empty' ? 'flex' : 'none',
+                                display: envio !== false && colorWp !== theme.dangerDark && colorWp !== theme.disabledBg ? 'flex' : 'none',
                                 justifyContent: 'flex-start',
                                 alignItems: 'center',
                             }}

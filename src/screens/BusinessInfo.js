@@ -23,6 +23,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 
 export default function BusinessInfo({ route }) {
     const { data } = route.params;
+    // console.log('Data: ', data)
     const { location } = useSelector(state => state.auth);
 
     const navigation = useNavigation()
@@ -40,11 +41,11 @@ export default function BusinessInfo({ route }) {
 
             const { urlMenu, entereza } = await res.json()
 
-            console.log('Entereza Response: ', entereza, '- ', urlMenu, '- ', codigoEmpresa)
+            console.log('Entereza GetMenuPdf Response: ', entereza, '- ', urlMenu, '- ', codigoEmpresa)
 
             if (entereza.codeError === 'COD200') {
                 setShowMenu('flex')
-                setUrlMenu(urlMenu[0])
+                setUrlMenu(urlMenu)
             } else {
                 setShowMenu('none')
                 setUrlMenu('')
@@ -161,9 +162,9 @@ export default function BusinessInfo({ route }) {
 
                 newSucursal.sort((a, b) => {
                     // Si la empresa A tiene link de WhatsApp y la empresa B no, A va primero
-                    if (a.wpp && !b.wpp) {
+                    if (a.wpp.wpp && !b.wpp.wpp) {
                         return -1;
-                    } else if (!a.wpp && b.wpp) { // Si la empresa B tiene link de WhatsApp y la empresa A no, B va primero
+                    } else if (!a.wpp.wpp && b.wpp.wpp) { // Si la empresa B tiene link de WhatsApp y la empresa A no, B va primero
                         return 1;
                     } else { // Si ambas empresas tienen o no tienen link de WhatsApp, se compara por horarios
                         if (a.horarios === true && b.horarios !== true) { // true antes que 'empty' y false

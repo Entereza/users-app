@@ -23,5 +23,7 @@ export const theme = {
     green2: '#2CFF8D',
     greenDark: '#1C8D86',
     turquese: '#22FFEA',
-    facebook: '#1977f3'
+    facebook: '#1977f3',
+    wpp: '#4CD236',
+    disabledBg: '#818181'
 }

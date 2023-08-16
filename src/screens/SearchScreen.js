@@ -20,6 +20,7 @@ export default function SearchScreen({ route }) {
   const [searchValue, setSearchValue] = React.useState('')
 
   const { nameUser, city } = route.params;
+  console.log(nameUser, city)
 
   const [dataSearch, setDataSearch] = React.useState([])
   const [dataEmpresas, setDataEmpresas] = React.useState(1)
