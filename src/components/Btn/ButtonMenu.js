@@ -28,7 +28,7 @@ export default function ButtonMenu({ showButton = 'none', onPress }) {
                         justifyContent: 'center',
                         alignItems: 'center',
                         marginBottom: 10,
-                        top: heightPercentageToDP(90),
+                        bottom: heightPercentageToDP(10),
                         right: 10,
                         zIndex: 2
                     }]}

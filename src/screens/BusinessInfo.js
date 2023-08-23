@@ -399,82 +399,77 @@ export default function BusinessInfo({ route }) {
             </ScrollView>
             <ButtonMenu onPress={openPdf} showButton={showMenu} />
 
-            <SafeAreaProvider>
-                <Modal
-                    animationType="slide"
-                    transparent={false}
-                    visible={modal}
-                    onRequestClose={handleOnModal}
+            <Modal
+                animationType="slide"
+                transparent={false}
+                visible={modal}
+                onRequestClose={handleOnModal}
+            >
+                <ViewStyled
+                    backgroundColor={theme.primary}
+                    style={{
+                        justifyContent: 'center',
+                        alignItems: 'flex-start'
+                    }}
                 >
-                    <SafeAreaView style={{ backgroundColor: theme.transparent, flex: 1 }}>
-
-                        <ViewStyled
-                            backgroundColor={theme.primary}
+                    <ViewStyled
+                        backgroundColor={theme.transparent}
+                        paddingHorizontal={4}
+                        height={7}
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderTopRightRadius: 20,
+                            borderTopLeftRadius: 20,
+                        }}
+                    >
+                        <Ionicons
+                            name="arrow-back-outline"
+                            size={adjustFontSize(28)}
+                            color={theme.quaternary}
                             style={{
-                                justifyContent: 'center',
-                                alignItems: 'flex-start'
+                                marginRight: 'auto',
                             }}
+                            onPress={handleOnModal}
+                        />
+
+                        <TextStyled
+                            textAlign={'center'}
+                            fontFamily='ArtegraBold'
+                            fontSize={18}
+                            style={{
+                                marginRight: 'auto'
+                            }}
+                            fontWeight='500'
+                            color={theme.quaternary}
                         >
-                            <ViewStyled
-                                backgroundColor={theme.transparent}
-                                paddingHorizontal={4}
-                                height={7}
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    borderTopRightRadius: 20,
-                                    borderTopLeftRadius: 20,
-                                }}
-                            >
-                                <Ionicons
-                                    name="arrow-back-outline"
-                                    size={adjustFontSize(28)}
-                                    color={theme.quaternary}
-                                    style={{
-                                        marginRight: 'auto',
-                                    }}
-                                    onPress={handleOnModal}
-                                />
+                            {
+                                `Menú de ${nombre}`
+                            }
+                        </TextStyled>
+                    </ViewStyled>
 
-                                <TextStyled
-                                    textAlign={'center'}
-                                    fontFamily='ArtegraBold'
-                                    fontSize={18}
-                                    style={{
-                                        marginRight: 'auto'
-                                    }}
-                                    fontWeight='500'
-                                    color={theme.quaternary}
-                                >
-                                    {
-                                        `Menú de ${nombre}`
-                                    }
-                                </TextStyled>
-                            </ViewStyled>
+                    <Pdf
+                        trustAllCerts={false}
+                        source={{ uri: urlMenu, cache: true }}
+                        onLoadComplete={(numberOfPages, filePath) => {
+                            console.log(`Number of pages: ${numberOfPages}`);
+                        }}
+                        onPageChanged={(page, numberOfPages) => {
+                            console.log(`Current page: ${page}`);
+                        }}
+                        onError={(error) => {
+                            console.log(error);
+                        }}
+                        onPressLink={(uri) => {
+                            console.log(`Link pressed: ${uri}`);
+                        }}
+                        style={styles.pdf}
 
-                            <Pdf
-                                trustAllCerts={false}
-                                source={{ uri: urlMenu, cache: true }}
-                                onLoadComplete={(numberOfPages, filePath) => {
-                                    console.log(`Number of pages: ${numberOfPages}`);
-                                }}
-                                onPageChanged={(page, numberOfPages) => {
-                                    console.log(`Current page: ${page}`);
-                                }}
-                                onError={(error) => {
-                                    console.log(error);
-                                }}
-                                onPressLink={(uri) => {
-                                    console.log(`Link pressed: ${uri}`);
-                                }}
-                                style={styles.pdf}
-
-                            />
-                        </ViewStyled>
-                    </SafeAreaView>
-                </Modal >
-            </SafeAreaProvider>
+                    />
+                </ViewStyled>
+            </Modal >
         </>
 
     )
