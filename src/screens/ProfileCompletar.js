@@ -50,7 +50,7 @@ export default function ProfileCompletar({
     }
 
     React.useEffect(() => {
-        if (info !== null) {
+        if (info) {
             sexNotNull()
         }
     }, [info])

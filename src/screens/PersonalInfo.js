@@ -51,11 +51,7 @@ export default function PersonalInfo({ route }) {
     const handleChangeName = () => {
         navigation.navigate('ProfileName');
     }
-
-    const handleCompletePerfil = () => {
-        navigation.navigate('CompletePerfil')
-    }
-
+    
     return (
         <ScrollView
             contentContainerStyle={{
@@ -113,25 +109,6 @@ export default function PersonalInfo({ route }) {
                             }}
                         />
                     </ProfileOptionsInfo>
-
-                    {
-                        buttonOpen
-                            ? <ProfileOptionsInfo
-                                title='Completar Perfil'
-                                onPress={handleCompletePerfil}
-                            >
-                                <MaterialCommunityIcons
-                                    name={"account-alert"}
-                                    size={adjustFontSize(26)}
-                                    color={"#FF9085"}
-                                    style={{
-                                        ...styles.optionIcon,
-                                        backgroundColor: `${'#FF9085'}30`
-                                    }}
-                                />
-                            </ProfileOptionsInfo>
-                            : <></>
-                    }
 
                     <ProfileOptionsPassword
                         title='Cambiar Contraseña'

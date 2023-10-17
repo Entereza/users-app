@@ -106,7 +106,7 @@ export default function ContinueApple({ display }) {
             console.log("Login Apple Res: ", entereza)
 
             if (entereza.codeError === codeErrors.cod200) {
-                console.log('Inicio de sesión exitoso: ', entereza)
+                console.log('Inicio de sesión exitoso: ', entereza, mail, codigoEntidad, jwt, rol)
 
                 await Promise.all([
                     AsyncStorage.setItem('ENT-EMAIL', mail),

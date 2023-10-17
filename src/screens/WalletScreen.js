@@ -336,7 +336,7 @@ export default function WalletScreen({ route }) {
     if (startText === true) {
       Animated.timing(textAnimation, {
         toValue: 1,
-        duration: 5,
+        duration: 3,
         useNativeDriver: true,
       }).start(({ finished }) => {
         if (finished) {

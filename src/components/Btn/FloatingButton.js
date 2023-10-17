@@ -44,8 +44,10 @@ export default function FloatingButton({ bottom = 0 }) {
     }
 
     React.useEffect(() => {
-        NumberWp()
-    }, [])
+        if (info && info.usuarioBean) {
+            NumberWp()
+        }
+    }, [info])
 
     return (
         <>

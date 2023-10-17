@@ -3,6 +3,7 @@ import { codeErrors } from "../../utils/codeErrors";
 import { fetchWithToken } from "../../utils/fetchWithToken";
 import { types } from "../types";
 import { _uiFinishChecking, _uiStartChecking } from "./uiActions";
+import { Alert } from 'react-native';
 
 export const _authLogin = (payload) => ({
     type: types.authLogin,
@@ -65,10 +66,13 @@ export const __authGetInfo = () => {
         return new Promise(async (resolve, reject) => {
             try {
                 const mail = await AsyncStorage.getItem('ENT-EMAIL')
+                
                 console.log('Starts Searching Info of User: ', mail)
 
                 const response = await fetchWithToken(`entereza/usuarios_list?code=${mail}`)
-    
+
+                console.log('Informacion del usuario encontrada.')
+
                 const {
                     entereza,
                     lista_usuarios,
@@ -79,7 +83,7 @@ export const __authGetInfo = () => {
                     creado_entereza,
                     expo
                 } = await response.json()
-    
+
 
                 if (entereza.codeError === codeErrors.cod526) {
                     let data = {
@@ -106,6 +110,8 @@ export const __authGetInfo = () => {
                 }
             } catch (err) {
                 console.log('Error authGetInfo: ', err)
+
+                Alert.alert('Ocurrió un error al cargar los datos.', 'Por favor intente nuevamente.')
             } finally {
                 console.log('Finished AuthGetInfo')
                 dispatch(_uiFinishChecking())
@@ -136,15 +142,21 @@ export const __authValidate = () => {
             if (token && mail && codigoEntidad) {
                 dispatch(_authLogin(data))
                 // console.log("Si hay token")
+                dispatch(__authGetInfo())
+                
             } else {
                 dispatch(_authLogout())
+
+                dispatch(_uiFinishChecking())
+
+                console.log('Close Validate Screen.')
+                return;
                 // console.log("No hay nada")
             }
         } catch (err) {
+            dispatch(_uiFinishChecking())
+
             console.log('EROR VALIDATE', err)
-        } finally {
-            console.log('Close LoginScreen.')
-            dispatch(__authGetInfo())
         }
     }
 }

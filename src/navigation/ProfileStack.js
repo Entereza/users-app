@@ -70,7 +70,7 @@ export default function ProfileStack() {
                     )
                 }}
             />
-            <Stack.Screen
+            {/* <Stack.Screen
                 name='CompletePerfil'
                 component={ProfileCompletar}
                 options={{
@@ -83,7 +83,7 @@ export default function ProfileStack() {
                         />
                     )
                 }}
-            />
+            /> */}
             <Stack.Screen
                 name='DeleteAccount'
                 component={DeleteAccount}

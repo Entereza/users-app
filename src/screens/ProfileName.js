@@ -82,7 +82,7 @@ export default function ProfileName() {
 
     const CheckNameApellido = async () => {
         if (newNameUser !== nameUser || newApellidosUser !== apellidosUser) {
-            console.log('Cambia el nombre o apellido')
+            // console.log('Cambia el nombre o apellido')
             setButtonDisabled(false)
         } else {
             setButtonDisabled(true)
@@ -275,7 +275,7 @@ export default function ProfileName() {
                                     value={newNameUser}
                                     onChangeText={nameUser => setNewNameUser(nameUser)}
                                     keyboardType={'default'}
-                                    maxLength={15}
+                                    maxLength={60}
                                     style={{
                                         backgroundColor: '#f3f5f7cc',
                                         paddingVertical: hp(1),
@@ -302,13 +302,13 @@ export default function ProfileName() {
                                         marginBottom: '1.5%',
                                     }}
                                 >
-                                    Apellidos/s
+                                    Apellido/s
                                 </TextStyled>
                                 <TextInput
                                     value={newApellidosUser}
                                     onChangeText={apellidosUser => setNewApellidosUser(apellidosUser)}
                                     keyboardType={'default'}
-                                    maxLength={40}
+                                    maxLength={60}
                                     style={{
                                         backgroundColor: '#f3f5f7cc',
                                         paddingVertical: hp(1),

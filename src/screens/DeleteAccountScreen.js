@@ -16,6 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import TextStyled from '../components/ui/TextStyled'
 import { __authLogout } from '../redux/actions/authActions';
 import { MaterialIcons } from '@expo/vector-icons'
+import { GoogleSignin } from '@react-native-google-signin/google-signin'
 
 export default function DeleteAccountScreen({
     navigation
@@ -102,9 +103,22 @@ export default function DeleteAccountScreen({
     // const DeleteFalse = () => {
     //     setDeleteModal(false)
     // }
+    React.useEffect(() => {
+        GoogleSignin.configure({
+            webClientId: '511900415351-u8a9qj8q91nc2d6jan3vvhoqhajir6v8.apps.googleusercontent.com',
+            offlineAccess: true,
+            forceCodeForRefreshToken: true,
+            scopes: [
+                'profile',
+                'email',
+                'openid',
+            ]
+        });
+    }, [])
 
     const closeSesion = () => {
         setClosing(true)
+        GoogleSignin.signOut()
         dispatch(__authLogout())
         setClosing(false)
     }

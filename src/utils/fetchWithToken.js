@@ -9,6 +9,7 @@ export const fetchWithToken = async (path, method, body) => {
     // console.log(token)
 
     let url = baseURL + "/" + path;
+    // console.log(url)
     if (method === 'GET') {
         return global.fetch(url, {
             method: method,

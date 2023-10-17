@@ -45,10 +45,6 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
   const dispatch = useDispatch()
   const User = useSelector(state => state.auth)
 
-  useEffect(() => {
-    dispatch(__authGetInfo())
-  }, [])
-
   const SendUbicationUser = async (coords, city) => {
     try {
       const Email = await AsyncStorage.getItem('ENT-EMAIL')
@@ -242,7 +238,7 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
         token,
         ...rest
       } = await res.json()
-      console.log('- Entereza Get: ', entereza, '\n - Token Get: ', token)
+      // console.log('- Entereza Get: ', entereza, '\n - Token Get: ', token)
 
       if (entereza.codeError === null) {
         setRepeat(false)
@@ -260,8 +256,8 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
   }
 
   React.useEffect(() => {
-    if (User !== null) {
-      if (User.info !== null) {
+    if (User) {
+      if (User.info) {
         SeeToken()
       } else {
         return;
@@ -313,7 +309,7 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
       return;  // return here to stop execution if there was an error
     }
 
-    console.log('ExpoToken For Save: ', token);
+    // console.log('ExpoToken For Save: ', token);
     return token;
   }
 
@@ -326,7 +322,7 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
         expoToken: token
       };
 
-      console.log('Data SendTokenExpo: ', data)
+      // console.log('Data SendTokenExpo: ', data)
 
       const response = await fetchWithToken("entereza/expo_add", "POST", data)
 
@@ -366,7 +362,7 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
           options={({ route }) => {
             const firstTime = route?.params?.params?.firstTime || false;
 
-            console.log('Route.Params: ', route)
+            // console.log('Route.Params: ', route)
             return {
               tabBarShowLabel: true,
               tabBarLabel: 'Billetera',

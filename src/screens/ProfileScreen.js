@@ -25,6 +25,8 @@ import ImageProfile from '../components/profile/ProfileImage';
 import { useNavigation } from '@react-navigation/native';
 import ProfileOptionsInfo from '../components/profile/ProfileOptionsInfo';
 import { fetchWithToken } from '../utils/fetchWithToken';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { Alert } from 'react-native';
 
 export default function ProfileScreen() {
 
@@ -107,11 +109,18 @@ export default function ProfileScreen() {
     }
 
     const handleOnLogout = () => {
-        setCloseSesion(false)
+        try {
+            setCloseSesion(false)
 
-        setClosing(true)
-        dispatch(__authLogout())
-        setClosing(false)
+            GoogleSignin.signOut()
+            setClosing(true)
+            dispatch(__authLogout())
+            setClosing(false)
+        } catch (error) {
+            console.log('Error handleOnLogout', error)
+
+            Alert.alert('No se pudo cerrar la sesión', 'Por favor intente nuevamente en unos minutos')
+        }
     }
 
     const [buttonOpen, setButtonOpen] = React.useState(false)
@@ -130,7 +139,7 @@ export default function ProfileScreen() {
     }
 
     React.useEffect(() => {
-        if (info != null) {
+        if (info) {
             MostrarCompletar()
         }
     }, [info])
@@ -241,7 +250,7 @@ export default function ProfileScreen() {
                                     color={buttonOpen ? "#FF9085" : '#34B7F1'}
                                     style={{
                                         ...styles.optionIcon,
-                                        backgroundColor: buttonOpen ? `${'#FF9085'}30` : `${'#34B7F1'}30` 
+                                        backgroundColor: buttonOpen ? `${'#FF9085'}30` : `${'#34B7F1'}30`
                                     }}
                                 />
                             </ProfileOptionsInfo>

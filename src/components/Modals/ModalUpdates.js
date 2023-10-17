@@ -7,12 +7,9 @@ import { fetchWithToken } from '../../utils/fetchWithToken'
 import ImageStyled from '../ui/ImageStyled'
 import ButtonNext from '../Btn/ButtonNext'
 import * as Aplication from 'expo-application'
-import { useSelector } from 'react-redux'
 import { fetchWithoutToken } from '../../utils/fetchWithoutToken'
 
 export default function ModalUpdates() {
-    const User = useSelector(state => state.auth)
-
     const BuildNro = Aplication.nativeBuildVersion
 
     const [modal, setModal] = React.useState(false);
@@ -40,9 +37,9 @@ export default function ModalUpdates() {
         console.log('Buildnro: ', BuildNro, ' - BuildBack: ', build)
         if (entereza.codeError === 'COD200') {
             if (build === BuildNro) {
-                console.log('Las Versiones de ', os, 'son iguales, tienes la última version de la app.')
+                console.log('App de ', os, ' está actualizada.')
             } else {
-                console.log('Las Versiones de ', os, 'NO son iguales, actualiza a la última version de la app.')
+                console.log('App de ', os, ' está desactualizada, actualiza a la última version de la app.')
                 setModal(true)
             }
         } else {

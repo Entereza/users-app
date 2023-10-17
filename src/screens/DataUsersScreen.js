@@ -201,7 +201,7 @@ export default function DataUsers() {
 
                 // Agregar el objeto al array datosModal
                 datosModal.push(obj);
-                console.log('Datos: ', obj)
+                // console.log('Datos: ', obj)
             }
         }
 
@@ -278,9 +278,7 @@ export default function DataUsers() {
             if (userData.carnet && userData.fecha_nacimiento && userData.contacto && userData.sexo) {
                 PushDataModal()
 
-                console.log('Datos completados: ', userData)
-            } else {
-                console.log('Aún está completando los datos.', userData)
+                // console.log('Datos completados: ', userData)
             }
         } else {
             console.log('Hay un error en el carnet.')
@@ -326,7 +324,7 @@ export default function DataUsers() {
     };
 
     React.useEffect(() => {
-        if (info.usuarioBean !== null) {
+        if (info && info.usuarioBean) {
             verifyDataUser()
         }
     }, [info])

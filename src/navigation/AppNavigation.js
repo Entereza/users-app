@@ -6,17 +6,15 @@ import { NavigationContainer } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 
 // CUSTOM 
+import { Alert } from 'react-native'
 import PublicNavigation from './PublicNavigation';
 import PrivateNavigation from './PrivateNavigation';
 import { __authValidate } from '../redux/actions/authActions';
 import LoaderScreen from '../screens/LoaderScreen';
 import ModalUpdates from '../components/Modals/ModalUpdates';
-import ModalUpdateTest from '../components/Modals/ModalUpdatesTest';
 import * as Updates from 'expo-updates';
 import { _uiFinishChecking, _uiStartChecking } from '../redux/actions/uiActions';
-import DataUsers from '../screens/DataUsersScreen';
 import { StatusBar } from 'expo-status-bar';
-import { theme } from '../utils/theme';
 
 export default function AppNavigation() {
   const User = useSelector(state => state.auth)
@@ -42,14 +40,19 @@ export default function AppNavigation() {
 
         await Updates.reloadAsync();
       } else {
-        console.log('No hay updates disponibles')
+
+        setUpdateAvailable(false)
+        console.log('Close Updates.')
+
+        console.log('No hay updates disponibles');
+        dispatch(__authValidate());
+        setTextUpdates(false)
       }
     } catch (e) {
-      console.error(e);
-    } finally {
-      console.log('Close Updates.')
       setTextUpdates(false)
-      dispatch(__authValidate())
+      dispatch(__authValidate());
+
+      console.log(e);
     }
   }
 
@@ -66,7 +69,7 @@ export default function AppNavigation() {
       const Sexo = await info.usuarioBean?.sexo
       const Fecha = await info.usuarioBean?.fecha_nacimiento
       const Numero = await info.usuarioBean?.contacto
-      console.log('Info Of User', User.info.usuarioBean)
+      // console.log('Info Of User', User.info.usuarioBean)
 
       // Info Of User {"apellidos": "12345", "carnet_identidad": null, "codigo_usuario": "USR-3c315fa0", "contacto": null, "extension_carnet": "", "fecha_nacimiento": null, "mail": "2@gmail.com", "nombres": "1234", "sexo": ""}
 
@@ -83,7 +86,7 @@ export default function AppNavigation() {
   }
 
   React.useEffect(() => {
-    if (info !== null) {
+    if (info && info.usuarioBean) {
       VerifyDataUser()
     } else {
       console.log('Info Nula no se puede realizar comprobación.')
