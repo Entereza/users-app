@@ -62,7 +62,7 @@ export default function ContinueApple({ display }) {
                 setShowAlert(true)
                 setAlertText({
                     title: 'Ha ocurrido un error.',
-                    message: entereza.msgError,
+                    message: response.msgError,
                     type: 'error',
                 })
 

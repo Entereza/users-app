@@ -6,6 +6,7 @@ export const types = {
     authSetAddress: "[AUTH] Set Address",
     authSetLat: "[AUTH] Set Lat",
     authSetLng: "[AUTH] Set Lng",
+    authSetCities: "[AUTH] SET_CITY_DATA",
     uiOpenQrMode: "[UI] Open QR Mode",
     uiCloseQrMode: "[UI] Close QR Mode",
     uiStartLoading: "[UI] Start Loading",

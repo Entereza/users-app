@@ -16,20 +16,17 @@ import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsi
 import { SafeAreaView } from 'react-native-safe-area-context';
 import backgroundCity from '../../assets/business/backgroundCity.png';
 import GradientBackground from '../../assets/business/GradientBackground.png';
-import backgroundCB from '../../assets/business/backgroundCB.jpg';
-import backgroundLP from '../../assets/business/backgroundLP.jpg';
-import backgroundTJ from '../../assets/business/backgroundTJ.jpg';
 
+//
 const images = {
-    "Cochabamba": backgroundCB,
-    "La Paz": backgroundLP,
-    "Tarija": backgroundTJ,
     "default": backgroundCity,
     "gradient": GradientBackground
 };
 
 
 export default function NavigationHeader() {
+
+    const { cityData } = useSelector(state => state.auth);
 
     const [imageBackground, setImageBackground] = React.useState(images.gradient)
 
@@ -42,7 +39,7 @@ export default function NavigationHeader() {
     const { location } = useSelector(state => state.auth);
 
     const CheckUbication = () => {
-        if (location.address?.state === "Cochabamba" || location.address?.state === "La Paz" || location.address?.state === "Tarija") {
+        if (location.address?.state === "Cochabamba" || location.address?.state === "La Paz" || location.address?.state === "Tarija" || location.address?.state === "Chuquisaca") {
             console.log('Location Conocida (CheckUbication): ', location.address?.state)
             if (location.address?.neighbourhood === "") {
                 console.log('Location CheckUbication neighbourhood: ', location.address?.neighbourhood)
@@ -56,21 +53,20 @@ export default function NavigationHeader() {
 
     const chooseBackgroundImage = () => {
         try {
-            let newState = location.address?.state;
+            let city = cityData.find(c => c.citieName === location.address?.state);
+            
+            console.log('city chooseBackgroundImage: ', city)
 
-            switch (newState) {
-                case "Cochabamba":
-                case "La Paz":
-                case "Tarija":
-                    setImageBackground(images[newState]);
-                    break;
-                default:
-                    setImageBackground(images.default);
+            if (city && city.urlCity) {
+                setImageBackground({ uri: city.urlCity });
+            } else {
+                setImageBackground(images.default);
             }
         } catch (error) {
-            console.log('Error chooseBackgroundImage: ', error)
+            setImageBackground(images.default);
+            console.log('Error chooseBackgroundImage: ', error);
         }
-    }
+    };
 
     React.useEffect(() => {
         if (location !== null) {

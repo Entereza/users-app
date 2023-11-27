@@ -12,11 +12,11 @@ import WalletStack from './WalletStack';
 import ProfileStack from './ProfileStack';
 import BusinessStack from '../navigation/BusinessStack';
 import { _uiSetPermission, _uiSetPermissionGps } from '../redux/actions/uiActions';
-import { _authSetLocation, __authGetInfo, _authGetInfo } from '../redux/actions/authActions';
+import { _authSetLocation, __authGetInfo, _authGetInfo, _authSetCityData } from '../redux/actions/authActions';
 import * as Location from 'expo-location'
 import * as Tracking from 'expo-tracking-transparency';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { fetchWithToken } from '../utils/fetchWithToken';
+import { fetchWithToken, fetchWithTokenCities } from '../utils/fetchWithToken';
 // import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import NotificacionWallet from '../components/Notifications/NotificationsWallet';
@@ -24,6 +24,7 @@ import { Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import LoaderScreen from '../screens/LoaderScreen';
 import DataUsers from '../screens/DataUsersScreen';
+import { codeErrors } from '../utils/codeErrors';
 
 const Tab = createBottomTabNavigator();
 
@@ -66,7 +67,6 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
       console.log('Error SendUbicationUser: ', error)
     }
   }
-
 
   const UbicationConPermisos = async () => {
     try {
@@ -162,6 +162,77 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
     requestTrackingPermissions()
   }, [])
 
+  //Obtener ciudades
+
+  const citiesError = [
+    {
+      "urlCity": "https://enterezabol.com/enterezacities/2aba059b-5fd7-4e52-9bc7-353d56c11e97.jpg",
+      "cityCode": "CB",
+      "citieName": "Cochabamba",
+      "citieCountry": "Bolivia",
+      "latitude": -66.15695,
+      "longitude": -17.3938
+    },
+    {
+      "urlCity": "https://enterezabol.com/enterezacities/36703366-576a-406e-8ec2-3bdd9cb134a9.jpg",
+      "cityCode": "LP",
+      "citieName": "La Paz",
+      "citieCountry": "Bolivia",
+      "latitude": -16.495659,
+      "longitude": -68.13356
+    },
+    {
+      "urlCity": "https://enterezabol.com/enterezacities/bb9fb5b7-c569-41a8-bf30-f28e4bbf5841.jpg",
+      "cityCode": "TJ",
+      "citieName": "Tarija",
+      "citieCountry": "Bolivia",
+      "latitude": -64.73431,
+      "longitude": -21.53392
+    },
+    {
+      "urlCity": "https://enterezabol.com/enterezacities/d5bb5709-31e9-477e-9bfa-42bc53c6426e.jpg",
+      "cityCode": "CH",
+      "citieName": "Chuquisaca",
+      "citieCountry": "Bolivia",
+      "latitude": -19.048529,
+      "longitude": -65.2601
+    }
+  ]
+
+  const handleErrorResponse = async () => {
+    try {
+      console.log('handleErrorResponse says: Seteando ciudades ...')
+      dispatch(_authSetCityData(citiesError));
+    } catch (error) {
+      console.log('Error Saving handleErrorResponse: ', error)
+    }
+  }
+
+  const fetchCitiesAndStore = async () => {
+    try {
+      const response = await fetchWithTokenCities("entereza-cities/obtener-ciudades-query?country=Bolivia&type=PROD", "GET");
+      const { entereza, cityList } = await response.json();
+
+      console.log('Respuesta fetchCitiesAndStore: ', entereza)
+      if (entereza.codeError === codeErrors.cod200) {
+        // Almacenar la información de las ciudades en Redux
+        dispatch(_authSetCityData(cityList));
+      } else {
+        // En caso de error, se puede manejar aquí o usar datos predeterminados
+        console.log('Ocurrio un error al obtener las ciudades: ', entereza)
+        handleErrorResponse();
+      }
+    } catch (error) {
+      console.log("Error al obtener ciudades: ", error);
+      handleErrorResponse();
+    }
+  }
+
+  React.useEffect(() => {
+    fetchCitiesAndStore()
+  }, [])
+
+  //Obtener/Generar tokenMVUser
   const [Repeat, setRepeat] = React.useState(true)
 
   const SeeToken = async () => {

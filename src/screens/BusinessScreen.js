@@ -3,7 +3,8 @@ import {
   ScrollView,
   FlatList,
   RefreshControl,
-  ActivityIndicator
+  ActivityIndicator,
+  Alert
 } from "react-native";
 
 import BussinessSearch from "../components/business/BussinessSearch";
@@ -33,7 +34,7 @@ export default function BusinessHome() {
   const [loadingSkeletonEmpresas, setLoadingSkeletonEmpresas] = useState(true)
   const [loadingMoreEmpresas, setLoadingMoreEmpresas] = useState(true)
 
-  const { location } = useSelector(state => state.auth);
+  const { location, cityData } = useSelector(state => state.auth);
 
   const nextPage = () => {
     setPage(page + 1);
@@ -265,6 +266,13 @@ export default function BusinessHome() {
     )
   }
 
+  const getCityCode = (stateName) => {
+    const city = cityData.find(city => city.citieName === stateName);
+    return city ? city.cityCode : 'DefaultCode'; // Retorna 'DefaultCode' si no se encuentra la ciudad
+  };
+
+  let cityCode = getCityCode(location.address.state);
+
   const getInfo = async () => {
     try {
       console.log('Starts Get Info of BusinessScreen')
@@ -274,30 +282,14 @@ export default function BusinessHome() {
       setLoadingSkeletonEmpresas(true)
       setLoadingMoreEmpresas(true)
 
-      let city;
-      if (location.address.state == "La Paz") {
-        city = 'LP'
-      }
-      if (location.address.state == "Cochabamba") {
-        city = 'CB'
-      }
-      if (location.address.state == "Santa Cruz") {
-        city = 'SC'
-      }
-      if (location.address.state == "Oruro") {
-        city = 'OR'
-      } 
-      if (location.address.state == "Tarija") {
-        city = 'TJ'
-      } 
-
       let res = await fetchWithToken(`entereza/rubros`, "GET");
 
       const { entereza, rubros, imgRubros } = await res.json();
 
       if (entereza.codeError === "COD200") {
+
         rubros.forEach(rubro => {
-          if (rubro.ciudad === city) {
+          if (rubro.ciudad === cityCode) {
             let imgCategory = imgRubros.find(
               (image) => image.codigo_rubro === rubro.codigoRubro
             )
@@ -306,9 +298,38 @@ export default function BusinessHome() {
             arrayRubros.push(rubro)
           }
         });
-        setImg(arrayRubros);
-        getInfoPromotions()
-        getInfoEmpresas5()
+
+        console.log('Lenght Rubros: ', arrayRubros.length)
+
+        if (arrayRubros.length > 0) {
+          setImg(arrayRubros);
+          getInfoPromotions()
+          getInfoEmpresas5()
+        } else {
+
+          Alert.alert(
+            // Título
+            'Empresas no disponibles',
+            // Mensaje
+            `Actualmente no tenemos empresas afiliadas en ${location.address.state}.\nSin embargo, puedes explorar empresas en otros departamentos.`,
+            // Botones
+            [
+              {
+                text: "Explorar Otros Departamentos",
+                onPress: () => {
+                  RedirectUbication()
+                },
+              },
+              {
+                text: "Cancelar",
+                onPress: () => { }, // No se necesita hacer nada, solo cerrar la alerta
+                style: "cancel"
+              }
+            ]
+          );
+
+          return;
+        }
       } else {
         setHasMore(false)
       }
@@ -323,22 +344,6 @@ export default function BusinessHome() {
   const getInfoPromotions = async () => {
     try {
       const token = await AsyncStorage.getItem('ENT-TKN')
-      let city;
-      if (location.address.state == "La Paz") {
-        city = 'LP'
-      }
-      if (location.address.state == "Cochabamba") {
-        city = 'CB'
-      }
-      if (location.address.state == "Santa Cruz") {
-        city = 'SC'
-      }
-      if (location.address.state == "Oruro") {
-        city = 'OR'
-      } 
-      if (location.address.state == "Tarija") {
-        city = 'TJ'
-      } 
 
       const formData = new FormData();
       formData.append('opcion', '2');
@@ -346,7 +351,7 @@ export default function BusinessHome() {
       formData.append('codigoEmpresa', '');
       formData.append('fechaInicio', '');
       formData.append('fechaFinal', '');
-      formData.append('ciudad', city);
+      formData.append('ciudad', cityCode);
 
       const res = await fetch("https://enterezabol.com:8443/entereza/promociones_operacion", {
         method: 'POST',
@@ -359,7 +364,7 @@ export default function BusinessHome() {
 
       const { entereza, promImg } = await res.json()
 
-      console.log('Entereza Response getInfoPromotions: ', entereza, promImg)
+      console.log('Entereza Response getInfoPromotions: ', entereza)
       if (entereza.codeError === "COD200") {
         setStartPromotions(true)
 
@@ -380,30 +385,13 @@ export default function BusinessHome() {
     try {
       setDataEmpresas([])
 
-      let city;
-      if (location.address.state == "La Paz") {
-        city = 'LP'
-      }
-      if (location.address.state == "Cochabamba") {
-        city = 'CB'
-      }
-      if (location.address.state == "Santa Cruz") {
-        city = 'SC'
-      }
-      if (location.address.state == "Oruro") {
-        city = 'OR'
-      } 
-      if (location.address.state == "Tarija") {
-        city = 'TJ'
-      } 
-
       const lat = await location.coords?.latitude
       const lng = await location.coords?.longitude
 
       console.log('Latitud: ', lat, '- Longitud: ', lng)
 
       let res = await fetchWithToken(
-        `entereza/emp_hub_filt?patron=Empresa&opcion=1&pageno=0&size=15&ciudad=${city}&categoria=COD-RUB-343&lat=${lat}&lng=${lng}`,
+        `entereza/emp_hub_filt?patron=Empresa&opcion=1&pageno=0&size=15&ciudad=${cityCode}&categoria=COD-RUB-343&lat=${lat}&lng=${lng}`,
         "GET"
       );
 
@@ -524,6 +512,12 @@ export default function BusinessHome() {
     setRefreshing(false)
   }
 
+  const navigation = useNavigation()
+
+  const RedirectUbication = () => {
+    navigation.navigate("ChangeUbication")
+  }
+
   React.useEffect(() => {
     if (location !== null) {
       if (location.address !== null) {
@@ -531,7 +525,7 @@ export default function BusinessHome() {
         getInfo();
       } else {
         console.log('location is null')
-        RedirectUbication()
+        // RedirectUbication()
       }
     } else {
       return
@@ -566,7 +560,6 @@ export default function BusinessHome() {
           <BusinessInputRedirect cityCode={location !== null ? location.address.state : 'Cochabamba'} loadingSkeleton={!startPromotions} />
 
           <BusinessPromotions
-            cityCode={location ? location.address.state : 'Cochabamba'}
             reload={loadingSkeleton}
             start={startPromotions}
             promotionsData={promotionsImg}
@@ -664,6 +657,7 @@ export default function BusinessHome() {
                 />
             }
           </ScrollView>
+
         </ViewStyled>
       </ScrollView>
 
