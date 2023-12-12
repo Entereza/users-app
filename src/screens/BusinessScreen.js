@@ -26,6 +26,7 @@ import BusinessInputRedirect from "../components/business/BusinessRedirectInput"
 import BusinessPromotions from "../components/business/BusinessPromotions";
 import FloatingButton from "../components/Btn/FloatingButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AlertStyled from "../components/ui/AlertStyled";
 
 export default function BusinessHome() {
   const [page, setPage] = useState(0);
@@ -287,7 +288,6 @@ export default function BusinessHome() {
       const { entereza, rubros, imgRubros } = await res.json();
 
       if (entereza.codeError === "COD200") {
-
         rubros.forEach(rubro => {
           if (rubro.ciudad === cityCode) {
             let imgCategory = imgRubros.find(
@@ -306,30 +306,16 @@ export default function BusinessHome() {
           getInfoPromotions()
           getInfoEmpresas5()
         } else {
-
-          Alert.alert(
-            // Título
-            'Empresas no disponibles',
-            // Mensaje
-            `Actualmente no tenemos empresas afiliadas en ${location.address.state}.\nSin embargo, puedes explorar empresas en otros departamentos.`,
-            // Botones
-            [
-              {
-                text: "Explorar Otros Departamentos",
-                onPress: () => {
-                  RedirectUbication()
-                },
-              },
-              {
-                text: "Cancelar",
-                onPress: () => { }, // No se necesita hacer nada, solo cerrar la alerta
-                style: "cancel"
-              }
-            ]
-          );
-
-          return;
+          setShowAlert(true)
+          setAlertText({
+            title: 'Empresas no disponibles',
+            message: 'No hay empresas afiliadas en tu estado, pero puedes buscar en otros departamentos.',
+            type: 'error',
+            handleAcept: closeRedirect,
+            showCancelButton: true
+          })
         }
+        return;
       } else {
         setHasMore(false)
       }
@@ -337,6 +323,11 @@ export default function BusinessHome() {
       console.log("Error entereza BusinessScreen", error);
     }
   };
+
+  const closeRedirect = () => {
+    handleCloseAlert()
+    RedirectUbication()
+  }
 
   const [promotionsImg, setPromotionsImg] = React.useState('')
 
@@ -519,21 +510,49 @@ export default function BusinessHome() {
   }
 
   React.useEffect(() => {
-    if (location !== null) {
-      if (location.address !== null) {
+    if (location) {
+      if (location?.address) {
         setHasMore(true)
         getInfo();
       } else {
         console.log('location is null')
         // RedirectUbication()
       }
-    } else {
-      return
     }
   }, [location]);
 
+  const [showAlert, setShowAlert] = React.useState(false)
+  const [alertText, setAlertText] = React.useState({
+    title: '',
+    message: '',
+    type: 'success',
+    handleAcept: '',
+    showCancelButton: ''
+  })
+  const handleCloseAlert = () => setShowAlert(false)
+
+  if (!location || !location.address) return null
+
   return (
     <>
+      {
+        showAlert
+        && (
+          <AlertStyled
+            widthModal={70}
+            heightModal={30}
+            title={alertText.title}
+            message={alertText.message}
+            type={alertText.type}
+            textConfirmButton={'Explorar'}
+            showCancelButton={alertText.showCancelButton}
+            onConfirmPressed={alertText.handleAcept}
+            onCancelPressed={handleCloseAlert}
+            showCloseButton={false}
+          />
+        )
+      }
+
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -557,7 +576,7 @@ export default function BusinessHome() {
             paddingBottom: 50,
           }}
         >
-          <BusinessInputRedirect cityCode={location !== null ? location.address.state : 'Cochabamba'} loadingSkeleton={!startPromotions} />
+          <BusinessInputRedirect cityCode={location ? location.address.state : 'Cochabamba'} loadingSkeleton={!startPromotions} />
 
           <BusinessPromotions
             reload={loadingSkeleton}

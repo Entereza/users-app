@@ -2,7 +2,7 @@
   "expo": {
     "name": "Entereza",
     "slug": "enterezaClient",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "orientation": "portrait",
     "icon": "./assets/IconEntereza.png",
     "userInterfaceStyle": "light",
@@ -25,7 +25,7 @@
       ],
       "supportsTablet": true,
       "bundleIdentifier": "com.entereza.client",
-      "buildNumber": "65",
+      "buildNumber": "66",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Requerimos tu ubicación para poder darte información sobre las empresas afiliadas de tu ciudad.",
         "NSUserTrackingUsageDescription": "Esto permite a Entereza ofrecerte la mejor experiencia y mayor información sobre las empresas afiliadas que están en tu ciudad.",
@@ -42,7 +42,7 @@
         "backgroundColor": "#000000"
       },
       "package": "com.entereza.client",
-      "versionCode": 64,
+      "versionCode": 65,
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.FOREGROUND_SERVICE",
@@ -85,7 +85,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Esto permite a Entereza acceder a tus fotos para poder utilizar esta función."
+          "photosPermission": "Esto permite a Entereza acceder a tus fotos para poder seleccionar la imagen que deseas utilizar en tu perfil.",
+          "cameraPermission": "Esto permite a Entereza acceder a tu cámara para poder sacar una imagen que será utilizada en tu perfil."
         }
       ],
       [

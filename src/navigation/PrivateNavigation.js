@@ -71,7 +71,9 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
   const UbicationConPermisos = async () => {
     try {
       console.log("Starts Searching UbicationConPermisos Android / IOs")
-      const { coords, ...rest } = await Location.getLastKnownPositionAsync({})
+      const { coords, ...rest } = await Location.getCurrentPositionAsync({})
+
+      console.log('Coords: ', coords)
 
       let res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.latitude}&lon=${coords.longitude}&addressdetails=1&format=json`, {
         method: 'GET'
