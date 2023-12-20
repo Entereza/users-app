@@ -53,6 +53,8 @@ export default function NavigationHeader() {
 
     const chooseBackgroundImage = () => {
         try {
+            console.log('CityData: ', cityData, '- Location: ', location)
+            
             let city = cityData.find(c => c.citieName === location.address?.state);
             
             console.log('city chooseBackgroundImage: ', city)

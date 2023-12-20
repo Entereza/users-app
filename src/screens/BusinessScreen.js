@@ -269,10 +269,9 @@ export default function BusinessHome() {
 
   const getCityCode = (stateName) => {
     const city = cityData.find(city => city.citieName === stateName);
+    console.log('getCityCode: ', city)
     return city ? city.cityCode : 'DefaultCode'; // Retorna 'DefaultCode' si no se encuentra la ciudad
   };
-
-  let cityCode = getCityCode(location.address.state);
 
   const getInfo = async () => {
     try {
@@ -305,16 +304,17 @@ export default function BusinessHome() {
           setImg(arrayRubros);
           getInfoPromotions()
           getInfoEmpresas5()
-        } else {
-          setShowAlert(true)
-          setAlertText({
-            title: 'Empresas no disponibles',
-            message: 'No hay empresas afiliadas en tu estado, pero puedes buscar en otros departamentos.',
-            type: 'error',
-            handleAcept: closeRedirect,
-            showCancelButton: true
-          })
         }
+        //  else {
+        //   setShowAlert(true)
+        //   setAlertText({
+        //     title: 'Empresas no disponibles',
+        //     message: 'No hay empresas afiliadas en tu estado, pero puedes buscar en otros departamentos.',
+        //     type: 'error',
+        //     handleAcept: closeRedirect,
+        //     showCancelButton: true
+        //   })
+        // }
         return;
       } else {
         setHasMore(false)
@@ -509,17 +509,24 @@ export default function BusinessHome() {
     navigation.navigate("ChangeUbication")
   }
 
+  const [cityCode, setCityCode] = React.useState(null);
+
   React.useEffect(() => {
-    if (location) {
-      if (location?.address) {
-        setHasMore(true)
-        getInfo();
-      } else {
-        console.log('location is null')
-        // RedirectUbication()
-      }
+    if (location && location.address && location.address.state) {
+      const newCityCode = getCityCode(location.address.state);
+      setCityCode(newCityCode);
+    } else {
+      // Manejar la situación en la que la ubicación no está disponible
+      setCityCode(null);
     }
-  }, [location]);
+  }, [location]); // Dependencia de useEffect
+
+  React.useEffect(() => {
+    if (cityCode) {
+      setHasMore(true)
+      getInfo();
+    }
+  }, [cityCode])
 
   const [showAlert, setShowAlert] = React.useState(false)
   const [alertText, setAlertText] = React.useState({
@@ -531,7 +538,22 @@ export default function BusinessHome() {
   })
   const handleCloseAlert = () => setShowAlert(false)
 
-  if (!location || !location.address) return null
+  if (!location || !location.address || !cityCode)
+    return (
+      <>
+        <ViewStyled
+          backgroundColor={theme.transparent}
+          height={25}
+          paddingTop={2}
+          style={{
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+          }}
+        >
+          <ActivityIndicator size="large" color={theme.secondary} />
+        </ViewStyled>
+      </>
+    )
 
   return (
     <>

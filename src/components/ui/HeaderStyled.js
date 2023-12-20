@@ -126,7 +126,7 @@ export default function HeaderStyled({
                 reloadEmp()
             }
             console.log("Starts Searching UbicationConPermisos Android / IOs")
-            const { coords } = await Location.getLastKnownPositionAsync()
+            const { coords } = await Location.getCurrentPositionAsync()
             console.log('CurrentRoute: ', coords, routeName);
 
             let res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.latitude}&lon=${coords.longitude}&addressdetails=1&format=json`, {

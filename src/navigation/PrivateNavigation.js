@@ -20,7 +20,7 @@ import { fetchWithToken, fetchWithTokenCities } from '../utils/fetchWithToken';
 // import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import NotificacionWallet from '../components/Notifications/NotificationsWallet';
-import { Platform } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import LoaderScreen from '../screens/LoaderScreen';
 import DataUsers from '../screens/DataUsersScreen';
@@ -71,9 +71,20 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
   const UbicationConPermisos = async () => {
     try {
       console.log("Starts Searching UbicationConPermisos Android / IOs")
-      const { coords, ...rest } = await Location.getCurrentPositionAsync({})
 
-      console.log('Coords: ', coords)
+      const location = await Location.getCurrentPositionAsync({});
+
+      if (!location) {
+        console.log('No location available');
+        // Manejar el caso en el que no hay ubicación
+        Alert.alert('No se pudo obtener su ubicación.', 'Verifique que su ubicación sea accesible')
+        UbicationSinPermisos()
+        return;
+      }
+
+      const { coords } = location;
+
+      console.log('Coords obtenidas: ', coords)
 
       let res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.latitude}&lon=${coords.longitude}&addressdetails=1&format=json`, {
         method: 'GET'
@@ -88,15 +99,13 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
       dispatch(_uiSetPermission(true))
       dispatch(_uiSetPermissionGps(true))
     } catch (err) {
+      UbicationSinPermisos()
       console.log("Error Location: ", err)
       if (err.code === 'E_LOCATION_SETTINGS_UNSATISFIED') {
-        setShowAlert(true)
-        setAlertText({
-          title: 'Fallo al mostrarte empresas',
-          message: 'Para mejorar tu experiencia activa tu ubicación.',
-          type: 'error',
-        })
+        Alert.alert('Fallo al mostrarte empresas', 'Para mejorar tu experiencia activa tu ubicación.')
         console.log("Code Error Location Off")
+      } else {
+        Alert.alert('Error al obtener tu ubicación', 'Por favor intenta nuevamente en unos minutos')
       }
     }
   }
@@ -213,6 +222,7 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
   const fetchCitiesAndStore = async () => {
     try {
       const response = await fetchWithTokenCities("entereza-cities/obtener-ciudades-query?country=Bolivia&type=PROD", "GET");
+
       const { entereza, cityList } = await response.json();
 
       console.log('Respuesta fetchCitiesAndStore: ', entereza)
@@ -222,10 +232,12 @@ export default function PrivateNavigation({ dataUsersIsNotComplete = null }) {
       } else {
         // En caso de error, se puede manejar aquí o usar datos predeterminados
         console.log('Ocurrio un error al obtener las ciudades: ', entereza)
+        Alert.alert('Ocurrio un error al obtener las ciudades', `${entereza}`)
         handleErrorResponse();
       }
     } catch (error) {
       console.log("Error al obtener ciudades: ", error);
+      Alert.alert('Error al obtener ciudades', `${error}`)
       handleErrorResponse();
     }
   }
