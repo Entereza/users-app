@@ -85,7 +85,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Esto permite a Entereza acceder a tus fotos para poder utilizar esta función."
+          "photosPermission": "Esto permite a Entereza acceder a tus fotos para poder seleccionar la imagen que deseas utilizar en tu perfil.",
+          "cameraPermission": "Esto permite a Entereza acceder a tu cámara para poder sacar una imagen que será utilizada en tu perfil."
         }
       ],
       [

@@ -487,7 +487,7 @@ export default function HeaderStyled({
                         <ButtonNext
                             fontSize={20}
                             width={80}
-                            text='Permitir'
+                            text='Continuar'
                             onPress={() => { PermissionsStatusUbication() }}
                         />
 
