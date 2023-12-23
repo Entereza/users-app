@@ -22,17 +22,12 @@ export default function ImageProfile() {
 
     const packageName = 'com.entereza.client'; // Reemplaza con el nombre del paquete de la aplicación
 
-    const openSettings = async () => {
-        try {
-            if (Platform.OS === 'ios') {
-                console.log('ios')
-                await Linking.openURL('app-settings:');
-            } else {
-                console.log('android')
-                await Linking.openSettings();
-            }
-        } catch (e) {
-            console.error('Failed to open app settings.', e);
+    const openSettings = () => {
+        console.log('android or ios')
+        if (Platform.OS === 'android') {
+            Linking.openSettings();
+        } else {
+            Linking.openURL(`app-settings:${packageName}`);
         }
     };
 
@@ -110,9 +105,9 @@ export default function ImageProfile() {
         setModal(true)
     }
 
-    const takeNewImage= async () => {
+    const takeNewImage = async () => {
         const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      
+
         if (status === 'granted') {
             console.log('Camera permission accepted');
 
@@ -121,23 +116,22 @@ export default function ImageProfile() {
                 const codeUser = await User.info.usuarioBean?.codigo_usuario
 
                 let result = await ImagePicker.launchCameraAsync({
-                  mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                  allowsEditing: true,
-                  aspect: [4, 3],
-                  quality: 1,
+                    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                    allowsEditing: true,
+                    aspect: [4, 3],
+                    quality: 1,
                 });
-          
+
                 if (!result.canceled) {
                     setShowImage('')
-    
+
                     const imageUri = result.assets[0].uri;
                     const imageName = imageUri.split('/').pop();
-    
+
                     const formData = new FormData();
                     formData.append('codigoUsuario', codeUser);
                     formData.append('imagen', { uri: imageUri, name: imageName, type: 'image/jpeg' });
                     formData.append('operacion', operationImg);
-    
                     const res = await fetch("https://enterezabol.com:8443/entereza/user_img", {
                         method: 'POST',
                         headers: {
@@ -147,12 +141,10 @@ export default function ImageProfile() {
                         body: formData
                     });
                     const { entereza, img } = await res.json()
-    
                     //A poner nueva
                     //B editar imagen
                     //C extraer
                     //D eliminar imagen
-    
                     if (entereza.codeError === 'COD200') {
                         console.log('Res: ', entereza)
                         if (operationImg === 'D') {
@@ -175,10 +167,10 @@ export default function ImageProfile() {
                     console.log('Image Results Error: ', result.assets)
                 }
             } catch (error) {
-            console.error('Error opening camera:', error);
+                console.error('Error opening camera:', error);
             }
         } else {
-          console.log('Camera permission denied');
+            console.log('Camera permission denied');
         }
     };
 
@@ -409,17 +401,17 @@ export default function ImageProfile() {
                             >
                                 <Pressable onPress={takeNewImage}>
                                     <View style={styles.pressableContainer}>
-                                        <View style={{marginLeft: 100}} />
-                                        <MaterialCommunityIcons style={{flex: 1}} name="camera" size={24} color={theme.secondary} />
-                                        <TextStyled style={{flex: 5}}>Sacar foto nueva</TextStyled>
+                                        <View style={{ marginLeft: 100 }} />
+                                        <MaterialCommunityIcons style={{ flex: 1 }} name="camera" size={24} color={theme.secondary} />
+                                        <TextStyled style={{ flex: 5 }}>Sacar foto nueva</TextStyled>
                                     </View>
                                 </Pressable>
                                 <View style={styles.divider} />
                                 <Pressable onPress={permissionResultImage}>
                                     <View style={styles.pressableContainer}>
-                                        <View style={{marginLeft: 100}} />
-                                        <MaterialCommunityIcons style={{flex: 1}} name="view-gallery-outline" size={24} color={theme.secondary} />
-                                        <TextStyled style={{flex: 5}}>Seleccionar imagen</TextStyled>
+                                        <View style={{ marginLeft: 100 }} />
+                                        <MaterialCommunityIcons style={{ flex: 1 }} name="view-gallery-outline" size={24} color={theme.secondary} />
+                                        <TextStyled style={{ flex: 5 }}>Seleccionar imagen</TextStyled>
                                     </View>
                                 </Pressable>
                             </ViewStyled>

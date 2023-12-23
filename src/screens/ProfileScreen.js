@@ -29,6 +29,18 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Alert } from 'react-native';
 
 export default function ProfileScreen() {
+    React.useEffect(() => {
+        GoogleSignin.configure({
+            webClientId: '511900415351-u8a9qj8q91nc2d6jan3vvhoqhajir6v8.apps.googleusercontent.com',
+            offlineAccess: true,
+            forceCodeForRefreshToken: true,
+            scopes: [
+                'profile',
+                'email',
+                'openid',
+            ]
+        });
+    }, [])
 
     const navigation = useNavigation()
 

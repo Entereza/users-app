@@ -4,6 +4,7 @@ const initialState = {
     user: null,
     info: null,
     location: null,
+    cityData: [],
 }
 
 export const authReducer = (state = initialState, action) => {
@@ -25,13 +26,18 @@ export const authReducer = (state = initialState, action) => {
                 info: action.payload,
             }
 
-        case types.authSetAddress: 
+        case types.authSetAddress:
             return {
                 ...state,
                 location: action.payload,
             }
 
+        case types.authSetCities:
+            return {
+                ...state,
+                cityData: action.payload,
+            };
         default:
-            return state
+            return state;
     }
 }

@@ -311,7 +311,7 @@ export default function BusinessInfo({ route }) {
                                 }}
                             >
                                 <ImageStyled
-                                    source={img}
+                                    source={img ? img : require('../assets/business/GradientBackground.png')}
                                     borderRadius={'50%'}
                                     style={{
                                         width: '100%',

@@ -25,6 +25,7 @@ export default function ModalUpdates() {
     }
 
     const CheckUpdates = async () => {
+        console.log('CheckUpdates starts...')
         const res = await fetchWithoutToken(`entereza/version_get?os=${os}`, "GET")
 
         const {
@@ -37,10 +38,11 @@ export default function ModalUpdates() {
         console.log('Buildnro: ', BuildNro, ' - BuildBack: ', build)
         if (entereza.codeError === 'COD200') {
             if (build === BuildNro) {
+                setModal(false)
                 console.log('App de ', os, ' está actualizada.')
             } else {
-                console.log('App de ', os, ' está desactualizada, actualiza a la última version de la app.')
                 setModal(true)
+                console.log('App de ', os, ' está desactualizada, actualiza a la última version de la app.')
             }
         } else {
             console.log('Version No Encontrada: ', entereza.msgError)

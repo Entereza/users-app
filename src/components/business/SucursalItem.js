@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+    Alert,
     Linking,
     TouchableOpacity
 } from 'react-native';
@@ -17,17 +18,34 @@ export default function SucursalItem({ item }) {
     const { location } = useSelector(state => state.auth);
 
     // console.log('Item: ', item)
-    // console.log('Wpp: ', item)
+    console.log('Wpp: ', item)
 
     const [colorWp, setColorWp] = React.useState(theme.disabledBg)
 
     const OpenWp = () => {
-        Linking.openURL(item.wpp.wpp)
+        Linking.canOpenURL(item.wpp.wpp)
+            .then((supported) => {
+                if (supported) {
+                    console.log('Can open this url: ', item.wpp.wpp)
+                    return Linking.openURL(item.wpp.wpp);
+                } else {
+                    Alert.alert('No se pudo redirigir a Whatsapp.', 'Por favor, intente nuevamente en unos momentos.')
+                    console.log("Don't know how to open this URL: ", item.wpp.wpp);
+                }
+            })
+            .catch((err) => {
+                Alert.alert('No se pudo redirigir a Whatsapp.', 'Por favor, intente nuevamente en unos momentos.')
+                console.error('An error occurred', err)
+            })
     }
 
     const SetColors = () => {
-        if (item.wpp.wpp !== '' && item.wpp.wpp !== null) {
-            setColorWp(theme.wpp)
+        if (item.wpp) {
+            if (item.wpp.wpp !== '' && item.wpp.wpp !== null) {
+                setColorWp(theme.wpp)
+            } else {
+                setColorWp(theme.disabledBg)
+            }
         } else {
             setColorWp(theme.disabledBg)
         }
@@ -47,7 +65,7 @@ export default function SucursalItem({ item }) {
 
     React.useEffect(() => {
         SucursalIsOpen()
-    }, [])
+    }, [item])
 
     const [envio, setEnvio] = React.useState('0')
 
@@ -73,6 +91,9 @@ export default function SucursalItem({ item }) {
     const VerifyState = () => {
         try {
             if (location.address.state === 'La Paz') {
+                setEnvio(false);
+                return;
+            } else if (location.address.state === 'Chuquisaca') {
                 setEnvio(false);
                 return;
             } else if (location.address.state === 'Cochabamba') {

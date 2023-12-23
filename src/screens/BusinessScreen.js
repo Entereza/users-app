@@ -3,7 +3,8 @@ import {
   ScrollView,
   FlatList,
   RefreshControl,
-  ActivityIndicator
+  ActivityIndicator,
+  Alert
 } from "react-native";
 
 import BussinessSearch from "../components/business/BussinessSearch";
@@ -25,6 +26,7 @@ import BusinessInputRedirect from "../components/business/BusinessRedirectInput"
 import BusinessPromotions from "../components/business/BusinessPromotions";
 import FloatingButton from "../components/Btn/FloatingButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AlertStyled from "../components/ui/AlertStyled";
 
 export default function BusinessHome() {
   const [page, setPage] = useState(0);
@@ -33,7 +35,7 @@ export default function BusinessHome() {
   const [loadingSkeletonEmpresas, setLoadingSkeletonEmpresas] = useState(true)
   const [loadingMoreEmpresas, setLoadingMoreEmpresas] = useState(true)
 
-  const { location } = useSelector(state => state.auth);
+  const { location, cityData } = useSelector(state => state.auth);
 
   const nextPage = () => {
     setPage(page + 1);
@@ -265,6 +267,12 @@ export default function BusinessHome() {
     )
   }
 
+  const getCityCode = (stateName) => {
+    const city = cityData.find(city => city.citieName === stateName);
+    console.log('getCityCode: ', city)
+    return city ? city.cityCode : 'DefaultCode'; // Retorna 'DefaultCode' si no se encuentra la ciudad
+  };
+
   const getInfo = async () => {
     try {
       console.log('Starts Get Info of BusinessScreen')
@@ -274,30 +282,13 @@ export default function BusinessHome() {
       setLoadingSkeletonEmpresas(true)
       setLoadingMoreEmpresas(true)
 
-      let city;
-      if (location.address.state == "La Paz") {
-        city = 'LP'
-      }
-      if (location.address.state == "Cochabamba") {
-        city = 'CB'
-      }
-      if (location.address.state == "Santa Cruz") {
-        city = 'SC'
-      }
-      if (location.address.state == "Oruro") {
-        city = 'OR'
-      } 
-      if (location.address.state == "Tarija") {
-        city = 'TJ'
-      } 
-
       let res = await fetchWithToken(`entereza/rubros`, "GET");
 
       const { entereza, rubros, imgRubros } = await res.json();
 
       if (entereza.codeError === "COD200") {
         rubros.forEach(rubro => {
-          if (rubro.ciudad === city) {
+          if (rubro.ciudad === cityCode) {
             let imgCategory = imgRubros.find(
               (image) => image.codigo_rubro === rubro.codigoRubro
             )
@@ -306,9 +297,25 @@ export default function BusinessHome() {
             arrayRubros.push(rubro)
           }
         });
-        setImg(arrayRubros);
-        getInfoPromotions()
-        getInfoEmpresas5()
+
+        console.log('Lenght Rubros: ', arrayRubros.length)
+
+        if (arrayRubros.length > 0) {
+          setImg(arrayRubros);
+          getInfoPromotions()
+          getInfoEmpresas5()
+        }
+        //  else {
+        //   setShowAlert(true)
+        //   setAlertText({
+        //     title: 'Empresas no disponibles',
+        //     message: 'No hay empresas afiliadas en tu estado, pero puedes buscar en otros departamentos.',
+        //     type: 'error',
+        //     handleAcept: closeRedirect,
+        //     showCancelButton: true
+        //   })
+        // }
+        return;
       } else {
         setHasMore(false)
       }
@@ -317,28 +324,17 @@ export default function BusinessHome() {
     }
   };
 
+  const closeRedirect = () => {
+    handleCloseAlert()
+    RedirectUbication()
+  }
+
   const [promotionsImg, setPromotionsImg] = React.useState('')
 
 
   const getInfoPromotions = async () => {
     try {
       const token = await AsyncStorage.getItem('ENT-TKN')
-      let city;
-      if (location.address.state == "La Paz") {
-        city = 'LP'
-      }
-      if (location.address.state == "Cochabamba") {
-        city = 'CB'
-      }
-      if (location.address.state == "Santa Cruz") {
-        city = 'SC'
-      }
-      if (location.address.state == "Oruro") {
-        city = 'OR'
-      } 
-      if (location.address.state == "Tarija") {
-        city = 'TJ'
-      } 
 
       const formData = new FormData();
       formData.append('opcion', '2');
@@ -346,7 +342,7 @@ export default function BusinessHome() {
       formData.append('codigoEmpresa', '');
       formData.append('fechaInicio', '');
       formData.append('fechaFinal', '');
-      formData.append('ciudad', city);
+      formData.append('ciudad', cityCode);
 
       const res = await fetch("https://enterezabol.com:8443/entereza/promociones_operacion", {
         method: 'POST',
@@ -359,7 +355,7 @@ export default function BusinessHome() {
 
       const { entereza, promImg } = await res.json()
 
-      console.log('Entereza Response getInfoPromotions: ', entereza, promImg)
+      console.log('Entereza Response getInfoPromotions: ', entereza)
       if (entereza.codeError === "COD200") {
         setStartPromotions(true)
 
@@ -380,30 +376,13 @@ export default function BusinessHome() {
     try {
       setDataEmpresas([])
 
-      let city;
-      if (location.address.state == "La Paz") {
-        city = 'LP'
-      }
-      if (location.address.state == "Cochabamba") {
-        city = 'CB'
-      }
-      if (location.address.state == "Santa Cruz") {
-        city = 'SC'
-      }
-      if (location.address.state == "Oruro") {
-        city = 'OR'
-      } 
-      if (location.address.state == "Tarija") {
-        city = 'TJ'
-      } 
-
       const lat = await location.coords?.latitude
       const lng = await location.coords?.longitude
 
       console.log('Latitud: ', lat, '- Longitud: ', lng)
 
       let res = await fetchWithToken(
-        `entereza/emp_hub_filt?patron=Empresa&opcion=1&pageno=0&size=15&ciudad=${city}&categoria=COD-RUB-343&lat=${lat}&lng=${lng}`,
+        `entereza/emp_hub_filt?patron=Empresa&opcion=1&pageno=0&size=15&ciudad=${cityCode}&categoria=COD-RUB-343&lat=${lat}&lng=${lng}`,
         "GET"
       );
 
@@ -524,22 +503,78 @@ export default function BusinessHome() {
     setRefreshing(false)
   }
 
+  const navigation = useNavigation()
+
+  const RedirectUbication = () => {
+    navigation.navigate("ChangeUbication")
+  }
+
+  const [cityCode, setCityCode] = React.useState(null);
+
   React.useEffect(() => {
-    if (location !== null) {
-      if (location.address !== null) {
-        setHasMore(true)
-        getInfo();
-      } else {
-        console.log('location is null')
-        RedirectUbication()
-      }
+    if (location && location.address && location.address.state) {
+      const newCityCode = getCityCode(location.address.state);
+      setCityCode(newCityCode);
     } else {
-      return
+      // Manejar la situación en la que la ubicación no está disponible
+      setCityCode(null);
     }
-  }, [location]);
+  }, [location]); // Dependencia de useEffect
+
+  React.useEffect(() => {
+    if (cityCode) {
+      setHasMore(true)
+      getInfo();
+    }
+  }, [cityCode])
+
+  const [showAlert, setShowAlert] = React.useState(false)
+  const [alertText, setAlertText] = React.useState({
+    title: '',
+    message: '',
+    type: 'success',
+    handleAcept: '',
+    showCancelButton: ''
+  })
+  const handleCloseAlert = () => setShowAlert(false)
+
+  if (!location || !location.address || !cityCode)
+    return (
+      <>
+        <ViewStyled
+          backgroundColor={theme.transparent}
+          height={25}
+          paddingTop={2}
+          style={{
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+          }}
+        >
+          <ActivityIndicator size="large" color={theme.secondary} />
+        </ViewStyled>
+      </>
+    )
 
   return (
     <>
+      {
+        showAlert
+        && (
+          <AlertStyled
+            widthModal={70}
+            heightModal={30}
+            title={alertText.title}
+            message={alertText.message}
+            type={alertText.type}
+            textConfirmButton={'Explorar'}
+            showCancelButton={alertText.showCancelButton}
+            onConfirmPressed={alertText.handleAcept}
+            onCancelPressed={handleCloseAlert}
+            showCloseButton={false}
+          />
+        )
+      }
+
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -563,10 +598,9 @@ export default function BusinessHome() {
             paddingBottom: 50,
           }}
         >
-          <BusinessInputRedirect cityCode={location !== null ? location.address.state : 'Cochabamba'} loadingSkeleton={!startPromotions} />
+          <BusinessInputRedirect cityCode={location ? location.address.state : 'Cochabamba'} loadingSkeleton={!startPromotions} />
 
           <BusinessPromotions
-            cityCode={location ? location.address.state : 'Cochabamba'}
             reload={loadingSkeleton}
             start={startPromotions}
             promotionsData={promotionsImg}
@@ -664,6 +698,7 @@ export default function BusinessHome() {
                 />
             }
           </ScrollView>
+
         </ViewStyled>
       </ScrollView>
 

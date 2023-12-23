@@ -66,7 +66,7 @@ export const __authGetInfo = () => {
         return new Promise(async (resolve, reject) => {
             try {
                 const mail = await AsyncStorage.getItem('ENT-EMAIL')
-                
+
                 console.log('Starts Searching Info of User: ', mail)
 
                 const response = await fetchWithToken(`entereza/usuarios_list?code=${mail}`)
@@ -143,7 +143,7 @@ export const __authValidate = () => {
                 dispatch(_authLogin(data))
                 // console.log("Si hay token")
                 dispatch(__authGetInfo())
-                
+
             } else {
                 dispatch(_authLogout())
 
@@ -165,3 +165,8 @@ export const _authSetLocation = (payload) => ({
     type: types.authSetAddress,
     payload,
 })
+
+export const _authSetCityData = (cityData) => ({
+    type: types.authSetCities,
+    payload: cityData,
+});
