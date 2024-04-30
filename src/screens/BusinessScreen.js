@@ -512,6 +512,7 @@ export default function BusinessHome() {
   const [cityCode, setCityCode] = React.useState(null);
 
   React.useEffect(() => {
+    console.log('location.address.state: ', location.address.state)
     if (location && location.address && location.address.state) {
       const newCityCode = getCityCode(location.address.state);
       setCityCode(newCityCode);

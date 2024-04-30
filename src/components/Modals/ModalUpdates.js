@@ -62,7 +62,8 @@ export default function ModalUpdates() {
     }
 
     React.useEffect(() => {
-        CheckOS()
+        // CheckOS()
+        setModal(false)
     }, [])
 
     React.useEffect(() => {

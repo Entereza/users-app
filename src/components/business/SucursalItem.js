@@ -67,81 +67,81 @@ export default function SucursalItem({ item }) {
         SucursalIsOpen()
     }, [item])
 
-    const [envio, setEnvio] = React.useState('0')
+    // const [envio, setEnvio] = React.useState(false)
 
-    let ranges;
+    // let ranges;
 
-    const PricesEnvios = () => {
-        const codKm = item.codKm;
-        let selectedEnvio = '0';
+    // const PricesEnvios = () => {
+    //     const codKm = item.codKm;
+    //     let selectedEnvio = '0';
 
-        console.log('Km For Prices: ', codKm)
+    //     console.log('Km For Prices: ', codKm)
 
-        for (const range in ranges) {
-            if (codKm >= range) {
-                selectedEnvio = ranges[range];
-            } else {
-                break; // Salir del bucle cuando se encuentra el rango adecuado
-            }
-        }
+    //     for (const range in ranges) {
+    //         if (codKm >= range) {
+    //             selectedEnvio = ranges[range];
+    //         } else {
+    //             break; // Salir del bucle cuando se encuentra el rango adecuado
+    //         }
+    //     }
 
-        setEnvio(selectedEnvio);
-    }
+    //     setEnvio(selectedEnvio);
+    // }
 
-    const VerifyState = () => {
-        try {
-            if (location.address.state === 'La Paz') {
-                setEnvio(false);
-                return;
-            } else if (location.address.state === 'Chuquisaca') {
-                setEnvio(false);
-                return;
-            } else if (location.address.state === 'Cochabamba') {
-                ranges = {
-                    0: '7',
-                    1: '8',
-                    2: '10',
-                    3: '12',
-                    4: '14',
-                    5: '16',
-                    6: '18',
-                    7: '20',
-                    8: '22',
-                    9: '25',
-                    10: '30',
-                };
-            } else if (location.address.state === 'Tarija') {
-                ranges = {
-                    0: '5',
-                    1.5: '6',
-                    2: '7',
-                    3: '8',
-                    4: '9',
-                    5: '10',
-                    6: '11',
-                    7: '12',
-                    8: '14',
-                    10: '15',
-                };
-            }
-        } catch (error) {
-            console.log('Err: ', error)
-        } finally {
-            PricesEnvios()
-        }
-    }
+    // const VerifyState = () => {
+    //     try {
+    //         if (location.address.state === 'La Paz') {
+    //             setEnvio(false);
+    //             return;
+    //         } else if (location.address.state === 'Chuquisaca') {
+    //             setEnvio(false);
+    //             return;
+    //         } else if (location.address.state === 'Cochabamba') {
+    //             ranges = {
+    //                 0: '7',
+    //                 1: '8',
+    //                 2: '10',
+    //                 3: '12',
+    //                 4: '14',
+    //                 5: '16',
+    //                 6: '18',
+    //                 7: '20',
+    //                 8: '22',
+    //                 9: '25',
+    //                 10: '30',
+    //             };
+    //         } else if (location.address.state === 'Tarija') {
+    //             ranges = {
+    //                 0: '5',
+    //                 1.5: '6',
+    //                 2: '7',
+    //                 3: '8',
+    //                 4: '9',
+    //                 5: '10',
+    //                 6: '11',
+    //                 7: '12',
+    //                 8: '14',
+    //                 10: '15',
+    //             };
+    //         }
+    //     } catch (error) {
+    //         console.log('Err: ', error)
+    //     } finally {
+    //         PricesEnvios()
+    //     }
+    // }
 
-    React.useEffect(() => {
-        if (location.coords !== null) {
-            if (location.coords.permissions !== false) {
-                VerifyState()
-                console.log('Permissions: ', location.coords.permissions)
-            } else {
-                console.log('Permissions: ', location.coords.permissions)
-                setEnvio(false)
-            }
-        }
-    }, [location])
+    // React.useEffect(() => {
+    //     if (location.coords !== null) {
+    //         if (location.coords.permissions !== false) {
+    //             VerifyState()
+    //             console.log('Permissions: ', location.coords.permissions)
+    //         } else {
+    //             console.log('Permissions: ', location.coords.permissions)
+    //             setEnvio(false)
+    //         }
+    //     }
+    // }, [location])
 
     return (
         <>
@@ -246,7 +246,6 @@ export default function SucursalItem({ item }) {
                         <ViewStyled
                             width={19}
                             height={4}
-                            marginBottom={envio !== false ? 1 : 0}
                             backgroundColor={theme.transparent}
                             style={{
                                 display: colorWp !== theme.disabledBg ? 'flex' : 'none',
@@ -303,7 +302,7 @@ export default function SucursalItem({ item }) {
                             </TouchableOpacity>
                         </ViewStyled>
 
-                        <ViewStyled
+                        {/* <ViewStyled
                             width={25}
                             height={3}
                             backgroundColor={theme.transparent}
@@ -320,7 +319,7 @@ export default function SucursalItem({ item }) {
                             >
                                 Envío Bs. {envio}
                             </TextStyled>
-                        </ViewStyled>
+                        </ViewStyled> */}
                     </ViewStyled>
 
                     {/* <ViewStyled
