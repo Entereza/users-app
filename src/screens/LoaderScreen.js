@@ -1,18 +1,16 @@
-import React from 'react'
+import React from 'react';
 import { ActivityIndicator } from 'react-native';
-// import { useFonts } from 'expo-font'
-import ViewStyled from '../components/ui/ViewStyled';
-import { theme } from '../utils/theme';
-import ImageStyled from '../components/ui/ImageStyled';
-import TextStyled from '../components/ui/TextStyled';
-import adjustFontSize from '../utils/adjustText';
+import ViewStyled from '../utils/ui/ViewStyled';
+import { theme_colors } from '../utils/theme/theme_colors';
+import ImageStyled from '../utils/ui/ImageStyled';
+import TextStyled from '../utils/ui/TextStyled';
 
-export default function LoaderScreen({ textUpdates, updateAvailable }) {
+export default function LoaderScreen() {
     return (
         <ViewStyled
             width={100}
             height={100}
-            backgroundColor={theme.dark}
+            backgroundColor={theme_colors.dark}
             style={{
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -21,14 +19,15 @@ export default function LoaderScreen({ textUpdates, updateAvailable }) {
             <ViewStyled
                 width={50}
                 height={30}
-                backgroundColor={theme.transparent}
+                marginBottom={2}
+                backgroundColor={theme_colors.transparent}
                 style={{
                     justifyContent: 'center',
                     alignItems: 'center',
                 }}
             >
                 <ImageStyled
-                    source={require('../../assets/img/EnterezaLogoColors.png')}
+                    source={require('../../assets/icons/IconColorsEntereza.png')}
                     style={{
                         resizeMode: 'contain',
                         width: '100%',
@@ -38,20 +37,20 @@ export default function LoaderScreen({ textUpdates, updateAvailable }) {
             </ViewStyled>
 
             <TextStyled
-                fontFamily='ArtegraBold'
-                fontSize={adjustFontSize(16)}
-                color={theme.primary}
+                fontSize={30}
+                color={theme_colors.white}
+                fontFamily='Artegra-SemiBold'
             >
                 {
-                    textUpdates
-                        ? updateAvailable
-                            ? `Actualizando Entereza...`
-                            : `Verificando Actualizaciones...`
-                        : `Cargando Datos...`
+                    `Cargando datos...`
                 }
             </TextStyled>
 
-            <ActivityIndicator size="large" color={theme.secondary} style={{ marginTop: 15 }} />
+            <ActivityIndicator
+                size="large"
+                color={theme_colors.white}
+                style={{ marginTop: 15 }}
+            />
         </ViewStyled>
     );
 }

@@ -1,0 +1,51 @@
+export const private_name_routes = {
+    billetera: {
+        billeteraStack: 'BilleteraStack',
+        billeteraStackLabel: 'Billetera',
+        billeteraHome: 'billeteraHome',
+        profileScreen: 'profileScreen',
+        codeScreen: 'codeScreen',
+        cashbackInfoScreen: 'cashbackInfoScreen',
+        transferScreen: 'transferScreen',
+        transferConfirmedScreen: 'transferConfirmedScreen',
+        cashbackKeyboardModal: 'cashbackKeyboardModal',
+        billeteraFinalConfirmation: 'billeteraFinalConfirmation',
+        recargarScreen: 'recargarScreen',
+        allOrdersScreen: 'allOrdersScreen'
+    },
+    empresas: {
+        empresasStack: 'EmpresasStack',
+        empresasStackLabel: 'Empresas',
+        empresasHome: 'empresasHome',
+        empresasDetails: 'empresasDetails',
+        empresaProducto: 'empresaProducto',
+        empresaCategory: 'empresaCategory',
+        carritoHome: 'carritoHome',
+        confirmOrder: 'confirmOrder',
+        empresasFinalConfirmation: 'empresasFinalConfirmation',
+        addressScreen: 'addressScreen',
+        methodScreen: 'methodScreen',
+        cashbackScreen: 'cashbackScreen',
+        facturacionScreen: 'facturacionScreen',
+        profileScreen: 'profileScreen',
+        editProfile: 'editProfile',
+        changePassword: 'changePassword',
+        followOrder: 'followOrder',
+        newAddressMap: 'newAddressMap',
+        saveAddress: 'saveAddress'
+    },
+    pedidos: {
+        pedidosStack: 'PedidosStack',
+        pedidosStackLabel: 'Pedidos',
+        pedidosHome: 'pedidosHome',
+        empresasDetails: 'empresasDetails',
+
+    },
+    profile: {
+        profileStack: 'ProfileStack',
+        profileStackLabel: 'Perfil',
+        profileHome: 'profileHome',
+        editProfile: 'editProfile',
+        changePassword: 'changePassword',
+    },
+}

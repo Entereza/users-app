@@ -2,7 +2,7 @@
   "expo": {
     "name": "Entereza",
     "slug": "enterezaClient",
-    "version": "1.2.2",
+    "version": "1.2.4",
     "orientation": "portrait",
     "icon": "./assets/IconEntereza.png",
     "userInterfaceStyle": "light",
@@ -12,26 +12,25 @@
       "backgroundColor": "#000000"
     },
     "scheme": "com.entereza.client",
-    "platforms": [
-      "ios",
-      "android"
-    ],
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "platforms": ["ios", "android"],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "associatedDomains": [
         "com.googleusercontent.apps.511900415351-ej15snog5mn00ikjcbuqeqa1pap18nkn"
       ],
       "supportsTablet": true,
       "bundleIdentifier": "com.entereza.client",
-      "buildNumber": "68",
+      "buildNumber": "72",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Requerimos tu ubicación para poder darte información sobre las empresas afiliadas de tu ciudad.",
         "NSUserTrackingUsageDescription": "Esto permite a Entereza ofrecerte la mejor experiencia y mayor información sobre las empresas afiliadas que están en tu ciudad.",
-        "UIBackgroundModes": [
-          "fetch",
-          "remote-notification"
+        "UIBackgroundModes": ["fetch", "remote-notification"],
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.511900415351-ej15snog5mn00ikjcbuqeqa1pap18nkn"
+            ]
+          }
         ]
       },
       "googleServicesFile": "./GoogleService-Info.plist"
@@ -42,7 +41,7 @@
         "backgroundColor": "#000000"
       },
       "package": "com.entereza.client",
-      "versionCode": 66,
+      "versionCode": 67,
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.FOREGROUND_SERVICE",
@@ -61,10 +60,7 @@
               "scheme": "com.entereza.client"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         }
       ]
     },
@@ -73,9 +69,12 @@
     },
     "plugins": [
       "expo-apple-authentication",
-      "@react-native-google-signin/google-signin",
-      "@config-plugins/react-native-blob-util",
-      "@config-plugins/react-native-pdf",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.511900415351-ej15snog5mn00ikjcbuqeqa1pap18nkn"
+        }
+      ],
       [
         "expo-tracking-transparency",
         {
@@ -109,7 +108,8 @@
             "targetSdkVersion": 33
           }
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "extra": {
       "eas": {
