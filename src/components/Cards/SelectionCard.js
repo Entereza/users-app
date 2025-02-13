@@ -1,82 +1,80 @@
 import React from 'react';
-import { Ionicons, AntDesign } from "@expo/vector-icons";
-import ViewStyled from "../../utils/ui/ViewStyled";
-import TextStyled from "../../utils/ui/TextStyled";
-import { TouchableOpacity } from 'react-native';
-import { theme_colors } from "../../utils/theme/theme_colors";
+import ViewStyled from '../../utils/ui/ViewStyled';
+import { theme_colors } from '../../utils/theme/theme_colors';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import TextStyled from '../../utils/ui/TextStyled';
+import { Pressable } from 'react-native';
+import adjustFontSize from '../../utils/ui/adjustText';
+import { theme_textStyles } from '../../utils/theme/theme_textStyles';
 
-export default function SelectionCard({id, name, icon, selection, onPress}) {
+export default function SelectionCard({ id, name, icon, onPress, selection }) {
+    const isSelected = selection === id;
+    const colorIcon = isSelected ? theme_colors.white : theme_colors.grey;
+    const colorText = isSelected ? theme_colors.white : theme_colors.black;
+    const backgroundColor = isSelected ? theme_colors.primary : theme_colors.white;
 
     return (
-        <TouchableOpacity
-            onPress={onPress}
-            backgroundColor={theme_colors.white}
-            style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 15,
-                borderWidth: 1,
-                backgroundColor: selection === id ? theme_colors.primary : theme_colors.white,
-                borderColor: selection === id ? theme_colors.primary : theme_colors.white,
-                padding: 18,
-                width: '87%',
-                marginBottom: 10,
-                marginTop: 10,
-                elevation: 50,
-                shadowColor: theme_colors.black,
-                shadowOffset: {
-                    width: 2,
-                    height: 2,
-                },
-                shadowOpacity: 0.25,
-                shadowRadius: 3.84,
-            }}
+        <ViewStyled
+            width={90}
+            height={10}
+            paddingHorizontal={1}
+            marginBottom={1}
+            backgroundColor={theme_colors.transparent}
         >
-            <ViewStyled
-                width={'85%'}
-                backgroundColor={theme_colors.transparent}
-                style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                }}
-            >
+            <Pressable onPress={onPress} style={{ width: '100%', height: '100%' }}>
                 <ViewStyled
-                    backgroundColor={theme_colors.transparent}
+                    borderRadius={2}
+                    paddingHorizontal={3.5}
+                    backgroundColor={backgroundColor}
                     style={{
+                        width: '100%',
+                        height: '90%',
                         flexDirection: 'row',
-                        justifyContent: 'flex-start',
-                        marginLeft: 5
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        shadowColor: theme_colors.black,
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.5,
+                        shadowRadius: 2,
+                        elevation: 3,
                     }}
                 >
-                    <Ionicons name={icon} size={20} color={selection === id ? theme_colors.white : theme_colors.primary} />
+                    <MaterialCommunityIcons 
+                        name={icon} 
+                        size={adjustFontSize(theme_textStyles.large)} 
+                        color={colorIcon} 
+                    />
 
-                    <TextStyled
-                        fontSize={7}
-                        color={selection === id ? theme_colors.white : theme_colors.black}
+                    <ViewStyled
+                        paddingHorizontal={2}
+                        height={7}
+                        backgroundColor={theme_colors.transparent}
                         style={{
-                            marginLeft: 15,
-                            marginTop: 2,
-                            fontFamily: 'SFPro-Bold',
+                            flex: 1,
+                            justifyContent: 'center',
+                            alignItems: 'flex-start',
                         }}
                     >
-                        {name}
-                    </TextStyled>
-                </ViewStyled>
+                        <TextStyled
+                            fontSize={theme_textStyles.small}
+                            color={colorText}
+                            numberOfLines={1}
+                            ellipsizeMode='tail'
+                            style={{
+                                fontFamily: 'SFPro-SemiBold',
+                            }}
+                        >
+                            {name}
+                        </TextStyled>
+                    </ViewStyled>
 
-                <ViewStyled
-                    backgroundColor={theme_colors.transparent}
-                    style={{
-                        justifyContent: 'flex-end',
-                        marginRight: 5
-                    }}
-                >
-                    { selection === id ? (
-                        <AntDesign name="checkcircle" size={20} color={theme_colors.white} />
-                    ) : ( 
-                        <AntDesign name="checkcircleo" size={20} color={theme_colors.secondary} />
-                    )}
+                    <MaterialCommunityIcons 
+                        name={"checkbox-blank-circle-outline"} 
+                        size={adjustFontSize(theme_textStyles.smedium)} 
+                        color={colorIcon} 
+                    />
                 </ViewStyled>
-            </ViewStyled>
-        </TouchableOpacity>
+            </Pressable>
+        </ViewStyled>
     );
 }

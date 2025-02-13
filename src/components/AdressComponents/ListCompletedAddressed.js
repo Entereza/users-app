@@ -9,11 +9,17 @@ import AddressSelectionCard from '../Cards/AddressSelectionCard'
 import useAddressStore from '../../utils/tools/interface/addressStore'
 import Toast from 'react-native-root-toast'
 import adjustFontSize from '../../utils/ui/adjustText'
+import { theme_textStyles } from '../../utils/theme/theme_textStyles'
+import { private_name_routes } from '../../utils/route/private_name_routes'
+import { useNavigation } from '@react-navigation/native'
+import useTabBarStore from '../../utils/tools/interface/tabBarStore'
 
 export default function ListCompletedAddressed({ listAddresses = [] }) {
     const { selectedAddress: selectedAddressStore, setSelectedAddress: setSelectedAddressStore } = useAddressStore()
     const [selectedAddress, setSelectedAddress] = useState(null)
     const [isDisabled, setIsDisabled] = useState(true)
+    const navigation = useNavigation()
+    const { changeColorStatusBar } = useTabBarStore()
 
     const onPressSelect = (address) => {
         if (selectedAddressStore?.id === address.id) {
@@ -50,7 +56,7 @@ export default function ListCompletedAddressed({ listAddresses = [] }) {
             },
             textStyle: {
                 fontFamily: "SFPro-SemiBold",
-                fontSize: adjustFontSize(11),
+                fontSize: adjustFontSize(theme_textStyles.smaller + .5),
             },
         });
     };
@@ -60,6 +66,11 @@ export default function ListCompletedAddressed({ listAddresses = [] }) {
         setSelectedAddressStore(selectedAddress)
         handleMessage('Ubicación seleccionada', Toast.positions.BOTTOM)
         setSelectedAddress(null)
+    }
+
+    const goToAddAddress = () => {
+        changeColorStatusBar(theme_colors.transparent);
+        navigation.navigate(private_name_routes.empresas.addAddress)
     }
 
     return (
@@ -90,7 +101,7 @@ export default function ListCompletedAddressed({ listAddresses = [] }) {
                 <TextStyled
                     fontFamily='SFPro-Bold'
                     textAlign='left'
-                    fontSize={10}
+                    fontSize={theme_textStyles.medium}
                     color={theme_colors.primary}
                     numberOfLines={1}
                     ellipsizeMode='tail'
@@ -102,14 +113,14 @@ export default function ListCompletedAddressed({ listAddresses = [] }) {
                     withIcon={true}
                     iconName='plus'
                     MaterialIcons
-                    onPress={() => { }}
+                    onPress={goToAddAddress}
                     borderWidth={1}
                     borderColor={theme_colors.lightGrey}
                     backgroundColor={theme_colors.transparent}
                     colorText={theme_colors.primary}
                     borderRadius={1.5}
-                    fontSize={4}
-                    sizeIcon={15}
+                    fontSize={theme_textStyles.smaller + .5}
+                    sizeIcon={theme_textStyles.smedium}
                     marginRightIcon={1}
                     width={45}
                     height={4}
@@ -164,7 +175,7 @@ export default function ListCompletedAddressed({ listAddresses = [] }) {
                 backgroundColor={isDisabled ? theme_colors.lightGrey : theme_colors.primary}
                 colorText={theme_colors.white}
                 borderRadius={1.5}
-                fontSize={8}
+                fontSize={theme_textStyles.medium}
                 height={6}
                 fontFamily={'SFPro-Bold'}
                 textButton={'Elegir Ubicación'}

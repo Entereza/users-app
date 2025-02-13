@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { FlatList, TouchableOpacity, Text } from 'react-native';
 import { theme_colors } from '../../utils/theme/theme_colors';
+import adjustFontSize from '../../utils/ui/adjustText';
+import { theme_textStyles } from '../../utils/theme/theme_textStyles';
 
 export default function BranchList ({ data }) {
     const [selectedItem, setSelectedItem] = useState(null);
@@ -19,7 +21,7 @@ export default function BranchList ({ data }) {
             <Text 
                 style={{ 
                     fontFamily: 'SFPro-Medium', 
-                    fontSize: 12, 
+                    fontSize: adjustFontSize(theme_textStyles.small), 
                     color: selectedItem === item ? theme_colors.white : theme_colors.black 
                 }}
             >

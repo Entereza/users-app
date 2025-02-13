@@ -11,6 +11,8 @@ const useTabBarStore = create(set => ({
     screenAnimationType: "none",
     changeScreenAnimationType: (value) => set({ screenAnimationType: value }),
 
+    nameStackBack: "",
+    changeNameStackBack: (value) => set({ nameStackBack: value }),
     nameRouteBack: "",
     changeNameRouteBack: (value) => set({ nameRouteBack: value })
 }));

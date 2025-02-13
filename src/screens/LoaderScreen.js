@@ -4,6 +4,7 @@ import ViewStyled from '../utils/ui/ViewStyled';
 import { theme_colors } from '../utils/theme/theme_colors';
 import ImageStyled from '../utils/ui/ImageStyled';
 import TextStyled from '../utils/ui/TextStyled';
+import { theme_textStyles } from '../utils/theme/theme_textStyles';
 
 export default function LoaderScreen() {
     return (
@@ -18,8 +19,8 @@ export default function LoaderScreen() {
         >
             <ViewStyled
                 width={50}
-                height={30}
-                marginBottom={2}
+                height={25}
+                marginBottom={5}
                 backgroundColor={theme_colors.transparent}
                 style={{
                     justifyContent: 'center',
@@ -37,7 +38,7 @@ export default function LoaderScreen() {
             </ViewStyled>
 
             <TextStyled
-                fontSize={30}
+                fontSize={theme_textStyles.xlarge}
                 color={theme_colors.white}
                 fontFamily='Artegra-SemiBold'
             >

@@ -5,6 +5,7 @@ import { theme_colors } from '../../utils/theme/theme_colors';
 import { TouchableOpacity, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { private_name_routes } from '../../utils/route/private_name_routes';
+import { theme_textStyles } from '../../utils/theme/theme_textStyles';
 
 export default function TotalBarAlternative({ quantity, total, title, isSelected }) {
 
@@ -28,9 +29,10 @@ export default function TotalBarAlternative({ quantity, total, title, isSelected
     return (
         <ViewStyled
             width={'90%'}
-            height={'10%'}
-            backgroundColor={theme_colors.white}
+            paddingVertical={1}
+            backgroundColor={theme_colors.transparent}
             style={{
+                height: 'auto',
                 borderRadius: 10,
                 alignItems: 'center',
                 flexDirection: 'row',
@@ -49,7 +51,7 @@ export default function TotalBarAlternative({ quantity, total, title, isSelected
                 }}
             >
                 <TextStyled
-                    fontSize={10}
+                    fontSize={theme_textStyles.small + .5}
                     fontFamily='SFPro-Regular'
                     color={theme_colors.grey}
                     style={{
@@ -59,7 +61,7 @@ export default function TotalBarAlternative({ quantity, total, title, isSelected
                     {quantity} productos
                 </TextStyled>
                 <TextStyled
-                    fontSize={10}
+                    fontSize={theme_textStyles.medium}
                     fontFamily='SFPro-Bold'
                     color={theme_colors.black}
                 >
@@ -93,7 +95,7 @@ export default function TotalBarAlternative({ quantity, total, title, isSelected
                     <TextStyled
                         fontFamily='SFPro-Bold'
                         color={theme_colors.white}
-                        fontSize={7}
+                        fontSize={theme_textStyles.medium}
                     >
                         {title}
                     </TextStyled>

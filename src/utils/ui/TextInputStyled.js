@@ -5,6 +5,7 @@ import ViewStyled from './ViewStyled';
 import TextStyled from './TextStyled';
 import { theme_colors } from '../theme/theme_colors';
 import adjustFontSize from './adjustText';
+import { theme_textStyles } from '../theme/theme_textStyles';
 
 const TextInputStyled = React.forwardRef(({
     editable = true,
@@ -24,11 +25,13 @@ const TextInputStyled = React.forwardRef(({
     containerStyle,
     inputStyle,
     colorIcon = theme_colors.tertiary,
-    sizeIcon = 20,
+    sizeIcon = theme_textStyles.medium,
     keyboardType = 'default',
     isVisible,
     isSecure = false,
     errorStyle,
+    multiline = false,
+    numberOfLines = 1,
     onSubmitEditing,
     ...rest
 }, ref) => {
@@ -75,6 +78,8 @@ const TextInputStyled = React.forwardRef(({
                     returnKeyType={returnKeyType}
                     onSubmitEditing={onSubmitEditing}
                     style={[inputStyle && inputStyle]}
+                    multiline={multiline}
+                    numberOfLines={multiline ? numberOfLines : 1}
                     {...rest}
                 />
 
@@ -83,9 +88,10 @@ const TextInputStyled = React.forwardRef(({
                         onPress={icon === 'eye' || icon === 'eye-off' ? handleVisible : null}
                     >
                         <ViewStyled
-                            width={10}
-                            backgroundColor={theme_colors.transparent}
+                            marginLeft={2}
+                            backgroundColor={theme_colors.orange}
                             style={{
+                                width: 'auto',
                                 height: 'auto',
                                 justifyContent: 'center',
                                 alignItems: 'center'

@@ -6,6 +6,7 @@ import { AntDesign } from '@expo/vector-icons';
 import ProductOptions from '../Cards/ProductOptions';
 import { SectionList, TouchableOpacity, View } from 'react-native';
 import BranchList from '../Text/BranchList';
+import { theme_textStyles } from '../../utils/theme/theme_textStyles';
 
 export default function BranchSelection() {
     const [expanded, setExpanded] = useState(false);
@@ -16,11 +17,12 @@ export default function BranchSelection() {
 
     const sucursales = ["HuperMall", "Cala Cala", "IC Norte", "Paseo Aranjuez", "Cancha", "America"];
 
-    return ( 
+    return (
         <ViewStyled
             width={'90%'}
             backgroundColor={theme_colors.white}
-            style={{ 
+            style={{
+                marginTop: 5,
                 padding: 10,
                 marginBottom: 10,
                 borderRadius: 10,
@@ -33,55 +35,59 @@ export default function BranchSelection() {
                 },
                 shadowOpacity: 0.2,
                 shadowRadius: 4,
+                shadowColor: theme_colors.black,
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.5,
+                shadowRadius: 2,
+                elevation: 3,
             }}
         >
-            <ViewStyled
-                width={'83%'}
-                backgroundColor={theme_colors.transparent}
-                style={{ 
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                }}
-            >
-                <ViewStyled
-                    width={'35%'}
+            <TouchableOpacity onPress={toggleExpand}>
+                <View
+                    width={'95%'}
                     backgroundColor={theme_colors.transparent}
-                    style={{ 
+                    style={{
                         flexDirection: 'row',
                         justifyContent: 'space-between',
-                        alignItems: 'center',
+                        alignItems: 'center'
                     }}
                 >
-                    <TextStyled
-                        fontSize={4.5}
-                        color={theme_colors.grey}
+                    <View
+                        backgroundColor={theme_colors.transparent}
                         style={{
-                            fontFamily: 'SFPro-Medium',
+                            flex: 1,
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
                         }}
                     >
-                        Selecciona la sucursal
-                    </TextStyled>
-                </ViewStyled>
+                        <TextStyled
+                            fontSize={theme_textStyles.small + .5}
+                            color={theme_colors.grey}
+                            style={{
+                                fontFamily: 'SFPro-Medium',
+                            }}
+                        >
+                            Selecciona la sucursal
+                        </TextStyled>
+                    </View>
 
-                <TouchableOpacity
-                    onPress={toggleExpand}
-                    backgroundColor={theme_colors.white}
-                >
-                    <AntDesign 
-                        name={expanded ? 'up' : 'down'} 
-                        size={15} 
-                        color={theme_colors.grey} 
+                    <AntDesign
+                        name={expanded ? 'up' : 'down'}
+                        size={15}
+                        color={theme_colors.grey}
                         style={{
                             marginLeft: 10
                         }}
                     />
-                </TouchableOpacity>
-            </ViewStyled>
+                </View>
+            </TouchableOpacity>
 
-            {expanded && (
-                <BranchList data={sucursales} />
-            )}
-        </ViewStyled>
+            {
+                expanded && (
+                    <BranchList data={sucursales} />
+                )
+            }
+        </ViewStyled >
     );
 };

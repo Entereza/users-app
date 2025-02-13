@@ -3,8 +3,11 @@ import React from 'react'
 import ProfileOptionsItem from './ProfileOptionsItem'
 import ViewStyled from '../../utils/ui/ViewStyled'
 import { theme_colors } from '../../utils/theme/theme_colors'
+import useAuthStore from '../../utils/tools/interface/authStore'
 
 export default function ProfileCloseSession() {
+  const { logout } = useAuthStore()
+
   return (
     <ViewStyled
       width={95}
@@ -26,7 +29,7 @@ export default function ProfileCloseSession() {
       <ProfileOptionsItem
         iconOption={'export'}
         nameOption={'Cerrar Sesión'}
-        onPress={null}
+        onPress={logout}
       />
     </ViewStyled>
   )

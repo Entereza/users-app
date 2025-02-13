@@ -9,7 +9,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import adjustFontSize from "../../utils/ui/adjustText";
 import { theme_textStyles } from "../../utils/theme/theme_textStyles";
 
-export default function HeaderDefaultScreen({ title, onPress }) {
+export default function HeaderDefaultScreen({ title, onPress, withBorder = true }) {
     const navigation = useNavigation();
 
     const goBack = () => {
@@ -26,7 +26,7 @@ export default function HeaderDefaultScreen({ title, onPress }) {
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    borderBottomWidth: 0.5,
+                    borderBottomWidth: withBorder ? 0.5 : 0,
                     borderColor: theme_colors.lightGrey,
                     position: 'relative'
                 }}

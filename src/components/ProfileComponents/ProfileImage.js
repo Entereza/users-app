@@ -4,9 +4,11 @@ import { theme_colors } from '../../utils/theme/theme_colors'
 import ImageStyled from '../../utils/ui/ImageStyled'
 import { MaterialIcons } from '@expo/vector-icons'
 import adjustFontSize from '../../utils/ui/adjustText'
+import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 
 export default function ProfileImage({
-    image
+    image,
+    canEdit = false,
 }) {
     return (
         <ViewStyled
@@ -35,29 +37,31 @@ export default function ProfileImage({
                 resizeMode="cover"
             />
 
-            <ViewStyled
-                borderRadius={1}
-                paddingHorizontal={1}
-                paddingVertical={0.5}
-                backgroundColor={theme_colors.white}
-                style={{
-                    width: 'auto',
-                    height: 'auto',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderWidth: 1,
-                    borderColor: theme_colors.primary,
-                    position: "absolute",
-                    bottom: -5,
-                    right: -5
-                }}
-            >
-                <MaterialIcons
-                    name="edit"
-                    size={adjustFontSize(20)}
-                    color={theme_colors.primary}
-                />
-            </ViewStyled>
+            {canEdit &&
+                <ViewStyled
+                    borderRadius={1}
+                    paddingHorizontal={1}
+                    paddingVertical={0.5}
+                    backgroundColor={theme_colors.white}
+                    style={{
+                        width: 'auto',
+                        height: 'auto',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderWidth: 1,
+                        borderColor: theme_colors.primary,
+                        position: "absolute",
+                        bottom: -5,
+                        right: -5
+                    }}
+                >
+                    <MaterialIcons
+                        name="edit"
+                        size={adjustFontSize(theme_textStyles.medium)}
+                        color={theme_colors.primary}
+                    />
+                </ViewStyled>
+            }
         </ViewStyled>
     )
 }

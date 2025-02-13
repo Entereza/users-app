@@ -17,11 +17,13 @@ import SearchBar from '../../../components/BusinessComponents/SearchBar';
 
 export default function EmpresasHomeScreen() {
     const navigation = useNavigation();
-    const { toggleTabBar } = useTabBarStore();
+    const { toggleTabBar, changeNameStackBack, changeNameRouteBack } = useTabBarStore();
 
     const goToProfileScreen = () => {
         toggleTabBar(false)
-        navigation.navigate(private_name_routes.profile.profileHome);
+        changeNameStackBack(private_name_routes.empresas.empresasStack)
+        changeNameRouteBack(private_name_routes.empresas.empresasHome)
+        navigation.navigate(private_name_routes.profile.profileStack, { screen: private_name_routes.pedidos.pedidosHome });
     }
 
     const { user } = useAuthStore();

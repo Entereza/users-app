@@ -5,6 +5,7 @@ import { theme_colors } from '../../utils/theme/theme_colors';
 import { StyleSheet } from 'react-native';
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
 import adjustFontSize from '../../utils/ui/adjustText';
+import { theme_textStyles } from '../../utils/theme/theme_textStyles';
 
 export default function ProfilePersonalData({
     formik
@@ -94,8 +95,8 @@ const styles = StyleSheet.create({
     },
     labelInput: {
         fontFamily: 'SFPro-SemiBold',
-        color: theme_colors.black,
-        fontSize: adjustFontSize(13),
+        color: theme_colors.grey,
+        fontSize: adjustFontSize(theme_textStyles.small + .5),
         marginBottom: 6
     },
     inputText: {
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
 
         color: theme_colors.black,
         fontFamily: 'SFPro-Medium',
-        fontSize: adjustFontSize(12),
+        fontSize: adjustFontSize(theme_textStyles.smedium),
 
         elevation: 2,
         shadowColor: theme_colors.black,
@@ -120,6 +121,6 @@ const styles = StyleSheet.create({
         paddingLeft: 12,
 
         color: theme_colors.danger,
-        fontSize: adjustFontSize(10)
+        fontSize: adjustFontSize(theme_textStyles.small)
     },
 })

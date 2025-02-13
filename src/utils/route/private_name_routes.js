@@ -32,7 +32,8 @@ export const private_name_routes = {
         changePassword: 'changePassword',
         followOrder: 'followOrder',
         newAddressMap: 'newAddressMap',
-        saveAddress: 'saveAddress'
+        saveAddress: 'saveAddress',
+        addAddress: 'addAddress'
     },
     pedidos: {
         pedidosStack: 'PedidosStack',

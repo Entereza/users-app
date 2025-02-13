@@ -26,6 +26,7 @@ export const theme_colors = {
     green: "#4AF1A1",
     lightGrey: "#EDEFFF",
     lightGrey2: "#898EBC",
+    lightGrey3: "#EDEEF5",
     semiTransparent: "#EEEEEE",
 
     success: '#28a745',

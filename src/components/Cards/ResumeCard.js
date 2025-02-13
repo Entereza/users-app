@@ -1,289 +1,245 @@
-import React from 'react';
-import { theme_colors } from '../../utils/theme/theme_colors';
-import TextStyled from '../../utils/ui/TextStyled';
-import ViewStyled from '../../utils/ui/ViewStyled';
-import { TouchableOpacity, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { private_name_routes } from '../../utils/route/private_name_routes';
+import React from 'react'
+import ViewStyled from '../../utils/ui/ViewStyled'
+import { theme_colors } from '../../utils/theme/theme_colors'
+import TextStyled from '../../utils/ui/TextStyled'
+import { theme_textStyles } from '../../utils/theme/theme_textStyles'
+import useCartStore from '../../utils/tools/interface/cartStore'
+import { TouchableOpacity } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import { private_name_routes } from '../../utils/route/private_name_routes'
 
-export default function ResumeCard ({ title, productos, envio, cupon, cashback }) {
+export default function ResumeCard() {
+    const { cart, myCashback } = useCartStore();
+    const navigation = useNavigation()
 
-    const navigation = useNavigation();
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    const resumeList = [
+        {
+            "text": "Productos",
+            "price": totalPrice,
+        },
+        {
+            "text": "Envío",
+            "price": 0,
+            "freeShipping": true,
+        },
+        {
+            "text": "Cupón",
+            "price": 0,
+        },
+        {
+            "text": "Mi Cashback",
+            "price": myCashback,
+            "selectCashback": true,
+            "colorText": theme_colors.primary
+        },
+    ]
 
     const goToCashbackScreen = () => {
-        navigation.navigate(private_name_routes.empresas.cashbackScreen, {
-            cashback: '14.50'
-        });
+        navigation.navigate(private_name_routes.empresas.cashbackScreen);
     }
 
-    return (
-        <View
-            backgroundColor={theme_colors.white}
-            style={{
-                width: '95%',
-                marginTop: 15,
-                borderRadius: 10,
-                elevation: 50,
-                shadowColor: theme_colors.black,
-                shadowOffset: {
-                    width: 1,
-                    height: 1,
-                },
-                shadowOpacity: 0.15,
-                shadowRadius: 4,
-                alignItems: 'center',
-                padding: 15
-            }}
-        >
-            <View
-                width={'100%'}
+    const ResumeItem = ({ text = "text", colorText = theme_colors.black, price = 0, freeShipping = false, selectCashback = false }) => {
+        const cashbackPrice = selectCashback && price
+
+        return (
+            <ViewStyled
+                width={85}
+                paddingVertical={.5}
                 backgroundColor={theme_colors.transparent}
                 style={{
-                    justifyContent: 'flex-start'
+                    height: 'auto',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
                 }}
             >
-                <TextStyled
-                    fontSize={10}
-                    color={theme_colors.black}
-                    style={{
-                        fontFamily: 'SFPro-Bold',
-                    }}
-                >
-                    {title}
-                </TextStyled>
-
-                <View
-                    width={'100%'}
-                    height={'0.2%'}
-                    backgroundColor={theme_colors.requiredGrey}
-                    style={{
-                        alignSelf: 'center',
-                        marginTop: 10
-                    }}
-                />
-
-                <View
+                <ViewStyled
                     backgroundColor={theme_colors.transparent}
                     style={{
-                        marginTop: 8,
+                        width: '50%',
+                        height: 'auto',
                         flexDirection: 'row',
-                        justifyContent: 'space-between',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
                     }}
                 >
                     <TextStyled
-                        fontSize={7}
-                        color={theme_colors.black}
+                        fontFamily='SFPro-SemiBold'
+                        textAlign='left'
+                        fontSize={theme_textStyles.smedium}
+                        color={colorText}
+                        numberOfLines={1}
+                        ellipsizeMode='tail'
                         style={{
-                            fontFamily: 'SFPro-Medium',
+                            width: 'auto'
                         }}
                     >
-                        Productos
+                        {text}
                     </TextStyled>
 
-                    <TextStyled
-                        fontSize={7}
-                        color={theme_colors.black}
-                        style={{
-                            fontFamily: 'SFPro-Medium',
-                        }}
-                    >
-                        Bs. {productos}
-                    </TextStyled>
-                </View>
-
-                <View
-                    backgroundColor={theme_colors.transparent}
-                    style={{
-                        marginTop: 8,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                    }}
-                >
-                    <View
-                        width={'28%'}
-                        backgroundColor={theme_colors.transparent}
-                        style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                        }}
-                    >
-                        <TextStyled
-                            fontSize={7}
-                            color={theme_colors.black}
+                    {freeShipping &&
+                        <ViewStyled
+                            marginLeft={3}
+                            paddingVertical={.2}
+                            paddingHorizontal={3}
+                            backgroundColor={theme_colors.green}
                             style={{
-                                fontFamily: 'SFPro-Medium',
-                            }}
-                        >
-                            Envío
-                        </TextStyled>
-
-                        {envio === "0" && (
-                            <View
-                                width={'60%'}
-                                backgroundColor={theme_colors.green}
-                                style={{
-                                    padding: 3,
-                                    alignItems: 'center',
-                                    borderRadius: 5,
-                                    marginLeft: 10
-                                }}
-                            >
-                                <TextStyled
-                                    fontSize={4.5}
-                                    color={theme_colors.white}
-                                    style={{
-                                        fontFamily: 'SFPro-Regular',
-                                    }}
-                                >
-                                    Gratis
-                                </TextStyled>
-                            </View>
-                        )}
-                    </View>
-
-                    <TextStyled
-                        fontSize={7}
-                        color={theme_colors.black}
-                        style={{
-                            fontFamily: 'SFPro-Medium',
-                        }}
-                    >
-                        Bs. {envio}
-                    </TextStyled>
-                </View>
-
-                <View
-                    backgroundColor={theme_colors.transparent}
-                    style={{
-                        marginTop: 8,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                    }}
-                >
-                    <TextStyled
-                        fontSize={7}
-                        color={theme_colors.black}
-                        style={{
-                            fontFamily: 'SFPro-Medium',
-                        }}
-                    >
-                        Cupón
-                    </TextStyled>
-
-                    <TextStyled
-                        fontSize={7}
-                        color={theme_colors.black}
-                        style={{
-                            fontFamily: 'SFPro-Medium',
-                        }}
-                    >
-                        Bs. {cupon}
-                    </TextStyled>
-                </View>
-
-                <View
-                    backgroundColor={theme_colors.transparent}
-                    style={{
-                        marginTop: 8,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                    }}
-                >
-                    <TextStyled
-                        fontSize={7}
-                        color={theme_colors.primary}
-                        style={{
-                            fontFamily: 'SFPro-Bold',
-                        }}
-                    >
-                        Mi cashback
-                    </TextStyled>
-
-                    {cashback === true ? (
-                        <TouchableOpacity
-                            onPress={goToCashbackScreen}
-                            backgroundColor={theme_colors.white}
-                            style={{
-                                borderColor: theme_colors.greyLine,
-                                borderWidth: 1,
-                                padding: 3,
+                                width: 'auto',
+                                height: 'auto',
+                                justifyContent: 'center',
                                 alignItems: 'center',
                                 borderRadius: 5
                             }}
                         >
                             <TextStyled
-                                fontSize={4.5}
-                                color={theme_colors.secondary}
-                                style={{
-                                    fontFamily: 'SFPro-Medium',
-                                }}
+                                fontFamily='SFPro-Regular'
+                                textAlign='center'
+                                fontSize={theme_textStyles.smaller + .5}
+                                color={theme_colors.white}
+                                numberOfLines={1}
+                                ellipsizeMode='tail'
                             >
-                                Seleccionar
+                                Gratis
                             </TextStyled>
-                        </TouchableOpacity> 
-                    ) : ( 
-                        <TouchableOpacity
-                            onPress={goToCashbackScreen}
-                            backgroundColor={theme_colors.transparent}
-                            style={{
-                                alignItems: 'center',
-                            }}
-                        >
-                            <TextStyled
-                                fontSize={7}
-                                color={theme_colors.primary}
-                                style={{
-                                    fontFamily: 'SFPro-Medium',
-                                    textDecorationLine: 'underline',
-                                }}
-                            >
-                                Bs. {cashback}
-                            </TextStyled>
-                        </TouchableOpacity>
-                    )}
-                </View>
+                        </ViewStyled>
+                    }
+                </ViewStyled>
 
-                <View
-                    backgroundColor={theme_colors.requiredGrey}
+                <TouchableOpacity onPress={selectCashback ? goToCashbackScreen : null}
                     style={{
-                        width: '100%',
-                        height: 1,
-                        marginTop: 8,
-                        alignSelf: 'center'
-                    }}
-                />
-
-                <View
-                    backgroundColor={theme_colors.transparent}
-                    style={{
-                        marginTop: 8,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
+                        width: '50%', height: 'auto',
+                        justifyContent: 'center', alignItems: 'flex-end'
                     }}
                 >
-                    <TextStyled
-                        fontSize={9}
-                        color={theme_colors.black}
+                    <ViewStyled
+                        backgroundColor={theme_colors.transparent}
+                        paddingHorizontal={selectCashback && !price ? 3 : 0}
                         style={{
-                            fontFamily: 'SFPro-Bold',
+                            width: selectCashback && !price ? 'auto' : '100%',
+                            height: 'auto',
+                            borderWidth: selectCashback && !price ? 3 : 0,
+                            borderColor: theme_colors.lightGrey,
+                            borderRadius: 10,
+                            justifyContent: 'center',
+                            alignItems: 'center'
                         }}
                     >
-                        Total
-                    </TextStyled>
+                        <TextStyled
+                            fontFamily='SFPro-SemiBold'
+                            textAlign={selectCashback && !price ? 'center' : 'right'}
+                            fontSize={selectCashback && !price ? theme_textStyles.small + .5 : theme_textStyles.smedium}
+                            color={colorText}
+                            numberOfLines={1}
+                            ellipsizeMode='tail'
+                            style={{
+                                width: '100%',
+                                textDecorationLine: cashbackPrice ? 'underline' : 'none',
+                            }}
+                        >
+                            {selectCashback && !price ? `Seleccionar` : `Bs. ${price}`}
+                        </TextStyled>
+                    </ViewStyled>
+                </TouchableOpacity>
+            </ViewStyled>
+        );
+    };
 
-                    <TextStyled
-                        fontSize={9}
-                        color={theme_colors.black}
-                        style={{
-                            marginLeft: 15,
-                            marginTop: 2,
-                            fontFamily: 'SFPro-Bold',
-                        }}
-                    >
-                        Bs. {productos}
-                    </TextStyled>
-                </View>
-            </View>
-        </View>
-    );
-};
+    return (
+        <ViewStyled
+            backgroundColor={theme_colors.white}
+            width={95}
+            marginVertical={1}
+            paddingVertical={1}
+            style={{
+                height: 'auto',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 15,
+
+                shadowColor: theme_colors.black,
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.5,
+                shadowRadius: 2,
+                elevation: 3,
+            }}
+        >
+            <ViewStyled
+                paddingVertical={1.5}
+                marginBottom={1}
+                backgroundColor={theme_colors.transparent}
+                style={{
+                    width: '90%',
+                    height: 'auto',
+                    borderBottomWidth: 0.5,
+                    borderColor: theme_colors.greyLine,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+            >
+                <TextStyled
+                    fontFamily='SFPro-Bold'
+                    textAlign='left'
+                    fontSize={theme_textStyles.medium}
+                    color={theme_colors.dark}
+                    numberOfLines={1}
+                    ellipsizeMode='tail'
+                    style={{
+                        width: '100%'
+                    }}
+                >
+                    Resumen
+                </TextStyled>
+            </ViewStyled>
+
+            {resumeList.map((item, index) => (
+                <ResumeItem key={index} text={item.text} price={item.price} colorText={item.colorText} freeShipping={item.freeShipping} selectCashback={item.selectCashback} />
+            ))}
+
+            <ViewStyled
+                paddingVertical={1.5}
+                marginTop={1}
+                backgroundColor={theme_colors.transparent}
+                style={{
+                    width: '90%',
+                    height: 'auto',
+                    borderTopWidth: 0.5,
+                    borderColor: theme_colors.greyLine,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                }}
+            >
+                <TextStyled
+                    fontFamily='SFPro-Bold'
+                    textAlign='left'
+                    fontSize={theme_textStyles.medium}
+                    color={theme_colors.dark}
+                    numberOfLines={1}
+                    ellipsizeMode='tail'
+                    style={{
+                        width: '50%'
+                    }}
+                >
+                    Total
+                </TextStyled>
+
+                <TextStyled
+                    fontFamily='SFPro-Bold'
+                    textAlign='right'
+                    fontSize={theme_textStyles.medium}
+                    color={theme_colors.dark}
+                    numberOfLines={1}
+                    ellipsizeMode='tail'
+                    style={{
+                        width: '50%'
+                    }}
+                >
+                    BOB. {totalPrice - myCashback}
+                </TextStyled>
+            </ViewStyled>
+        </ViewStyled>
+    )
+}

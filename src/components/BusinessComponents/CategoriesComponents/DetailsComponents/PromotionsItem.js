@@ -3,27 +3,29 @@ import ViewStyled from '../../../../utils/ui/ViewStyled'
 import { theme_colors } from '../../../../utils/theme/theme_colors'
 import ImageStyled from '../../../../utils/ui/ImageStyled'
 import TextStyled from '../../../../utils/ui/TextStyled'
+import { theme_textStyles } from '../../../../utils/theme/theme_textStyles'
+import ButtonsAddToCart from '../../ButtonsAddToCart'
 
-export default function PromotionsItem({ item }) {
+export default function PromotionsItem({ item, shadow = true }) {
     return (
         <ViewStyled
             backgroundColor={theme_colors.white}
             width={90}
             height={14}
-            marginRight={3}
-            marginBottom={1}
+            // marginRight={3}
             paddingHorizontal={3}
             style={{
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 borderRadius: 15,
-
-                shadowColor: theme_colors.black,
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.5,
-                shadowRadius: 2,
-                elevation: 3,
+                ...(shadow && {
+                    shadowColor: theme_colors.black,
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.5,
+                    shadowRadius: 2,
+                    elevation: 3,
+                })
             }}
         >
             <ViewStyled
@@ -71,7 +73,7 @@ export default function PromotionsItem({ item }) {
                     <TextStyled
                         fontFamily='SFPro-SemiBold'
                         textAlign='left'
-                        fontSize={7}
+                        fontSize={theme_textStyles.smedium}
                         color={theme_colors.black}
                     >
                         {item.nameProduct}
@@ -79,7 +81,7 @@ export default function PromotionsItem({ item }) {
                     <TextStyled
                         fontFamily='SFPro-Regular'
                         textAlign='left'
-                        fontSize={10}
+                        fontSize={theme_textStyles.small}
                         color={theme_colors.grey}
                     >
                         {item.type}
@@ -87,24 +89,28 @@ export default function PromotionsItem({ item }) {
                 </ViewStyled>
 
                 <ViewStyled
+                    paddingLeft={3.2}
                     paddingVertical={0.5}
                     backgroundColor={theme_colors.transparent}
                     style={{
-                        width: '90%',
+                        width: '100%',
                         flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'flex-start',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        position: 'relative'
                     }}
                 >
                     <TextStyled
                         fontFamily='SFPro-SemiBold'
                         textAlign='left'
-                        fontSize={7}
+                        fontSize={theme_textStyles.small + .5}
                         color={theme_colors.black}
                     >
                         Bs. {item.price}
                     </TextStyled>
-                    
+
+                    <ButtonsAddToCart item={item} />
                 </ViewStyled>
             </ViewStyled>
         </ViewStyled>

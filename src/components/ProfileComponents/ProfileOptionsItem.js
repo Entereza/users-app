@@ -5,6 +5,7 @@ import ViewStyled from '../../utils/ui/ViewStyled'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import adjustFontSize from '../../utils/ui/adjustText'
 import TextStyled from '../../utils/ui/TextStyled'
+import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 
 export default function ProfileOptionsItem({
     nameOption,
@@ -43,7 +44,7 @@ export default function ProfileOptionsItem({
                 >
                     <MaterialCommunityIcons
                         name={iconOption}
-                        size={adjustFontSize(25)}
+                        size={adjustFontSize(theme_textStyles.large)}
                         color={theme_colors.secondary}
                     />
                 </ViewStyled>
@@ -60,7 +61,7 @@ export default function ProfileOptionsItem({
                     <TextStyled
                         fontFamily='SFPro-SemiBold'
                         textAlign='left'
-                        fontSize={8}
+                        fontSize={theme_textStyles.smedium}
                         color={theme_colors.black}
                     >
                         {nameOption}
@@ -79,7 +80,7 @@ export default function ProfileOptionsItem({
                 >
                     <MaterialCommunityIcons
                         name={"chevron-right"}
-                        size={adjustFontSize(34)}
+                        size={adjustFontSize(theme_textStyles.xlarge)}
                         color={theme_colors.grey}
                     />
                 </ViewStyled>

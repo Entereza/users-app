@@ -5,6 +5,7 @@ import ViewStyled from '../../utils/ui/ViewStyled'
 import adjustFontSize from '../../utils/ui/adjustText'
 import TextStyled from '../../utils/ui/TextStyled'
 import { theme_colors } from '../../utils/theme/theme_colors'
+import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 
 export default function SearchBar({
     onPress,
@@ -43,7 +44,7 @@ export default function SearchBar({
                 >
                     <ViewStyled
                         width={75}
-                        height={4}
+                        height={4.5}
                         backgroundColor={theme_colors.transparent}
                         style={{
                             justifyContent: 'center',
@@ -61,14 +62,14 @@ export default function SearchBar({
                                     returnKeyType='search'
                                     style={{
                                         fontFamily: 'SFPro-Regular',
-                                        fontSize: adjustFontSize(11),
+                                        fontSize: adjustFontSize(theme_textStyles.smaller + .5),
                                         backgroundColor: theme_colors.transparent,
-                                        width: "90%",
+                                        width: "100%",
                                     }}
                                 />
                                 : <TextStyled
                                     textAlign='left'
-                                    fontSize={4}
+                                    fontSize={theme_textStyles.small}
                                     color={theme_colors.grey}
                                     numberOfLines={2}
                                     ellipsizeMode='tail'
@@ -93,7 +94,7 @@ export default function SearchBar({
                         <MaterialCommunityIcons
                             name={withFilters ? "tune" : "magnify"}
                             color={theme_colors.textGrey}
-                            size={adjustFontSize(17)}
+                            size={adjustFontSize(theme_textStyles.large)}
                         />
                     </ViewStyled>
                     {/* </Pressable> */}

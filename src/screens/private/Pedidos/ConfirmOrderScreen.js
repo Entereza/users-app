@@ -4,32 +4,21 @@ import ViewStyled from '../../../utils/ui/ViewStyled';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { ScrollView, View } from 'react-native';
 import { private_name_routes } from '../../../utils/route/private_name_routes';
-import FacturacionCard from '../../../components/Cards/FacturacionCard';
 import ResumeCard from '../../../components/Cards/ResumeCard';
 import AddressCard from '../../../components/Cards/AddressCard';
 import CashbackCard from '../../../components/Cards/CashbackCard';
 import SlideButton from '../../../components/Buttons/SlideButton';
 import SwipeToConfirm from '../../../components/TransferChasbackComponents/PayComponents/SwipeToConfirm';
+import useAddressStore from '../../../utils/tools/interface/addressStore';
+import useAuthStore from '../../../utils/tools/interface/authStore';
+import useCartStore from '../../../utils/tools/interface/cartStore';
+import InfoField from '../../../components/CartComponents/InfoField';
+import HeaderDefaultScreen from '../../../components/Header/HeaderDefaultScreen';
 
 export default function ConfirmOrderScreen() {
-
-    const metodosDePago = [
-        { id: 1, name: 'Efectivo', icon: 'cash-outline' },
-        { id: 2, name: 'QR', icon: 'qr-code-outline' },
-        { id: 3, name: 'Tarjeta', icon: 'card-outline' },
-    ];
-
-    const direcciones = [
-        { id: 1, address: 'Av. Tadeo Haenke esq. Melchor', place: 'Casa' },
-        { id: 2, address: 'Av. Santa Cruz, Edificio Villa Provenza, Piso 7', place: 'Oficina' },
-    ];
-
-    const facturacion = [
-        { id: 1, name: 'Rocha Torrez', nit: '123456789' },
-    ];
-
-    const route = useRoute();
-    const { selection } = route.params;
+    const { user } = useAuthStore();
+    const { billingInfo, paymentMethod } = useCartStore()
+    const { selectedAddress } = useAddressStore();
 
     const navigation = useNavigation();
 
@@ -40,104 +29,99 @@ export default function ConfirmOrderScreen() {
     }
 
     const goToMethodScreen = () => {
-        navigation.navigate(private_name_routes.empresas.methodScreen, {
-            options: metodosDePago
-        });
+        navigation.navigate(private_name_routes.empresas.methodScreen);
     }
 
     const goToAddressScreen = () => {
         navigation.navigate(private_name_routes.empresas.addressScreen, {
-            addresses: direcciones
+            internScreen: true
         });
     }
 
     const goToFacturacionScreen = () => {
-        navigation.navigate(private_name_routes.empresas.facturacionScreen, {
-            facturacion: facturacion
-        });
+        navigation.navigate(private_name_routes.empresas.facturacionScreen);
     }
 
-    const findMethodById = (id) => {
-        return metodosDePago.find(metodo => metodo.id === id);
-    };
-
-    const findAddressById = (id) => {
-        return direcciones.find(direccion => direccion.id === id);
-    };
-
     return (
-        <View
+        <ViewStyled
+            backgroundColor={theme_colors.white}
             style={{
-                width: '100%',
-                height: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: theme_colors.white
+                height: '100%'
             }}
         >
-            <View
-                backgroundColor={theme_colors.backgroundGrey}
-                style={{
-                    width: '100%',
-                    alignContent: 'center',
-                    justifyContent: 'center',
-                    borderTopRightRadius: 20,
-                    borderTopLeftRadius: 20
-                }}
-            >
-                <AddressCard
-                    address={findAddressById(selection) ? findAddressById(selection).address : direcciones.find(direccion => direccion.id === 1).address}
-                    client={"Gastón Rocha #70761855"}
-                    icon={"map-location-dot"}
-                    onPress={goToAddressScreen}
-                />
-            </View>
+            <HeaderDefaultScreen title={"Confirmar Pedido"} withBorder={false} />
 
-            <ViewStyled
-                width={'100%'}
-                backgroundColor={theme_colors.white}
-                style={{
-                    flex: 1,
-                    borderRadius: 20,
-                    borderColor: theme_colors.requiredGrey,
-                    borderWidth: 0.5,
-                    alignItems: 'center',
+            <ScrollView
+                contentContainerStyle={{
+                    flexGrow: 1,
+                    backgroundColor: theme_colors.transparent,
+                    paddingBottom: 20
                 }}
+                showsVerticalScrollIndicator={false}
             >
-                <ScrollView
-                    contentContainerStyle={{
-                        flexGrow: 1,
-                        backgroundColor: theme_colors.transparent,
+                <ViewStyled
+                    width={100}
+                    paddingTop={1}
+                    paddingBottom={3}
+                    backgroundColor={theme_colors.categoryGrey}
+                    style={{
+                        height: 'auto',
+                        alignContent: 'center',
                         justifyContent: 'flex-start',
-                        alignItems: 'center',
-                        paddingBottom: 15
+                        borderTopRightRadius: 20,
+                        borderTopLeftRadius: 20,
                     }}
-                    showsVerticalScrollIndicator={false}
-                    scrollToOverflowEnabled={false}
                 >
-                    <FacturacionCard
-                        title={"Facturación"}
-                        icon={"receipt-outline"}
-                        info={facturacion.find(facturacion => facturacion.id === 1).name}
-                        info2={facturacion.find(facturacion => facturacion.id === 1).nit}
+                    <AddressCard
+                        address={selectedAddress ? selectedAddress.nameAddress : "Por favor, selecciona una dirección"}
+                        client={selectedAddress ? `${user.names} #${user.ci}` : ""}
+                        icon={"map-location-dot"}
+                        onPress={goToAddressScreen}
+                    />
+                </ViewStyled>
+
+                <ViewStyled
+                    width={100}
+                    paddingTop={3}
+                    backgroundColor={theme_colors.white}
+                    style={{
+                        flex: 1,
+                        bottom: 0,
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        borderTopRightRadius: 20,
+                        borderTopLeftRadius: 20,
+                        marginTop: -20
+                    }}
+                >
+                    <InfoField
+                        label='Facturación'
+                        icon='receipt'
+                        value={billingInfo?.name || ""}
+                        secondaryValue={billingInfo?.nit || ""}
+                        emptyValues='Agregar datos de facturación'
                         onPress={goToFacturacionScreen}
                     />
 
-                    <FacturacionCard
-                        title={"Método de Pago"}
-                        icon={findMethodById(selection) ? findMethodById(selection).icon : "cash-outline"}
-                        info={findMethodById(selection) ? findMethodById(selection).name : "Efectivo"}
-                        info2={"BOB"}
+                    <InfoField
+                        label='Método de Pago'
+                        icon={paymentMethod?.icon}
+                        value={paymentMethod?.name || ""}
+                        typeIcon={"FontAwesome6"}
+                        secondaryValue={"BOB"}
+                        emptyValues='Seleccionar método'
                         onPress={goToMethodScreen}
                     />
 
-                    <ResumeCard title={"Resumen"} productos={"490"} envio={"0"} cupon={"0"} cashback={selection} />
+                    <ResumeCard />
 
-                    <CashbackCard cashback={"49"} />
-                </ScrollView>
+                    <CashbackCard />
+                </ViewStyled>
 
+            </ScrollView>
+            {selectedAddress &&
                 <SwipeToConfirm onConfirm={goToConfirmationScreen} />
-            </ViewStyled>
-        </View>
+            }
+        </ViewStyled>
     );
 };

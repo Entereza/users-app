@@ -7,6 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import { private_name_routes } from '../../../utils/route/private_name_routes'
 import useTabBarStore from '../../../utils/tools/interface/tabBarStore'
+import { theme_textStyles } from '../../../utils/theme/theme_textStyles'
 
 export default function CategoryItem({ item }) {
     const navigation = useNavigation()
@@ -53,7 +54,7 @@ export default function CategoryItem({ item }) {
             </Pressable>
             <TextStyled
                 textAlign='center'
-                fontSize={4.5}
+                fontSize={theme_textStyles.small + .5}
                 color={theme_colors.black}
                 style={{
                     width: "100%",

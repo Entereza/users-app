@@ -3,8 +3,9 @@ import ViewStyled from '../../utils/ui/ViewStyled'
 import { theme_colors } from '../../utils/theme/theme_colors'
 import { FontAwesome } from '@expo/vector-icons'
 import TextStyled from '../../utils/ui/TextStyled'
+import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 
-export default function IndicatorItem({ indicator, iconSize = 16, fontSize = 12 }) {
+export default function IndicatorItem({ indicator, iconSize = 16, fontSize = theme_textStyles.small }) {
     return (
         <ViewStyled
             backgroundColor={theme_colors.transparent}

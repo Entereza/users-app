@@ -5,9 +5,22 @@ import { theme_colors } from '../../../utils/theme/theme_colors'
 import HeaderInternalScreen from '../../../components/Header/HeaderInternalScreen';
 import ListCompletedAddressed from '../../../components/AdressComponents/ListCompletedAddressed';
 import useAddressStore from '../../../utils/tools/interface/addressStore';
+import { useNavigation } from '@react-navigation/native';
+import useTabBarStore from '../../../utils/tools/interface/tabBarStore';
 
-export default function AddressSelectionScreen() {
+export default function AddressSelectionScreen({ route }) {
+    const { internScreen } = route.params || false
     const { listAddresses } = useAddressStore()
+
+    const navigation = useNavigation();
+    const { toggleTabBar } = useTabBarStore();
+
+    const goBack = () => {
+        if (!internScreen) {
+            toggleTabBar(true)
+        }
+        navigation.goBack();
+    };
 
     return (
         <SafeAreaStyled
@@ -15,7 +28,7 @@ export default function AddressSelectionScreen() {
             styleArea={styles.safeArea}
             styleView={styles.startView}
         >
-            <HeaderInternalScreen title={"Ubicación"} />
+            <HeaderInternalScreen title={"Ubicación"} onPress={goBack} />
 
             <ListCompletedAddressed listAddresses={listAddresses} />
         </SafeAreaStyled>

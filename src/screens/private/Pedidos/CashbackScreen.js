@@ -1,185 +1,233 @@
-import { TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
 import { theme_colors } from "../../../utils/theme/theme_colors";
-import TextStyled from "../../../utils/ui/TextStyled";
 import ViewStyled from "../../../utils/ui/ViewStyled";
-import { useState } from "react";
-import BigBottomButton from "../../../components/Buttons/BigBottomButton";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { private_name_routes } from "../../../utils/route/private_name_routes";
+import useCartStore from "../../../utils/tools/interface/cartStore";
+import useAuthStore from "../../../utils/tools/interface/authStore";
+import AlertStyled from "../../../utils/ui/AlertStyled";
+import SelectAmmountTransfer from "../../../components/CalculatorComponents/SelectAmmountTransfer";
+import NumbersCalculator from "../../../components/CalculatorComponents/NumbersCalculator";
+import { heightPercentageToDP } from "react-native-responsive-screen";
+import { theme_textStyles } from "../../../utils/theme/theme_textStyles";
+import TextStyled from "../../../utils/ui/TextStyled";
+import ButtonWithIcon from "../../../components/Buttons/ButtonWithIcon";
+import { useNavigation } from "@react-navigation/native";
 
-export default function CashbackScreen(){
+export default function CashbackScreen() {
+    const navigation = useNavigation()
 
-    const route = useRoute();
-    const { cashback } = route.params;
+    const { user } = useAuthStore()
+    const cashback = user?.cashback || 0
 
+    const { myCashback, setMyCashback } = useCartStore();
     const [displayValue, setDisplayValue] = useState('');
+
+    useEffect(() => {
+        if (myCashback > 0) {
+            setDisplayValue(myCashback)
+        }
+    }, [myCashback])
+
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertText, setAlertText] = useState({
+        title: '',
+        message: '',
+        type: 'success',
+        textConfirmButton: '',
+        showCancelButton: true
+    });
+
+    const handleCloseAlert = () => {
+        setShowAlert(false)
+    }
+
+    const addAmmount = () => {
+        setMyCashback(displayValue)
+        navigation.goBack()
+    }
 
     const handlePress = (value) => {
         if (value === '<') {
             setDisplayValue(displayValue.slice(0, -1));
-        } else if (value === '.'){
-            setDisplayValue(displayValue + ".");
-        } else if (value === 'Bs. 5'){
-            setDisplayValue("5");
-        } else if (value === 'Bs. 10'){
-            setDisplayValue("10");
-        } else if (value === 'All in'){
-            setDisplayValue(cashback);
+        } else if (value === '.') {
+            if (!displayValue.includes('.')) {
+                if (displayValue > 0) {
+                    setDisplayValue(displayValue + value);
+                } else {
+                    setDisplayValue(0 + value);
+                }
+            }
         } else {
-            setDisplayValue(displayValue + value);
+            let newAmmount = displayValue + value;
+
+            // Validate if the new amount is greater than the user's cashback
+            if (parseFloat(newAmmount) > cashback) {
+                setShowAlert(true);
+                setAlertText({
+                    title: 'Monto inválido',
+                    message: `El monto no puede ser mayor que tu cashback disponible: ${(parseFloat(cashback) - parseFloat(displayValue ? displayValue : 0)).toFixed(2)}.`,
+                    type: 'info',
+                    textConfirmButton: 'Entendido',
+                    showCancelButton: false
+                });
+                return;
+            }
+
+            // Validate if the new amount is greater than 9999
+            if (parseFloat(newAmmount) > 9999) {
+                setShowAlert(true);
+                setAlertText({
+                    title: 'Monto inválido',
+                    message: 'Por seguridad, no se permite usar ese tipo de monto.',
+                    type: 'info',
+                    textConfirmButton: 'Entendido',
+                    showCancelButton: false
+                });
+                return;
+            }
+
+            // Validate if the new amount has more than 2 decimal places
+            let decimalIndex = newAmmount.indexOf('.');
+            if (decimalIndex !== -1 && newAmmount.length - decimalIndex - 1 > 2) {
+                setShowAlert(true);
+                setAlertText({
+                    title: 'Monto inválido',
+                    message: 'El monto no puede tener más de 2 decimales.',
+                    type: 'info',
+                    textConfirmButton: 'Entendido',
+                    showCancelButton: false
+                });
+                return;
+            }
+
+            setDisplayValue(newAmmount);
         }
     };
 
-    const navigation = useNavigation();
-
-    const goToConfirmationScreen = () => {
-        navigation.navigate(private_name_routes.empresas.confirmOrder, {
-            selection: displayValue
-        });
-    }
+    const isDisabled = displayValue <= 0
 
     return (
-        <ViewStyled
-            width={'100%'}
-            height={'92%'}
-            backgroundColor={theme_colors.white}
-            style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}
-        >
-            <ViewStyled 
-                backgroundColor={theme_colors.transparent}
-                style={{
-                    flexDirection: 'row', 
-                    justifyContent: 'space-between',
-                }}
-            >
-                <TextStyled color={theme_colors.primary} style={{fontSize: 20, marginRight: 10, fontFamily: 'SFPro-SemiBold' }}>Bs.</TextStyled>
-                <TextStyled color={theme_colors.primary} style={{fontSize: 90}}>{displayValue === '' ? "0" : displayValue }</TextStyled>
-            </ViewStyled>
+        <>
+            {
+                showAlert &&
+                <AlertStyled
+                    widthModal={90}
+                    heightModal={30}
+                    heightText={19}
+                    title={alertText.title}
+                    message={alertText.message}
+                    type={alertText.type}
+                    onConfirmPressed={alertText.showCancelButton ? addAmmount : handleCloseAlert}
+                    onCancelPressed={handleCloseAlert}
+                    textConfirmButton={alertText.textConfirmButton}
+                    textCancelButton={'No, gracias'}
+                    showCloseButton={false}
+                    showCancelButton={alertText.showCancelButton}
+                    widthConfirm={alertText.showCancelButton ? '55%' : '95%'}
+                    widthCancel={'40%'}
+                />
+            }
 
-            <TextStyled color={theme_colors.grey} style={{fontSize: 12, marginTop: 60}}>Tienes disponible Bs. {cashback} </TextStyled>
-            
-            <ViewStyled 
-                width={'70%'}
-                backgroundColor={theme_colors.transparent}
+            <ViewStyled
+                backgroundColor={theme_colors.white}
                 style={{
-                    flexDirection: 'row', 
-                    justifyContent: 'space-between',
-                    marginTop: 20
+                    height: '100%',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
                 }}
             >
-                {["Bs. 5", "Bs. 10", "All in"].map((number) => (
-                    <TouchableOpacity
-                        key={number}
+                <ViewStyled
+                    width={85}
+                    marginTop={10}
+                    backgroundColor={theme_colors.transparent}
+                    style={{
+                        height: 'auto',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'flex-start',
+                    }}
+                >
+                    <TextStyled
+                        fontFamily='SFPro-Bold'
+                        textAlign='left'
+                        fontSize={theme_textStyles.medium}
+                        color={theme_colors.primary}
+                        numberOfLines={1}
                         style={{
-                            backgroundColor: theme_colors.requiredGrey,
-                            padding: 12,
-                            margin: 5,
-                            borderRadius: 10,
+                            marginTop: 15
                         }}
-                        onPress={() => handlePress(number)}
                     >
-                        <TextStyled color={theme_colors.black} style={{ fontSize: 14, fontFamily: 'SFPro-Medium' }}>{number}</TextStyled>
-                    </TouchableOpacity>
-                ))}
-            </ViewStyled>
+                        {'Bs. '}
+                    </TextStyled>
+                    <TextStyled
+                        fontFamily='SFPro-Bold'
+                        textAlign='left'
+                        fontSize={20}
+                        color={theme_colors.primary}
+                        numberOfLines={1}
+                    >
+                        {displayValue ? displayValue : 0}
+                    </TextStyled>
+                </ViewStyled>
 
-            <ViewStyled 
-                width={'70%'}
-                backgroundColor={theme_colors.transparent}
-                style={{
-                    flexDirection: 'row', 
-                    justifyContent: 'space-between',
-                }}
-            >
-                {[1, 2, 3].map((number) => (
-                    <TouchableOpacity
-                        key={number}
+                <ViewStyled
+                    paddingVertical={1.5}
+                    marginTop={1}
+                    backgroundColor={theme_colors.transparent}
+                    style={{
+                        width: '90%',
+                        height: 'auto',
+                        borderTopWidth: 0.5,
+                        borderColor: theme_colors.greyLine,
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                    }}
+                >
+                    <TextStyled
+                        fontFamily='SFPro-SemiBold'
+                        textAlign='center'
+                        fontSize={theme_textStyles.small}
+                        color={'#AAAAAA'}
+                        numberOfLines={1}
+                        ellipsizeMode='tail'
                         style={{
-                            padding: 12,
-                            margin: 5,
-                            borderRadius: 10,
+                            width: '100%'
                         }}
-                        onPress={() => handlePress(number)}
                     >
-                        <TextStyled color={theme_colors.grey} style={{ fontSize: 20, fontFamily: 'SFPro-SemiBold' }}>{number}</TextStyled>
-                    </TouchableOpacity>
-                ))}
-            </ViewStyled>
-            
-            <ViewStyled 
-                width={'70%'}
-                backgroundColor={theme_colors.transparent}
-                style={{
-                    flexDirection: 'row', 
-                    justifyContent: 'space-between'
-                }}
-            >
-                {[4, 5, 6].map((number) => (
-                    <TouchableOpacity
-                        key={number}
-                        style={{
-                            padding: 12,
-                            margin: 5,
-                            borderRadius: 10,
-                        }}
-                        onPress={() => handlePress(number)}
-                    >
-                        <TextStyled color={theme_colors.grey} style={{ fontSize: 20, fontFamily: 'SFPro-SemiBold' }}>{number}</TextStyled>
-                    </TouchableOpacity>
-                ))}
-            </ViewStyled>
+                        Tienes disponible Bs. {(parseFloat(cashback) - parseFloat(displayValue ? displayValue : 0)).toFixed(2)}
+                    </TextStyled>
+                </ViewStyled>
 
-            <ViewStyled 
-                width={'70%'}
-                backgroundColor={theme_colors.transparent}
-                style={{
-                    flexDirection: 'row', 
-                    justifyContent: 'space-between'
-                }}
-            >
-                {[7, 8, 9].map((number) => (
-                    <TouchableOpacity
-                        key={number}
-                        style={{
-                            padding: 12,
-                            margin: 5,
-                            borderRadius: 10,
-                        }}
-                        onPress={() => handlePress(number)}
-                    >
-                        <TextStyled color={theme_colors.grey} style={{ fontSize: 20, fontFamily: 'SFPro-SemiBold' }}>{number}</TextStyled>
-                    </TouchableOpacity>
-                ))}
-            </ViewStyled>
+                <SelectAmmountTransfer
+                    cashbackUser={cashback ? cashback : 0}
+                    ammountTransfer={0}
+                    onPress={handlePress}
+                />
 
-            <ViewStyled 
-                width={'70%'}
-                backgroundColor={theme_colors.transparent}
-                style={{
-                    flexDirection: 'row', 
-                    justifyContent: 'space-between'
-                }}
-            >
-                {[".", 0, "<"].map((number) => (
-                    <TouchableOpacity
-                        key={number}
-                        style={{
-                            padding: 12,
-                            margin: 5,
-                            borderRadius: 10,
-                        }}
-                        onPress={() => handlePress(number)}
-                    >
-                        <TextStyled color={theme_colors.grey} style={{ fontSize: 20, fontFamily: 'SFPro-SemiBold' }}>{number}</TextStyled>
-                    </TouchableOpacity>
-                ))}
-            </ViewStyled>
+                <NumbersCalculator
+                    onPress={handlePress}
+                />
 
-            <BigBottomButton text={"Agregar Cashback"} color={theme_colors.primary} textColor={theme_colors.white} width={'90%'} onPress={goToConfirmationScreen}  marginTop={15}/>
-            
-        </ViewStyled>
+                <ButtonWithIcon
+                    withIcon={false}
+
+                    onPress={addAmmount}
+                    borderWidth={1}
+                    borderColor={isDisabled ? theme_colors.lightGrey : theme_colors.primary}
+                    backgroundColor={isDisabled ? theme_colors.lightGrey : theme_colors.primary}
+                    colorText={theme_colors.white}
+                    borderRadius={1.5}
+                    fontSize={theme_textStyles.medium}
+                    height={6}
+                    fontFamily={'SFPro-Bold'}
+                    textButton={'Agregar Cashback'}
+                    style={{
+                        width: '95%',
+                        marginTop: 'auto',
+                        marginBottom: 20
+                    }}
+                />
+            </ViewStyled>
+        </>
     );
 };

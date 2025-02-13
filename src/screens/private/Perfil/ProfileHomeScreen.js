@@ -5,19 +5,15 @@ import HeaderDefaultScreen from '../../../components/Header/HeaderDefaultScreen'
 import InfoProfileUser from '../../../components/ProfileComponents/InfoProfileUser'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import useTabBarStore from '../../../utils/tools/interface/tabBarStore'
-import { private_name_routes } from '../../../utils/route/private_name_routes'
-import useAuthStore from '../../../utils/tools/interface/authStore'
 
 export default function ProfileHomeScreen() {
     const navigation = useNavigation();
-    const { toggleTabBar, nameRouteBack } = useTabBarStore();
+    const { toggleTabBar, nameStackBack, nameRouteBack } = useTabBarStore();
 
     const goBack = () => {
         toggleTabBar(true);
-        if (nameRouteBack === private_name_routes.billetera.billeteraHome) {
-            navigation.navigate(nameRouteBack);
-        } else if (nameRouteBack === private_name_routes.empresas.empresasHome) {
-            navigation.navigate(nameRouteBack);
+        if (nameStackBack !== "" && nameRouteBack !== "") {
+            navigation.navigate(nameStackBack, { screen: nameRouteBack })
         } else {
             navigation.goBack()
         }

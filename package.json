@@ -53,6 +53,7 @@
     "react-native-animatable": "^1.4.0",
     "react-native-circular-progress-indicator": "^4.4.2",
     "react-native-confetti-cannon": "^1.5.2",
+    "react-native-credit-card-input": "^1.0.0",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-maps": "1.14.0",

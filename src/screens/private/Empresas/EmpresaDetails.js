@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useRef, useEffect } from 'react'
 import ViewStyled from '../../../utils/ui/ViewStyled'
 import { theme_colors } from '../../../utils/theme/theme_colors'
-import { Pressable } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import { Animated, Pressable, ScrollView, StyleSheet, BackHandler } from 'react-native'
+import { useNavigation, useFocusEffect } from '@react-navigation/native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import adjustFontSize from '../../../utils/ui/adjustText'
 import ImageStyled from '../../../utils/ui/ImageStyled'
@@ -13,6 +13,12 @@ import CategoriesProductsList from '../../../components/BusinessComponents/Categ
 import useTabBarStore from '../../../utils/tools/interface/tabBarStore'
 import { products } from '../../../utils/tools/storage/data'
 import PromotionsList from '../../../components/BusinessComponents/CategoriesComponents/DetailsComponents/PromotionsList'
+import { theme_textStyles } from '../../../utils/theme/theme_textStyles'
+import ProductsList from '../../../components/BusinessComponents/ProductsComponents/ProductsList'
+import useCategoryStore from '../../../utils/tools/interface/categoryStore'
+import { heightPercentageToDP } from 'react-native-responsive-screen'
+import ButtonGoToCart from '../../../components/Buttons/ButtonGoToCart'
+import useCartStore from '../../../utils/tools/interface/cartStore'
 
 export default function EmpresaDetails({ route }) {
     const { business } = route.params
@@ -21,6 +27,44 @@ export default function EmpresaDetails({ route }) {
     const { top } = useSafeAreaInsets()
     const { toggleTabBar } = useTabBarStore()
     const navigation = useNavigation()
+
+    // Referencias y estados para el scroll
+    const scrollViewRef = useRef(null)
+    const {
+        setScrollViewRef,
+        selectedCategory,
+        setSelectedCategory,
+        setHasPromotions,
+        setSectionPosition,
+        resetState,
+        isManualSelection
+    } = useCategoryStore()
+
+    // Establecer la referencia del ScrollView
+    useEffect(() => {
+        setScrollViewRef(scrollViewRef.current)
+
+        // Limpiar estado al desmontar
+        return () => {
+            resetState()
+        }
+    }, [])
+
+    // Manejar el botón de retroceso del hardware
+    useFocusEffect(
+        React.useCallback(() => {
+            const onBackPress = () => {
+                goBack();
+                return true;
+            };
+
+            BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+            return () => {
+                BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+            };
+        }, [])
+    );
 
     // Velocidad promedio de delivery en moto: 30 km/h = 8.33 m/s
     const avgDeliverySpeed = 8.33 // metros por segundo
@@ -43,26 +87,94 @@ export default function EmpresaDetails({ route }) {
         }
     ]
 
-
-    //
     const goBack = () => {
+        resetState()
         toggleTabBar(true)
         navigation.goBack()
     }
 
     // Get list categories
-    // Get list products by category
-    // Tomando en cuenta todos los productos se debe obtener el nombre de las categorias
     const getCategories = () => {
         const categories = products.map(product => product.category)
-        return ['Menú', ...new Set(categories)]
+        const uniqueCategories = [...new Set(categories)]
+        // Filtrar categorías que tienen productos y excluir 'Promociones'
+        const categoriesWithProducts = uniqueCategories.filter(category =>
+            category !== 'Promociones' && products.some(product => product.category === category)
+        )
+        return ['Menú', ...categoriesWithProducts]
     }
 
     const getProductsByCategory = (category) => {
         return products.filter(product => product.category === category)
     }
 
+    const promotions = products.filter(product => product.category === 'Promociones')
+
+    // Actualizar el estado de promociones
+    useEffect(() => {
+        setHasPromotions(promotions.length > 0)
+    }, [])
+
     const categories = getCategories()
+
+    // Manejar el scroll
+    const handleScroll = (event) => {
+        const scrollY = event.nativeEvent.contentOffset.y
+        const layoutHeight = event.nativeEvent.layoutMeasurement.height
+        const contentHeight = event.nativeEvent.contentSize.height
+        const isCloseToBottom = layoutHeight + scrollY >= contentHeight - 20
+
+        if (isManualSelection) return;
+
+        // Encontrar la sección actual basada en la posición del scroll
+        let currentSection = 'Menú'
+
+        if (scrollY <= 10) {
+            currentSection = 'Menú'
+        } else if (isCloseToBottom) {
+            // Si estamos cerca del final, seleccionar la última categoría
+            const nonMenuCategories = categories.filter(cat => cat !== 'Menú')
+            currentSection = nonMenuCategories[nonMenuCategories.length - 1]
+        } else {
+            Object.entries(useCategoryStore.getState().sectionPositions).forEach(([category, position]) => {
+                if (scrollY >= position - 50) {
+                    currentSection = category
+                }
+            })
+        }
+
+        if (currentSection !== selectedCategory) {
+            setSelectedCategory(currentSection)
+        }
+    }
+
+    const cart = useCartStore((state) => state.cart);
+
+    // Componente de footer para dar espacio adicional
+    const FooterComponent = () => (
+        <ViewStyled
+            backgroundColor={theme_colors.transparent}
+            width={90}
+            height={cart.length > 0 ? 18 : 13}
+            paddingTop={2}
+            style={{
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+            }}
+        >
+            <TextStyled
+                fontFamily='SFPro-Italic'
+                textAlign='center'
+                fontSize={theme_textStyles.small}
+                color={theme_colors.grey}
+                style={{
+                    width: "100%",
+                }}
+            >
+                {`Estos son todos los productos de '${businessName}'`}
+            </TextStyled>
+        </ViewStyled>
+    )
 
     return (
         <ViewStyled
@@ -75,6 +187,7 @@ export default function EmpresaDetails({ route }) {
                 position: 'relative'
             }}
         >
+            {/* Header con imagen */}
             <ViewStyled
                 backgroundColor={theme_colors.transparent}
                 style={{
@@ -112,14 +225,13 @@ export default function EmpresaDetails({ route }) {
                         style={{
                             justifyContent: 'center',
                             alignItems: 'center',
-
                             borderWidth: 1,
                             borderColor: theme_colors.primary
                         }}
                     >
                         <MaterialCommunityIcons
                             name="arrow-left"
-                            size={adjustFontSize(25)}
+                            size={adjustFontSize(theme_textStyles.xlarge)}
                             color={theme_colors.primary}
                         />
                     </ViewStyled>
@@ -130,7 +242,7 @@ export default function EmpresaDetails({ route }) {
                 backgroundColor={theme_colors.white}
                 style={{
                     width: '100%',
-                    height: '78%',
+                    height: '80%',
                     justifyContent: 'flex-start',
                     alignItems: 'center',
                     position: 'absolute',
@@ -138,12 +250,13 @@ export default function EmpresaDetails({ route }) {
                     borderTopLeftRadius: 30,
                     borderTopRightRadius: 30,
                     paddingTop: 15,
+                    position: 'absolute'
                 }}
             >
                 <TextStyled
                     fontFamily='SFPro-Bold'
                     textAlign='left'
-                    fontSize={11}
+                    fontSize={theme_textStyles.xlarge + 1}
                     color={theme_colors.black}
                     numberOfLines={1}
                     ellipsizeMode='tail'
@@ -166,11 +279,9 @@ export default function EmpresaDetails({ route }) {
                         alignItems: 'center',
                         justifyContent: 'flex-start',
                         borderRadius: 10,
-
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-
                         shadowColor: theme_colors.black,
                         shadowOffset: { width: 0, height: 2 },
                         shadowOpacity: 0.5,
@@ -179,14 +290,55 @@ export default function EmpresaDetails({ route }) {
                     }}
                 >
                     {indicators.map((indicator, index) => (
-                        <IndicatorItem key={index} indicator={indicator} iconSize={18} fontSize={7} />
+                        <IndicatorItem key={index} indicator={indicator} iconSize={18} fontSize={theme_textStyles.smedium} />
                     ))}
                 </ViewStyled>
 
                 <CategoriesProductsList categories={categories} />
 
-                <PromotionsList promotions={getProductsByCategory('Promociones')} />
+                <ScrollView
+                    ref={scrollViewRef}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.scrollContent}
+                    onScroll={handleScroll}
+                    scrollEventThrottle={16}
+                >
+                    {promotions.length > 0 && (
+                        <PromotionsList
+                            promotions={promotions}
+                            onLayout={(event) => {
+                                setSectionPosition('Promociones', event.nativeEvent.layout.y)
+                            }}
+                        />
+                    )}
+
+                    {categories.filter(category => category !== 'Menú').map((category, index) => {
+                        const categoryProducts = getProductsByCategory(category)
+                        if (categoryProducts.length === 0) return null
+
+                        return (
+                            <ProductsList
+                                key={index}
+                                category={category}
+                                products={categoryProducts}
+                                onLayout={(event) => {
+                                    setSectionPosition(category, event.nativeEvent.layout.y)
+                                }}
+                            />
+                        )
+                    })}
+                    <FooterComponent />
+                </ScrollView>
+
+                <ButtonGoToCart />
             </ViewStyled>
         </ViewStyled>
     )
 }
+
+const styles = StyleSheet.create({
+    scrollContent: {
+        width: '100%',
+        alignItems: 'center',
+    }
+});

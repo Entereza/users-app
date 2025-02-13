@@ -1,35 +1,33 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// {
-//   names: "Anelisse",
-//   lastNames: "Rocabado",
-//   phoneNumber: 75469425,
-//   ci: 7820697,
-//   email: "anelisserocabado@gmail.com",
-//   password: "12345678",
-//   image: ""
-// },
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import useTabBarStore from './tabBarStore';
 
 const useAuthStore = create(set => ({
-  user: null,
-
   isChecking: true,
+  user: null,
 
   setIsChecking: (value) => {
     set({ isChecking: value });
+  },
+
+  setUserData: (user) => {
+    set({ user: user });
   },
 
   clearUserData: () => {
     set({ user: null });
   },
 
-  getUserData: async (deliveryCode) => {
+  getUserData: async () => {
 
   },
 
   logout: async () => {
+    GoogleSignin.signOut()
     await AsyncStorage.clear();
     set({ user: null });
+    useTabBarStore.getState().toggleTabBar(true);
   }
 }));
 

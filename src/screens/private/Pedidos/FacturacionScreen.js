@@ -1,193 +1,195 @@
-import { useState } from "react";
-import BigBottomButton from "../../../components/Buttons/BigBottomButton";
-import { theme_colors } from "../../../utils/theme/theme_colors";
-import TextStyled from "../../../utils/ui/TextStyled";
-import ViewStyled from "../../../utils/ui/ViewStyled";
-import { TextInput, GestureHandlerRootView } from "react-native-gesture-handler";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { KeyboardAvoidingView, TouchableOpacity, View } from "react-native";
-import { private_name_routes } from "../../../utils/route/private_name_routes";
+import React, { useEffect, useState } from 'react'
+import ViewStyled from '../../../utils/ui/ViewStyled'
+import { theme_colors } from '../../../utils/theme/theme_colors'
+import TextStyled from '../../../utils/ui/TextStyled'
+import { theme_textStyles } from '../../../utils/theme/theme_textStyles'
+import TextInputStyled from '../../../utils/ui/TextInputStyled'
+import { useFormik } from 'formik'
+import { schemaFacturacion } from '../../../utils/tools/interface/schemasFormik'
+import { StyleSheet } from 'react-native'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import adjustFontSize from '../../../utils/ui/adjustText'
+import ButtonWithIcon from '../../../components/Buttons/ButtonWithIcon'
+import useCartStore from '../../../utils/tools/interface/cartStore'
+import { useNavigation } from '@react-navigation/native'
 
-export default function FacturacionScreen(){
-    const route = useRoute();
-    const { facturacion } = route.params;
+export default function FacturacionScreen() {
+    const navigation = useNavigation()
+    const { billingInfo, setBillingInfo } = useCartStore()
+    const [isDisabled, setIsDisabled] = useState(true)
+    const [isLoading, setIsLoading] = useState(false)
 
-    const [isSearchActive, setSearchActive] = useState(false);
-    const [searchText, setSearchText] = useState(facturacion.find(facturacion => facturacion.id === 1).name);
-    const [searchNit, setSearchNit] = useState(facturacion.find(facturacion => facturacion.id === 1).nit);
+    const formik = useFormik({
+        initialValues: {
+            name: "",
+            nit: "",
+        },
+        validationSchema: schemaFacturacion,
+        validateOnChange: true,
+        onSubmit: async (values) => {
+            setIsLoading(true)
+            try {
+                const dataFacturation = {
+                    name: values.name,
+                    nit: values.nit,
+                };
 
-    const handleSearchButtonPress = () => {
-        setSearchActive(true);
-    };
+                setBillingInfo(dataFacturation)
+            } catch (err) {
+                console.log('Error on editProfile: ', err)
+            } finally {
+                setTimeout(() => {
+                    setIsLoading(false)
+                    navigation.goBack()
+                }, 1000);
+            }
+        }
+    });
 
-    const handleSearch = () => {
-        setSearchActive(false);
-    };
+    useEffect(() => {
+        formik.setValues({ name: billingInfo.name, nit: billingInfo.nit })
+    }, [billingInfo])
 
-    const navigation = useNavigation();
+    useEffect(() => {
+        const formValues = formik.values;
+        const hasChanges = (
+            formValues.name !== billingInfo?.name ||
+            formValues.nit.toString() !== billingInfo?.nit?.toString()
+        );
 
-    // CORREGIR ENVIO DE DATOS, CRUCE CON EL CASHBACK 
-    const goToConfirmScreen = () => {
-        navigation.navigate(private_name_routes.empresas.confirmOrder, {
-            selection: [searchText, searchNit]
-        });
-    }
+        const isValid = formik.isValid && hasChanges;
+
+        setIsDisabled(!isValid);
+    }, [formik.values, formik.isValid, billingInfo])
 
     return (
-        <GestureHandlerRootView>
-            <KeyboardAvoidingView
-                behavior="position"
-                style={{ flex: 1 }}
+        <ViewStyled
+            backgroundColor={theme_colors.white}
+            style={{
+                width: '100%',
+                flex: 1,
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+            }}
+        >
+            <ViewStyled
+                paddingVertical={1.5}
+                paddingHorizontal={1}
+                backgroundColor={theme_colors.transparent}
+                style={{
+                    width: '90%',
+                    height: 'auto',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    borderBottomWidth: 0.2,
+                    borderColor: theme_colors.primary
+                }}
             >
-                <ViewStyled
-                    backgroundColor={theme_colors.white}
-                    style={{
-                        alignItems: 'center'
-                    }}
+                <TextStyled
+                    fontFamily='SFPro-Bold'
+                    textAlign='left'
+                    fontSize={theme_textStyles.medium}
+                    color={theme_colors.primary}
+                    numberOfLines={1}
+                    ellipsizeMode='tail'
                 >
-                    <ViewStyled
-                        width={'100%'}
-                        height={'77%'}
-                        backgroundColor={theme_colors.white}
-                        style={{
-                            alignItems: 'center',
-                        }}
-                    >
-                        <TextStyled
-                            fontSize={10}
-                            color={theme_colors.primary}
-                            style={{
-                                alignSelf: 'flex-start',
-                                margin: 10,
-                                marginLeft: 20,
-                                fontFamily: 'SFPro-Bold',
-                            }}
-                        >
-                            Datos de facturación
-                        </TextStyled>
+                    Datos de Facturación
+                </TextStyled>
+            </ViewStyled>
 
-                        <ViewStyled
-                            width={'90%'}
-                            height={'0.2%'}
-                            backgroundColor={theme_colors.greyLine}
-                            style={{
-                                alignSelf: 'center',
-                                marginBottom: 10,
-                                marginTop: 5
-                            }}
-                        />
+            <TextInputStyled
+                value={formik.values.name}
+                label='Nombre / Razón Social *'
+                placeholder="Ej: Rocha"
+                onChangeText={text => formik.setFieldValue('name', text)}
+                onBlur={() => formik.setFieldTouched('name')}
+                errorMessage={formik.touched.name && formik.errors.name}
+                placeholderTextColor={styles.textPlaceholder}
+                labelStyle={styles.labelInput}
+                containerStyle={styles.containerInput}
+                inputStyle={styles.inputText}
+                errorStyle={styles.errorText}
+                returnKeyType='next'
+            />
 
-                        <ViewStyled
-                            width={'90%'}
-                            backgroundColor={theme_colors.white}
-                            style={{
-                                alignContent: 'center',
-                            }}
-                        >
-                            <TextStyled
-                                fontSize={7}
-                                color={theme_colors.black}
-                                style={{
-                                    alignSelf: 'flex-start',
-                                    fontFamily: 'SFPro-Bold',
-                                    marginTop: 10
-                                }}
-                            >
-                                Nombre / Razón Social
-                            </TextStyled>
+            <TextInputStyled
+                value={formik.values.nit}
+                label='CI / NIT *'
+                placeholder="Ej: 123456"
+                onChangeText={text => formik.setFieldValue('nit', text)}
+                onBlur={() => formik.setFieldTouched('nit')}
+                keyboardType={"number-pad"}
+                errorMessage={formik.touched.nit && formik.errors.nit}
+                placeholderTextColor={styles.textPlaceholder}
+                labelStyle={styles.labelInput}
+                containerStyle={styles.containerInput}
+                inputStyle={styles.inputText}
+                errorStyle={styles.errorText}
+                returnKeyType='next'
+            />
 
-                            <TouchableOpacity
-                                onPress={handleSearchButtonPress}
-                                style={{
-                                    width: '100%',
-                                    height: 40,
-                                    alignSelf: 'center',
-                                    justifyContent: 'center',
-                                    borderRadius: 10,
-                                    borderWidth: 1,
-                                    backgroundColor: theme_colors.white,
-                                    borderColor: theme_colors.white,
-                                    padding: 8,
-                                    marginBottom: 10,
-                                    marginTop: 10,
-                                    elevation: 50,
-                                    shadowColor: theme_colors.black,
-                                    shadowOffset: {
-                                        width: 2,
-                                        height: 2,
-                                    },
-                                    shadowOpacity: 0.25,
-                                    shadowRadius: 3.84,
-                                }}
-                            >
-                                <TextInput
-                                    value={searchText}
-                                    onChangeText={setSearchText}
-                                    placeholder={facturacion.find(facturacion => facturacion.id === 1).name}
-                                    placeholderTextColor={theme_colors.grey}
-                                    onSubmitEditing={handleSearch}
-                                />
-                            </TouchableOpacity>
+            <ButtonWithIcon
+                disabled={isDisabled || isLoading}
+                loading={isLoading}
+                backgroundColor={isDisabled ? `${theme_colors.grey}22` : theme_colors.primary}
+                borderWidth={0}
+                colorText={theme_colors.white}
+                onPress={formik.handleSubmit}
+                borderRadius={1.5}
+                withIcon={false}
+                fontSize={theme_textStyles.medium}
+                fontFamily={'SFPro-Bold'}
+                textButton={isLoading ? 'Guardando datos...' : 'Guardar cambios'}
+                height={6}
+                style={{
+                    width: '95%',
+                    marginTop: 'auto',
+                    marginBottom: 20
+                }}
+            />
+        </ViewStyled>
+    )
+}
 
-                            <TextStyled
-                                fontSize={7}
-                                color={theme_colors.black}
-                                style={{
-                                    alignSelf: 'flex-start',
-                                    fontFamily: 'SFPro-Bold',
-                                    marginTop: 10
-                                }}
-                            >
-                                CI / NIT
-                            </TextStyled>
+const styles = StyleSheet.create({
+    textPlaceholder: theme_colors.grey,
+    colorIcon: theme_colors.secondary,
+    sizeIcon: 12,
+    containerInput: {
+        width: widthPercentageToDP(90),
+        height: 'auto',
+        paddingVertical: heightPercentageToDP(0.8),
+        marginTop: 10
+    },
+    labelInput: {
+        fontFamily: 'SFPro-SemiBold',
+        color: theme_colors.black,
+        fontSize: adjustFontSize(theme_textStyles.small + .5),
+        marginBottom: 6
+    },
+    inputText: {
+        paddingHorizontal: 12,
+        paddingVertical: 5,
+        borderRadius: 12,
 
-                            <TouchableOpacity
-                                onPress={handleSearchButtonPress}
-                                style={{
-                                    width: '100%',
-                                    height: 40,
-                                    alignSelf: 'center',
-                                    justifyContent: 'center',
-                                    borderRadius: 10,
-                                    borderWidth: 1,
-                                    backgroundColor: theme_colors.white,
-                                    borderColor: theme_colors.white,
-                                    padding: 8,
-                                    marginBottom: 10,
-                                    marginTop: 10,
-                                    elevation: 50,
-                                    shadowColor: theme_colors.black,
-                                    shadowOffset: {
-                                        width: 2,
-                                        height: 2,
-                                    },
-                                    shadowOpacity: 0.25,
-                                    shadowRadius: 3.84,
-                                }}
-                            >
-                                <TextInput
-                                    value={searchNit}
-                                    onChangeText={setSearchNit}
-                                    placeholder={facturacion.find(facturacion => facturacion.id === 1).nit}
-                                    placeholderTextColor={theme_colors.grey}
-                                    onSubmitEditing={handleSearch}
-                                />
-                            </TouchableOpacity>
-                        </ViewStyled>
-                    </ViewStyled>
+        backgroundColor: theme_colors.white,
+        width: '100%',
+        height: 'auto',
 
-                    <ViewStyled
-                        width={'100%'}
-                        height={'20%'}
-                        backgroundColor={theme_colors.white}
-                        style={{
-                            alignItems: 'center',
-                        }}
-                    >
-                        <BigBottomButton text={"Guardar cambios"} color={theme_colors.primary} textColor= {theme_colors.white} width={'90%'} onPress={goToConfirmScreen} marginTop={15}/>
-                    </ViewStyled>
-                </ViewStyled>
-            </KeyboardAvoidingView>
-        </GestureHandlerRootView>
-    );
-};
+        color: theme_colors.black,
+        fontFamily: 'SFPro-Regular',
+        fontSize: adjustFontSize(theme_textStyles.smedium),
+
+        elevation: 2,
+        shadowColor: theme_colors.black,
+    },
+    errorText: {
+        width: '100%',
+        textAlign: 'left',
+        paddingLeft: 12,
+
+        color: theme_colors.danger,
+        fontSize: adjustFontSize(theme_textStyles.small)
+    },
+})

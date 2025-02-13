@@ -9,6 +9,7 @@ import { useNavigation } from '@react-navigation/native'
 import { private_name_routes } from '../../utils/route/private_name_routes'
 import useTabBarStore from '../../utils/tools/interface/tabBarStore'
 import { businesses } from '../../utils/tools/storage/data'
+import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 
 export default function BusinessSection() {
   const navigation = useNavigation();
@@ -52,7 +53,7 @@ export default function BusinessSection() {
         <TextStyled
           fontFamily='SFPro-Bold'
           textAlign='left'
-          fontSize={10}
+          fontSize={theme_textStyles.large}
           color={theme_colors.black}
           numberOfLines={1}
           ellipsizeMode='tail'
@@ -68,6 +69,7 @@ export default function BusinessSection() {
           alignItems: 'center',
           width: '100%',
           paddingHorizontal: 5,
+          paddingTop: 2,
           paddingBottom: heightPercentageToDP(10),
         }}
         renderItem={({ item, index }) =>

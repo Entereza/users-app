@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { private_name_routes } from '../../utils/route/private_name_routes';
 import ProfileHomeScreen from '../../screens/private/Perfil/ProfileHomeScreen';
 import PersonalDataScreen from '../../screens/private/Perfil/PersonalDataScreen';
+import ChangePasswordScreen from '../../screens/private/Perfil/ChangePasswordScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,6 +31,17 @@ export default function ProfileStack() {
             <Stack.Screen
                 name={private_name_routes.profile.editProfile}
                 component={PersonalDataScreen}
+                options={{
+                    navigationBarHidden: true,
+                    animation: "slide_from_right",
+                    animationTypeForReplace: 'pop',
+                    headerShown: false
+                }}
+            />
+
+            <Stack.Screen
+                name={private_name_routes.profile.changePassword}
+                component={ChangePasswordScreen}
                 options={{
                     navigationBarHidden: true,
                     animation: "slide_from_right",

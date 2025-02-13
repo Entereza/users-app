@@ -4,6 +4,8 @@ import { theme_colors } from '../../utils/theme/theme_colors';
 import { FontAwesome6, MaterialCommunityIcons, Octicons } from '@expo/vector-icons';
 import TextStyled from '../../utils/ui/TextStyled';
 import { Pressable } from 'react-native';
+import adjustFontSize from '../../utils/ui/adjustText';
+import { theme_textStyles } from '../../utils/theme/theme_textStyles';
 
 export default function AddressSelectionCard({ item, isSelected, onPressSelect, onPressEdit }) {
     const colorIcon = isSelected ? theme_colors.white : theme_colors.grey
@@ -42,15 +44,20 @@ export default function AddressSelectionCard({ item, isSelected, onPressSelect, 
                         elevation: 3,
                     }}
                 >
-                    <Octicons name={"location"} size={30} color={colorIcon} />
+                    <Octicons name={"location"} size={adjustFontSize(theme_textStyles.large)} color={colorIcon} />
 
                     <ViewStyled
-                        width={48}
+                        paddingHorizontal={2}
                         height={7}
                         backgroundColor={theme_colors.transparent}
+                        style={{
+                            flex: 1,
+                            justifyContent: 'center',
+                            alignItems: 'flex-start',
+                        }}
                     >
                         <TextStyled
-                            fontSize={4.5}
+                            fontSize={theme_textStyles.small}
                             color={colorText}
                             numberOfLines={2}
                             ellipsizeMode='tail'
@@ -58,11 +65,11 @@ export default function AddressSelectionCard({ item, isSelected, onPressSelect, 
                                 fontFamily: 'SFPro-SemiBold',
                             }}
                         >
-                            {item.address}
+                            {item.nameAddress}
                         </TextStyled>
 
                         <TextStyled
-                            fontSize={10}
+                            fontSize={theme_textStyles.smaller + .5}
                             color={colorSubtitle}
                             numberOfLines={1}
                             ellipsizeMode='tail'
@@ -70,18 +77,21 @@ export default function AddressSelectionCard({ item, isSelected, onPressSelect, 
                                 fontFamily: 'SFPro-Regular',
                             }}
                         >
-                            {item.place}
+                            {item.referencesAddress}
                         </TextStyled>
                     </ViewStyled>
 
-                    <MaterialCommunityIcons name={"checkbox-blank-circle-outline"} size={23} color={colorIcon} />
+                    <MaterialCommunityIcons name={"checkbox-blank-circle-outline"} size={adjustFontSize(theme_textStyles.smedium)} color={colorIcon} />
                 </ViewStyled>
             </Pressable>
 
-            <Pressable onPress={onPressEdit} style={{
-                width: '10%',
-                height: '70%',
-            }}>
+            <Pressable
+                onPress={onPressEdit}
+                style={{
+                    width: '10%',
+                    height: '70%',
+                }}
+            >
                 <ViewStyled
                     backgroundColor={theme_colors.transparent}
                     style={{
@@ -92,7 +102,7 @@ export default function AddressSelectionCard({ item, isSelected, onPressSelect, 
                         alignItems: 'center',
                     }}
                 >
-                    <FontAwesome6 name={"pencil"} size={27} color={theme_colors.lightGrey2} />
+                    <FontAwesome6 name={"pencil"} size={adjustFontSize(theme_textStyles.medium)} color={theme_colors.lightGrey2} />
                 </ViewStyled>
             </Pressable>
         </ViewStyled >

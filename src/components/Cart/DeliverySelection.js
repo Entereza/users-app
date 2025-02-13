@@ -2,14 +2,16 @@ import React from 'react';
 import ViewStyled from '../../utils/ui/ViewStyled';
 import TextStyled from '../../utils/ui/TextStyled';
 import { theme_colors } from '../../utils/theme/theme_colors';
+import { theme_textStyles } from '../../utils/theme/theme_textStyles';
 
 export default function DeliverySelection({ cost, time }) {
 
-    return ( 
+    return (
         <ViewStyled
-            width={'60%'}
+            marginTop={2}
+            width={'75%'}
             backgroundColor={theme_colors.transparent}
-            style={{ 
+            style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 marginBottom: 10
@@ -17,13 +19,13 @@ export default function DeliverySelection({ cost, time }) {
         >
             <ViewStyled
                 backgroundColor={theme_colors.transparent}
-                style={{ 
+                style={{
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                 }}
             >
                 <TextStyled
-                    fontSize={4.5}
+                    fontSize={theme_textStyles.small + .5}
                     color={theme_colors.black}
                     fontFamily='SFPro-SemiBold'
                     style={{
@@ -33,7 +35,7 @@ export default function DeliverySelection({ cost, time }) {
                     Envío:
                 </TextStyled>
                 <TextStyled
-                    fontSize={4.5}
+                    fontSize={theme_textStyles.small + .5}
                     color={theme_colors.black}
                     fontFamily='SFPro-Regular'
                     style={{
@@ -47,13 +49,13 @@ export default function DeliverySelection({ cost, time }) {
 
             <ViewStyled
                 backgroundColor={theme_colors.transparent}
-                style={{ 
+                style={{
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                 }}
             >
                 <TextStyled
-                    fontSize={4.5}
+                    fontSize={theme_textStyles.small + .5}
                     color={theme_colors.black}
                     fontFamily='SFPro-SemiBold'
                     style={{
@@ -63,7 +65,7 @@ export default function DeliverySelection({ cost, time }) {
                     Tiempo:
                 </TextStyled>
                 <TextStyled
-                    fontSize={4.5}
+                    fontSize={theme_textStyles.small + .5}
                     color={theme_colors.black}
                     fontFamily='SFPro-Regular'
                     style={{

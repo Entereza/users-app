@@ -12,26 +12,45 @@
       "backgroundColor": "#000000"
     },
     "scheme": "com.entereza.client",
-    "platforms": ["ios", "android"],
-    "assetBundlePatterns": ["**/*"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "associatedDomains": [
         "com.googleusercontent.apps.511900415351-ej15snog5mn00ikjcbuqeqa1pap18nkn"
       ],
+      "config": {
+        "googleMapsApiKey": "AIzaSyDuPGoPpbEn3IERAonyLZhWW-h0jDwto1A"
+      },
       "supportsTablet": true,
       "bundleIdentifier": "com.entereza.client",
-      "buildNumber": "72",
+      "buildNumber": "78",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Requerimos tu ubicación para poder darte información sobre las empresas afiliadas de tu ciudad.",
         "NSUserTrackingUsageDescription": "Esto permite a Entereza ofrecerte la mejor experiencia y mayor información sobre las empresas afiliadas que están en tu ciudad.",
-        "UIBackgroundModes": ["fetch", "remote-notification"],
+        "UIBackgroundModes": [
+          "fetch",
+          "remote-notification",
+          "fetch",
+          "remote-notification"
+        ],
         "CFBundleURLTypes": [
           {
             "CFBundleURLSchemes": [
               "com.googleusercontent.apps.511900415351-ej15snog5mn00ikjcbuqeqa1pap18nkn"
             ]
+          },
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.511900415351-ej15snog5mn00ikjcbuqeqa1pap18nkn"
+            ]
           }
-        ]
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       },
       "googleServicesFile": "./GoogleService-Info.plist"
     },
@@ -49,9 +68,15 @@
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.DOWNLOAD_WITHOUT_NOTIFICATION",
-        "android.permission.ACCESS_NETWORK_STATE"
+        "android.permission.ACCESS_NETWORK_STATE",
+        "com.google.android.gms.permission.AD_ID"
       ],
       "googleServicesFile": "./google-services.json",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBzRmWGq1kM5-f4gn1kEvJ49N2utlvZPzg"
+        }
+      },
       "intentFilters": [
         {
           "action": "VIEW",
@@ -60,7 +85,10 @@
               "scheme": "com.entereza.client"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },

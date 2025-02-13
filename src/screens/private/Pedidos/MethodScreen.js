@@ -1,409 +1,135 @@
-import React, { useState } from 'react';
-import { theme_colors } from '../../../utils/theme/theme_colors';
-import ViewStyled from '../../../utils/ui/ViewStyled';
-import TextStyled from '../../../utils/ui/TextStyled';
-import SelectionCard from '../../../components/Cards/SelectionCard';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { private_name_routes } from '../../../utils/route/private_name_routes';
-import BigBottomButton from '../../../components/Buttons/BigBottomButton';
-import CreditCard from '../../../components/Buttons/CreditCard';
-import NewCardAndAddress from '../../../components/Buttons/NewCardAndAddress';
-import { KeyboardAvoidingView, TouchableOpacity } from 'react-native';
-import { GestureHandlerRootView, ScrollView, TextInput } from 'react-native-gesture-handler';
+import React, { useState, useEffect } from 'react'
+import ViewStyled from '../../../utils/ui/ViewStyled'
+import { theme_colors } from '../../../utils/theme/theme_colors'
+import TextStyled from '../../../utils/ui/TextStyled'
+import { theme_textStyles } from '../../../utils/theme/theme_textStyles'
+import { FlatList, Keyboard } from 'react-native'
+import PaymentMethodCard from '../../../components/PaymentMethodComponents/PaymentMethodCard'
+import useCartStore from '../../../utils/tools/interface/cartStore'
+import HeaderInternalScreen from '../../../components/Header/HeaderInternalScreen'
+import HeaderDefaultScreen from '../../../components/Header/HeaderDefaultScreen'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { useNavigation } from '@react-navigation/native'
+import useTabBarStore from '../../../utils/tools/interface/tabBarStore'
 
 export default function MethodScreen() {
+    const { listPaymentMethods, paymentMethod: selectedPaymentMethodStored, setPaymentMethod } = useCartStore()
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null)
+    const [keyboardVisible, setKeyboardVisible] = useState(false)
 
-    const route = useRoute();
-    const { options } = route.params;
+    const navigation = useNavigation()
+    const { toggleTabBar } = useTabBarStore()
 
-    const [selectedOption, setSelectedOption] = useState(null);
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            () => {
+                setKeyboardVisible(true)
+            }
+        )
+        const keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            () => {
+                setKeyboardVisible(false)
+            }
+        )
 
-    const handleSelectOption = (option) => {
-        setSelectedOption(option);
-    };
+        return () => {
+            keyboardDidHideListener.remove()
+            keyboardDidShowListener.remove()
+        }
+    }, [])
 
-    const navigation = useNavigation();
-
-    const handlePress = () => {
-        navigation.navigate(private_name_routes.empresas.confirmOrder, {
-            selection: selectedOption
-        });
+    const onPressSelect = (item) => {
+        if (selectedPaymentMethodStored?.name === item.name) {
+            return
+        } else {
+            setSelectedPaymentMethod(item)
+            setPaymentMethod(item)
+        }
     }
 
-    const [createNewPressed, setCreateNewPressed] = useState(false);
-
-    const handleCreatePress = () => {
-        setCreateNewPressed(!createNewPressed);
+    const goBack = () => {
+        navigation.goBack()
+        toggleTabBar(false)
     }
-
-    const [isSearchActive, setSearchActive] = useState(false);
-    const [newCard, setNewCard] = useState('');
-    const [newTitular, setNewTitular] = useState('');
-    const [newDate, setNewDate] = useState('');
-    const [newCvv, setNewCvv] = useState('');
-
-    const handleSearchButtonPress = () => {
-        setSearchActive(true);
-    };
-
-    const handleSearch = () => {
-        setSearchActive(false);
-    };
 
     return (
-        <ViewStyled
-            backgroundColor={theme_colors.white}
-            style={{
-                alignItems: 'center'
-            }}
-        >
+        <SafeAreaView edges={["top"]} style={{ backgroundColor: theme_colors.white }}>
             <ViewStyled
-                width={'100%'}
-                height={'77%'}
-                backgroundColor={theme_colors.transparent}
+                backgroundColor={theme_colors.white}
+                width={100}
                 style={{
+                    height: '100%',
+                    justifyContent: 'flex-start',
                     alignItems: 'center',
                 }}
             >
-                <TextStyled
-                    fontSize={10}
-                    color={theme_colors.primary}
-                    style={{
-                        alignSelf: 'flex-start',
-                        margin: 10,
-                        marginLeft: 20,
-                        fontFamily: 'SFPro-Bold',
-                    }}
-                >
-                    Selecciona
-                </TextStyled>
+                {
+                    !keyboardVisible && (
+                        <>
+                            <HeaderInternalScreen title={"Método de pago"} onPress={goBack} />
 
-                <ViewStyled
-                    width={'90%'}
-                    height={'0.2%'}
-                    backgroundColor={theme_colors.greyLine}
-                    style={{
-                        alignSelf: 'center',
-                        marginBottom: 10,
-                        marginTop: 5
-                    }}
-                />
-
-                {options.map((option) => (
-                    <React.Fragment key={option.id}>
-                        <SelectionCard
-                            id={option.id}
-                            name={option.name}
-                            icon={option.icon}
-                            onPress={() => handleSelectOption(option.id)}
-                            selection={selectedOption}
-                        />
-                         
-                         {/* QR */}
-                        {option.id === 2 && selectedOption === 2 && (
                             <ViewStyled
-                                width={'90%'}
+                                height={4}
+                                marginTop={1}
                                 backgroundColor={theme_colors.transparent}
                                 style={{
-                                    marginBottom: 10
+                                    width: '90%',
+                                    justifyContent: 'center',
+                                    alignItems: 'flex-start',
                                 }}
                             >
-                                <TextStyled 
-                                    fontSize={4.5} 
-                                    fontFamily='SFPro-SemiBold'
-                                    color={theme_colors.grey}
-                                > 
-                                    Se indicará a la moto que pagarás con QR y lo tendrá listo al momento de entregarte el pedido.
+                                <TextStyled
+                                    fontFamily='SFPro-Bold'
+                                    textAlign='left'
+                                    fontSize={theme_textStyles.medium}
+                                    color={theme_colors.primary}
+                                    numberOfLines={1}
+                                    ellipsizeMode='tail'
+                                >
+                                    Selecciona
                                 </TextStyled>
                             </ViewStyled>
-                        )}
+                            <ViewStyled
+                                width={'90%'}
+                                height={'0.2%'}
+                                backgroundColor={theme_colors.greyLine}
+                                style={{
+                                    alignSelf: 'center',
+                                    marginBottom: 20,
+                                    marginTop: 10
+                                }}
+                            />
+                        </>
+                    )
+                }
 
-                        {/* SELECCION DE TARJETA */}
-                        {option.id === 3 && selectedOption === 3 && (
-                            !createNewPressed ? (
-                                <ViewStyled
-                                    width={'90%'}
-                                    backgroundColor={theme_colors.transparent}
-                                    style={{
-                                        alignContent: 'center',
-                                        justiFyContent: 'center'
-                                    }}
-                                >
-                                    <ViewStyled
-                                        width={'88%'}
-                                        backgroundColor={theme_colors.transparent}
-                                        style={{
-                                            alignItems: 'flex-end',
-                                            marginBottom: 10
-                                        }}
-                                    >
-                                        <NewCardAndAddress title={"Tarjeta"} onPress={handleCreatePress}/>
-                                    </ViewStyled>
-
-                                    <CreditCard bank={"Banco Unión"} number={"**** 4321"} name={"Anelisse Rocabado"} expiry={"12/24"} />
-                                </ViewStyled>
-                            ) : (
-                                <GestureHandlerRootView>
-                                    <KeyboardAvoidingView
-                                        behavior="position"
-                                        style={{ flex: 1 }}
-                                    >
-                                        <ScrollView
-                                            height={'45%'}
-                                            contentContainerStyle={{
-                                                flexGrow: 1,
-                                                backgroundColor: theme_colors.transparent,
-                                                justifyContent: 'flex-start',
-                                                alignItems: 'center',
-                                            }}
-                                            showsVerticalScrollIndicator={false}
-                                            scrollToOverflowEnabled={false}
-                                        >
-                                            <ViewStyled
-                                                backgroundColor={theme_colors.transparent}
-                                                style={{
-                                                    alignItems: 'flex-end',
-                                                    marginBottom: 10
-                                                }}
-                                            >
-                                                <NewCardAndAddress title={"Tarjeta"} onPress={handleCreatePress}/>
-
-                                                {/* PASAR DATOS DE LA TARJETA */}
-                                                <ViewStyled
-                                                    width={'88%'}
-                                                    backgroundColor={theme_colors.white}
-                                                    style={{
-                                                        alignContent: 'center',
-                                                    }}
-                                                >
-                                                    <TextStyled
-                                                        fontSize={7}
-                                                        color={theme_colors.black}
-                                                        style={{
-                                                            alignSelf: 'flex-start',
-                                                            fontFamily: 'SFPro-Bold',
-                                                            marginTop: 10,
-                                                            marginLeft: 2
-                                                        }}
-                                                    >
-                                                        Número de tarjeta
-                                                    </TextStyled>
-
-                                                    <TouchableOpacity
-                                                        onPress={handleSearchButtonPress}
-                                                        style={{
-                                                            width: '99%',
-                                                            height: 40,
-                                                            alignSelf: 'center',
-                                                            justifyContent: 'center',
-                                                            borderRadius: 10,
-                                                            borderWidth: 1,
-                                                            backgroundColor: theme_colors.white,
-                                                            borderColor: theme_colors.white,
-                                                            padding: 8,
-                                                            marginBottom: 10,
-                                                            marginTop: 10,
-                                                            elevation: 50,
-                                                            shadowColor: theme_colors.black,
-                                                            shadowOffset: {
-                                                                width: 2,
-                                                                height: 2,
-                                                            },
-                                                            shadowOpacity: 0.25,
-                                                            shadowRadius: 3.84,
-                                                        }}
-                                                    >
-                                                        <TextInput
-                                                            value={newCard}
-                                                            onChangeText={setNewCard}
-                                                            placeholder={"Ej. 4757 1236 2546 1258"}
-                                                            placeholderTextColor={theme_colors.grey}
-                                                            onSubmitEditing={handleSearch}
-                                                        />
-                                                    </TouchableOpacity>
-
-                                                    <TextStyled
-                                                        fontSize={7}
-                                                        color={theme_colors.black}
-                                                        style={{
-                                                            alignSelf: 'flex-start',
-                                                            fontFamily: 'SFPro-Bold',
-                                                            marginTop: 10,
-                                                            marginLeft: 2
-                                                        }}
-                                                    >
-                                                        Nombre del Titular
-                                                    </TextStyled>
-
-                                                    <TouchableOpacity
-                                                        onPress={handleSearchButtonPress}
-                                                        style={{
-                                                            width: '99%',
-                                                            height: 40,
-                                                            alignSelf: 'center',
-                                                            justifyContent: 'center',
-                                                            borderRadius: 10,
-                                                            borderWidth: 1,
-                                                            backgroundColor: theme_colors.white,
-                                                            borderColor: theme_colors.white,
-                                                            padding: 8,
-                                                            marginBottom: 10,
-                                                            marginTop: 10,
-                                                            elevation: 50,
-                                                            shadowColor: theme_colors.black,
-                                                            shadowOffset: {
-                                                                width: 2,
-                                                                height: 2,
-                                                            },
-                                                            shadowOpacity: 0.25,
-                                                            shadowRadius: 3.84,
-                                                        }}
-                                                    >
-                                                        <TextInput
-                                                            value={newTitular}
-                                                            onChangeText={setNewTitular}
-                                                            placeholder={"Ej. Luis Frías"}
-                                                            placeholderTextColor={theme_colors.grey}
-                                                            onSubmitEditing={handleSearch}
-                                                        />
-                                                    </TouchableOpacity>
-
-                                                    <ViewStyled
-                                                        backgroundColor={theme_colors.transparent}
-                                                        style={{
-                                                            flexDirection: 'row',
-                                                            justifyContent: 'space-between'
-                                                        }}
-                                                    >
-                                                        <ViewStyled
-                                                            backgroundColor={theme_colors.transparent}
-                                                            style={{
-                                                                width: '48%',
-                                                                alignItems: 'flex-start'
-                                                            }}
-                                                        >   
-                                                            <TextStyled
-                                                                fontSize={7}
-                                                                color={theme_colors.black}
-                                                                style={{
-                                                                    alignSelf: 'flex-start',
-                                                                    fontFamily: 'SFPro-Bold',
-                                                                    marginTop: 10,
-                                                                    marginLeft: 2
-                                                                }}
-                                                            >
-                                                                Valida hasta
-                                                            </TextStyled>
-
-                                                            <TouchableOpacity
-                                                                onPress={handleSearchButtonPress}
-                                                                style={{
-                                                                    width: '99%',
-                                                                    height: 40,
-                                                                    alignSelf: 'flex-start',
-                                                                    justifyContent: 'center',
-                                                                    borderRadius: 10,
-                                                                    borderWidth: 1,
-                                                                    backgroundColor: theme_colors.white,
-                                                                    borderColor: theme_colors.white,
-                                                                    padding: 8,
-                                                                    marginBottom: 10,
-                                                                    marginTop: 10,
-                                                                    elevation: 50,
-                                                                    shadowColor: theme_colors.black,
-                                                                    shadowOffset: {
-                                                                        width: 2,
-                                                                        height: 2,
-                                                                    },
-                                                                    shadowOpacity: 0.25,
-                                                                    shadowRadius: 3.84,
-                                                                }}
-                                                            >
-                                                                <TextInput
-                                                                    value={newTitular}
-                                                                    onChangeText={setNewTitular}
-                                                                    placeholder={"dd/mm/aa"}
-                                                                    placeholderTextColor={theme_colors.grey}
-                                                                    onSubmitEditing={handleSearch}
-                                                                />
-                                                            </TouchableOpacity>
-                                                        </ViewStyled>
-
-                                                        <ViewStyled
-                                                            backgroundColor={theme_colors.transparent}
-                                                            style={{
-                                                                width: '48%',
-                                                                alignContent: 'flex-start'
-                                                            }}
-                                                        >  
-                                                            <TextStyled
-                                                                fontSize={7}
-                                                                color={theme_colors.black}
-                                                                style={{
-                                                                    alignSelf: 'flex-start',
-                                                                    fontFamily: 'SFPro-Bold',
-                                                                    marginTop: 10,
-                                                                    marginLeft: 2
-                                                                }}
-                                                            >
-                                                                CVC
-                                                            </TextStyled>
-
-                                                            <TouchableOpacity
-                                                                onPress={handleSearchButtonPress}
-                                                                style={{
-                                                                    width: '99%',
-                                                                    height: 40,
-                                                                    alignSelf: 'flex-start',
-                                                                    justifyContent: 'center',
-                                                                    borderRadius: 10,
-                                                                    borderWidth: 1,
-                                                                    backgroundColor: theme_colors.white,
-                                                                    borderColor: theme_colors.white,
-                                                                    padding: 8,
-                                                                    marginBottom: 10,
-                                                                    marginTop: 10,
-                                                                    elevation: 50,
-                                                                    shadowColor: theme_colors.black,
-                                                                    shadowOffset: {
-                                                                        width: 2,
-                                                                        height: 2,
-                                                                    },
-                                                                    shadowOpacity: 0.25,
-                                                                    shadowRadius: 3.84,
-                                                                }}
-                                                            >
-                                                                <TextInput
-                                                                    value={newTitular}
-                                                                    onChangeText={setNewTitular}
-                                                                    placeholder={"***"}
-                                                                    placeholderTextColor={theme_colors.grey}
-                                                                    onSubmitEditing={handleSearch}
-                                                                />
-                                                            </TouchableOpacity>
-                                                        </ViewStyled>
-                                                    </ViewStyled>
-                                                </ViewStyled>
-                                            </ViewStyled>
-                                        </ScrollView>
-                                    </KeyboardAvoidingView>
-                                </GestureHandlerRootView>
-                            )
-                        )}
-                    </React.Fragment>
-                ))}
+                <FlatList
+                    contentContainerStyle={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                    horizontal={false}
+                    scrollEnabled={true}
+                    data={listPaymentMethods}
+                    renderItem={({ item, index }) =>
+                        <PaymentMethodCard
+                            key={index}
+                            item={item}
+                            isKeyboardVisible={keyboardVisible}
+                            isSelected={
+                                selectedPaymentMethod
+                                    ? selectedPaymentMethod?.name === item.name
+                                    : selectedPaymentMethodStored?.name === item.name
+                            }
+                            onPressSelect={() => onPressSelect(item)}
+                        />
+                    }
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+                />
             </ViewStyled>
-
-            <ViewStyled
-                width={'100%'}
-                height={'20%'}
-                backgroundColor={theme_colors.transparent}
-                style={{
-                    alignItems: 'center',
-                }}
-            >
-                <BigBottomButton text={"Elegir método de pago"} color={theme_colors.primary} textColor= {theme_colors.white} width={'90%'} marginTop={15} onPress={handlePress}/>
-            </ViewStyled>
-        </ViewStyled>
-    );
-};
+        </SafeAreaView>
+    )
+}

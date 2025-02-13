@@ -7,6 +7,7 @@ import { FontAwesome } from '@expo/vector-icons'
 import ImageStyled from '../../utils/ui/ImageStyled'
 import { LinearGradient } from 'expo-linear-gradient'
 import IndicatorItem from './IndicatorItem'
+import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 
 export default function BusinessItem({ item, onPress }) {
   // Ubicación falsa de la empresa
@@ -117,7 +118,7 @@ export default function BusinessItem({ item, onPress }) {
               <TextStyled
                 fontFamily='SFPro-SemiBold'
                 textAlign='left'
-                fontSize={4.5}
+                fontSize={theme_textStyles.small}
                 color={theme_colors.white}
               >
                 Cashback {item.cashback} %
@@ -139,7 +140,7 @@ export default function BusinessItem({ item, onPress }) {
           <TextStyled
             fontFamily='SFPro-Bold'
             textAlign='left'
-            fontSize={7}
+            fontSize={theme_textStyles.smedium}
             color={theme_colors.black}
             style={{
               width: '95%',

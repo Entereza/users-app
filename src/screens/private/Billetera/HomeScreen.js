@@ -12,7 +12,7 @@ import useTabBarStore from '../../../utils/tools/interface/tabBarStore';
 
 export default function HomeScreen() {
     const navigation = useNavigation();
-    const { toggleTabBar, changeNameRouteBack } = useTabBarStore()
+    const { toggleTabBar, changeNameStackBack, changeNameRouteBack } = useTabBarStore()
 
     const goToRechargeMoneyScreen = () => {
         toggleTabBar(false)
@@ -22,9 +22,10 @@ export default function HomeScreen() {
     }
 
     const goToProfileScreen = () => {
+        changeNameStackBack(private_name_routes.billetera.billeteraStack)
         changeNameRouteBack(private_name_routes.billetera.billeteraHome)
         toggleTabBar(false)
-        navigation.navigate(private_name_routes.billetera.profileScreen);
+        navigation.navigate(private_name_routes.profile.profileStack, { screen: private_name_routes.pedidos.pedidosHome });
     }
 
     return (

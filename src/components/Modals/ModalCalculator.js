@@ -94,7 +94,10 @@ export default function ModalCalculator({
                 }
             }
         } else {
-            let newAmmount = ammountTransfer + value;
+            let newAmmount = parseFloat(ammountTransfer) + parseFloat(value);
+
+            // Convert newAmmount to a string for indexOf
+            let newAmmountStr = newAmmount.toString();
 
             // Validate if the new amount is greater than 9999
             if (parseFloat(newAmmount) > 9999) {
@@ -110,8 +113,8 @@ export default function ModalCalculator({
             }
 
             // Validate if the new amount has more than 2 decimal places
-            let decimalIndex = newAmmount.indexOf('.');
-            if (decimalIndex !== -1 && newAmmount.length - decimalIndex - 1 > 2) {
+            let decimalIndex = newAmmountStr.indexOf('.');
+            if (decimalIndex !== -1 && newAmmountStr.length - decimalIndex - 1 > 2) {
                 setShowAlert(true);
                 setAlertText({
                     title: 'Monto inválido',
@@ -123,7 +126,7 @@ export default function ModalCalculator({
                 return;
             }
 
-            setAmmountTransfer(newAmmount);
+            setAmmountTransfer(newAmmountStr);
         }
     };
 

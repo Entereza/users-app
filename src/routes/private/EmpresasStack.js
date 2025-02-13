@@ -3,7 +3,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { private_name_routes } from '../../utils/route/private_name_routes';
 import EmpresasHomeScreen from '../../screens/private/Empresas/EmpresasHomeScreen';
 import EmpresaDetails from '../../screens/private/Empresas/EmpresaDetails';
-import EmpresaProducto from '../../screens/private/Empresas/EmpresaProducto';
 import EmpresasCategory from '../../screens/private/Empresas/EmpresasCategory';
 import HeaderDefaultScreen from '../../components/Header/HeaderDefaultScreen';
 import CarritoHomeScreen from '../../screens/private/Pedidos/CarritoHomeScreen';
@@ -13,12 +12,11 @@ import MethodScreen from '../../screens/private/Pedidos/MethodScreen';
 import AddressSelectionScreen from '../../screens/private/Pedidos/AddressSelectionScreen';
 import CashbackScreen from '../../screens/private/Pedidos/CashbackScreen';
 import FacturacionScreen from '../../screens/private/Pedidos/FacturacionScreen';
-import ProfileHomeScreen from '../../screens/private/Perfil/ProfileHomeScreen';
-import PersonalDataScreen from '../../screens/private/Perfil/PersonalDataScreen';
-import ChangePassword from '../../screens/private/Perfil/ChangePassword';
 import FollowOrder from '../../screens/private/Pedidos/FollowOrder';
-import NewAddressMap from '../../screens/private/Pedidos/NewAddressMap';
+// import NewAddressMap from '../../screens/private/Pedidos/NewAddressMap';
 import SaveAddressScreen from '../../screens/private/Pedidos/SaveAddressScreen';
+import EmpresaProductDetails from '../../screens/private/Empresas/EmpresaProductDetails';
+import AddAddressScreen from '../../screens/private/Pedidos/AddAddressScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -54,7 +52,7 @@ export default function EmpresasStack() {
 
                 <Stack.Screen
                     name={private_name_routes.empresas.empresaProducto}
-                    component={EmpresaProducto}
+                    component={EmpresaProductDetails}
                     options={{
                         navigationBarHidden: true,
                         animation: "slide_from_right",
@@ -95,10 +93,7 @@ export default function EmpresasStack() {
                         navigationBarHidden: true,
                         animation: "slide_from_right",
                         animationTypeForReplace: 'pop',
-                        headerShown: true,
-                        header: () => (
-                            <HeaderDefaultScreen title={"Confirmar pedido"} />
-                        )
+                        headerShown: false,
                     }}
                 />
 
@@ -122,10 +117,6 @@ export default function EmpresasStack() {
                         navigationBarHidden: true,
                         animation: "slide_from_right",
                         animationTypeForReplace: 'pop',
-                        headerShown: true,
-                        header: () => (
-                            <HeaderDefaultScreen title={"Método de pago"} />
-                        )
                     }}
                 />
 
@@ -166,7 +157,7 @@ export default function EmpresasStack() {
                         animationTypeForReplace: 'pop',
                         headerShown: true,
                         header: () => (
-                            <HeaderDefaultScreen title={"Facturacion"} />
+                            <HeaderDefaultScreen title={"Facturación"} />
                         )
                     }}
                 />
@@ -183,15 +174,17 @@ export default function EmpresasStack() {
                 />
 
                 <Stack.Screen
-                    name={private_name_routes.empresas.newAddressMap}
-                    component={NewAddressMap}
+                    name={private_name_routes.empresas.addAddress}
+                    component={AddAddressScreen}
                     options={{
                         presentation: 'fullScreenModal',
                         navigationBarHidden: true,
                         animation: "slide_from_right",
                         animationTypeForReplace: 'pop',
+                        headerShown: false,
                     }}
                 />
+
                 <Stack.Screen
                     name={private_name_routes.empresas.saveAddress}
                     component={SaveAddressScreen}

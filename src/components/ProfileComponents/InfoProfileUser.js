@@ -14,9 +14,7 @@ export default function InfoProfileUser() {
     const { user } = useAuthStore()
 
     const goToPersonalDataScreen = () => {
-        navigation.navigate(private_name_routes.profile.profileStack, {
-            screen: private_name_routes.profile.editProfile,
-        });
+        navigation.navigate(private_name_routes.profile.editProfile);
     }
 
     const goToChangePassword = () => {

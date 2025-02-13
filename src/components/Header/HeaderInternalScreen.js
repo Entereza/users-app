@@ -7,6 +7,7 @@ import adjustFontSize from '../../utils/ui/adjustText'
 import TextStyled from '../../utils/ui/TextStyled'
 import { useNavigation } from '@react-navigation/native'
 import useTabBarStore from '../../utils/tools/interface/tabBarStore'
+import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 
 export default function HeaderInternalScreen({ title, onPress }) {
     const navigation = useNavigation();
@@ -54,7 +55,7 @@ export default function HeaderInternalScreen({ title, onPress }) {
                 >
                     <MaterialCommunityIcons
                         name="arrow-left"
-                        size={adjustFontSize(25)}
+                        size={adjustFontSize(theme_textStyles.xlarge)}
                         color={theme_colors.primary}
                     />
                 </ViewStyled>
@@ -72,7 +73,7 @@ export default function HeaderInternalScreen({ title, onPress }) {
                 <TextStyled
                     fontFamily='SFPro-Bold'
                     textAlign={'center'}
-                    fontSize={9}
+                    fontSize={theme_textStyles.medium}
                     color={theme_colors.black}
                     style={{
                         width: '100%'

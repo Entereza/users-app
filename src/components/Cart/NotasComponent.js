@@ -3,6 +3,7 @@ import { TextInput, KeyboardAvoidingView } from 'react-native';
 import ViewStyled from '../../utils/ui/ViewStyled';
 import TextStyled from '../../utils/ui/TextStyled';
 import { theme_colors } from '../../utils/theme/theme_colors';
+import { theme_textStyles } from '../../utils/theme/theme_textStyles';
 
 export default function NotasComponent({ isSelected }) {
     const [nota, setNota] = useState('');
@@ -10,7 +11,7 @@ export default function NotasComponent({ isSelected }) {
     return (
         <KeyboardAvoidingView
             behavior='position'
-            style={{ backgroundColor: theme_colors.transparent }}
+            style={{ backgroundColor: theme_colors.transparent, marginTop: 'auto' }}
         >
             <ViewStyled
                 width={'100%'}
@@ -23,7 +24,7 @@ export default function NotasComponent({ isSelected }) {
             >
                 <TextStyled
                     width={'88%'}
-                    fontSize={7}
+                    fontSize={theme_textStyles.medium}
                     fontFamily='SFPro-SemiBold'
                     color={theme_colors.grey}
                     style={{
@@ -50,6 +51,8 @@ export default function NotasComponent({ isSelected }) {
                         paddingHorizontal: 10,
                         paddingTop: 10,
                         paddingBottom: 10,
+                        textAlignVertical: 'top',
+                        textAlign: 'left'
                     }}
                 />
             </ViewStyled>

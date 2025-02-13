@@ -5,6 +5,7 @@ import { FlatList } from 'react-native'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import BusinessItem from '../BusinessItem'
 import TextStyled from '../../../utils/ui/TextStyled'
+import { theme_textStyles } from '../../../utils/theme/theme_textStyles'
 
 export default function ListBusinesses({ businesses = [], nameCategory = '' }) {
     const goToBusinessScreen = (item) => {
@@ -54,7 +55,7 @@ export default function ListBusinesses({ businesses = [], nameCategory = '' }) {
                             <TextStyled
                                 fontFamily='SFPro-Italic'
                                 textAlign='center'
-                                fontSize={4}
+                                fontSize={theme_textStyles.small}
                                 color={theme_colors.grey}
                                 style={{
                                     width: "100%",

@@ -2,10 +2,15 @@ import React from 'react';
 import { theme_colors } from '../../utils/theme/theme_colors';
 import TextStyled from '../../utils/ui/TextStyled';
 import ViewStyled from '../../utils/ui/ViewStyled';
-import { AntDesign } from '@expo/vector-icons';
-import { TouchableOpacity, Image, View } from 'react-native';
+import { Image, View } from 'react-native';
+import { theme_textStyles } from '../../utils/theme/theme_textStyles';
+import useCartStore from '../../utils/tools/interface/cartStore';
 
-export default function CashbackCard ({ cashback, onPress }) {
+export default function CashbackCard() {
+    const { cart, myCashback } = useCartStore();
+    const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    const cashback = totalPrice - myCashback
     
     return (
         <View
@@ -14,16 +19,13 @@ export default function CashbackCard ({ cashback, onPress }) {
                 width: '95%',
                 marginTop: 15,
                 borderRadius: 10,
-                elevation: 50,
-                shadowColor: theme_colors.black,
-                shadowOffset: {
-                    width: 1,
-                    height: 1,
-                },
-                shadowOpacity: 0.15,
-                shadowRadius: 4,
                 alignItems: 'center',
-                padding: 15
+                padding: 15,
+                shadowColor: theme_colors.black,
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.5,
+                shadowRadius: 2,
+                elevation: 3,
             }}
         >
             <View
@@ -43,7 +45,7 @@ export default function CashbackCard ({ cashback, onPress }) {
                     }}
                 >
                     <TextStyled
-                        fontSize={10}
+                        fontSize={theme_textStyles.medium}
                         color={theme_colors.black}
                         style={{
                             fontFamily: 'SFPro-Bold',
@@ -77,7 +79,7 @@ export default function CashbackCard ({ cashback, onPress }) {
                 >
                     <TextStyled
                         width={'60%'}
-                        fontSize={10}
+                        fontSize={theme_textStyles.small}
                         color={theme_colors.grey}
                         style={{
                             marginTop: 10,
@@ -88,7 +90,7 @@ export default function CashbackCard ({ cashback, onPress }) {
                     </TextStyled>
 
                     <TextStyled
-                        fontSize={7}
+                        fontSize={theme_textStyles.medium}
                         color={theme_colors.primary}
                         style={{
                             marginTop: 10,

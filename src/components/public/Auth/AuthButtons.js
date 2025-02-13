@@ -1,10 +1,22 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import ViewStyled from '../../../utils/ui/ViewStyled'
 import { theme_colors } from '../../../utils/theme/theme_colors'
 import ButtonAuthentication from '../../Buttons/ButtonAuthentication'
-import { GoogleSignin } from '@react-native-google-signin/google-signin'
+import * as AppleAuthentication from 'expo-apple-authentication';
+import { Platform } from 'react-native';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { useNavigation } from '@react-navigation/native';
+import useAuthStore from '../../../utils/tools/interface/authStore';
+import { public_name_routes } from '../../../utils/route/public_name_routes';
 
 export default function AuthButtons() {
+    // const navigation = useNavigation();
+    const { setUserData } = useAuthStore();
+    const navigation = useNavigation()
+
+    const [loadingGoogle, setLoadingGoogle] = useState(false);
+    const [loadingApple, setLoadingApple] = useState(false);
+
     // Configure Google Sign In
     const configureGoogleSignIn = () => {
         GoogleSignin.configure({
@@ -19,42 +31,99 @@ export default function AuthButtons() {
         configureGoogleSignIn()
     }, [])
 
+    // Set Fake UserData
+    const setUserDataFake = () => {
+        setUserData({
+            names: "Anelisse",
+            lastNames: "Rocabado",
+            phoneNumber: 75469425,
+            ci: 7820697,
+            cashback: 50,
+            email: "anelisserocabado@gmail.com",
+            password: "12345678",
+            image: ""
+        })
+    }
+
     // Google Sign In
     const signInWithGoogle = async () => {
         try {
+            setLoadingGoogle(true);
             await GoogleSignin.hasPlayServices()
 
             const userInfo = await GoogleSignin.signIn()
-            console.log(userInfo)
+            console.log('Google User Info: ', userInfo)
+            setUserDataFake()
         } catch (error) {
-            console.log(error)
+            console.log('Google Error: ', error)
+        } finally {
+            setLoadingGoogle(false);
         }
     }
+
+    // Apple Sign In
+    const signInWithApple = async () => {
+        try {
+            setLoadingApple(true);
+            const credential = await AppleAuthentication.signInAsync({
+                requestedScopes: [
+                    AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                    AppleAuthentication.AppleAuthenticationScope.EMAIL,
+                ],
+            });
+
+            // credential.user is the unique identifier for this user
+            console.log('Apple Credential: ', credential);
+            setUserDataFake()
+            return credential;
+        } catch (error) {
+            if (error.code === 'ERR_CANCELED') {
+                console.log('User canceled Apple Sign in');
+            } else {
+                console.error('Error during Apple Sign in:', error);
+            }
+        } finally {
+            setLoadingApple(false);
+        }
+    }
+
+    // Entereza Sign In
+    const signInWithEntereza = async () => {
+        navigation.navigate(public_name_routes.auth.signIn)
+    }
+
+    const isAnyLoading = loadingGoogle || loadingApple;
 
     const listButtons = [
         {
             'title': 'Continuar con Google',
             'icon': require('../../../../assets/icons/logoGoogle.png'),
-            'onPress': null,
+            'onPress': signInWithGoogle,
             'backgroundColor': theme_colors.white,
             'borderColor': theme_colors.lightGrey,
             'colorText': theme_colors.black,
+            'loading': loadingGoogle,
+            'disabled': isAnyLoading
         },
-        {
+        ...(Platform.OS === 'ios' ? [{
             'title': 'Continuar con Apple',
             'icon': require('../../../../assets/icons/logoApple.png'),
-            'onPress': null,
+            'onPress': signInWithApple,
             'backgroundColor': theme_colors.white,
             'borderColor': theme_colors.lightGrey,
             'colorText': theme_colors.black,
-        },
+            'loading': loadingApple,
+            'disabled': isAnyLoading
+        }] : []),
         {
             'title': 'Continuar con Entereza',
             'icon': require('../../../../assets/icons/logoWhiteEntereza.png'),
-            'onPress': null,
+            'onPress': signInWithEntereza,
             'backgroundColor': theme_colors.primary,
             'borderColor': theme_colors.primary,
             'colorText': theme_colors.white,
+            'loading': false,
+            'disabled': isAnyLoading
         }
     ]
 
@@ -81,6 +150,8 @@ export default function AuthButtons() {
                         WithBorder={true}
                         borderWidth={0.8}
                         margin={true}
+                        loading={button.loading}
+                        disabled={button.disabled}
                     />
                 ))
             }
