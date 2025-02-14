@@ -12,7 +12,6 @@ export default function TermsConditions() {
             backgroundColor={theme_colors.transparent}
             paddingVertical={0.5}
             style={{
-                position: 'absolute',
                 bottom: 0,
                 height: 'auto',
                 flexDirection: 'row',

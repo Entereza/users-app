@@ -3,11 +3,12 @@ import ViewStyled from '../../../utils/ui/ViewStyled'
 import { theme_colors } from '../../../utils/theme/theme_colors'
 import ButtonAuthentication from '../../Buttons/ButtonAuthentication'
 import * as AppleAuthentication from 'expo-apple-authentication';
-import { Platform } from 'react-native';
+import { Platform, Alert } from 'react-native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useNavigation } from '@react-navigation/native';
 import useAuthStore from '../../../utils/tools/interface/authStore';
 import { public_name_routes } from '../../../utils/route/public_name_routes';
+import { authService } from '../../../services/api/auth';
 
 export default function AuthButtons() {
     // const navigation = useNavigation();
@@ -53,9 +54,101 @@ export default function AuthButtons() {
 
             const userInfo = await GoogleSignin.signIn()
             console.log('Google User Info: ', userInfo)
-            setUserDataFake()
+
+            // Try signup first
+            try {
+                const signupResponse = await authService.signupWithGoogle({
+                    token_id: userInfo.idToken
+                });
+
+                console.log('SignupResponse: ', signupResponse)
+
+                if (signupResponse.code === 'COD200') {
+                    Alert.alert(
+                        "Éxito",
+                        signupResponse.msg || "Registro exitoso",
+                        [{ text: "OK" }]
+                    );
+                    setUserData({
+                        names: userInfo.user.givenName,
+                        lastNames: userInfo.user.familyName,
+                        phoneNumber: 75469425,
+                        ci: 7820697,
+                        cashback: 50,
+                        email: userInfo.user.email,
+                        password: "12345678",
+                        image: userInfo.user.photo
+                    });
+                    return;
+                }
+            } catch (signupError) {
+                console.log('Signup failed, trying login:', signupError);
+                if (signupError.message !== 'Usuario ya existe') {
+                    Alert.alert(
+                        "Error",
+                        signupError.message || "Error en el registro",
+                        [{ text: "OK" }]
+                    );
+                }
+            }
+
+            // If signup fails, try login
+            try {
+                const loginResponse = await authService.loginWithGoogle({
+                    token_id: userInfo.idToken
+                });
+
+                console.log('LoginRsponse: ', loginResponse)
+
+                if (loginResponse.code === 'COD200') {
+                    Alert.alert(
+                        "Éxito",
+                        loginResponse.msg || "Inicio de sesión exitoso",
+                        [{ text: "OK" }]
+                    );
+                    setUserData({
+                        names: "Anelisse",
+                        lastNames: "Rocabado",
+                        phoneNumber: 75469425,
+                        ci: 7820697,
+                        cashback: 50,
+                        email: 'anelisse@gmail.com',
+                        password: '12345678',
+                        image: ""
+                    });
+                    // setUserData({
+                    //     names: userInfo.user.givenName,
+                    //     lastNames: userInfo.user.familyName,
+                    //     phoneNumber: 75469425,
+                    //     ci: 7820697,
+                    //     cashback: 50,
+                    //     email: userInfo.user.email,
+                    //     password: "12345678",
+                    //     image: userInfo.user.photo
+                    // });
+                } else {
+                    Alert.alert(
+                        "Error",
+                        loginResponse.msg || "Error al iniciar sesión",
+                        [{ text: "OK" }]
+                    );
+                }
+            } catch (loginError) {
+                console.error('Login failed:', loginError);
+                Alert.alert(
+                    "Error",
+                    loginError.message || "Error al iniciar sesión con Google",
+                    [{ text: "OK" }]
+                );
+                throw loginError;
+            }
         } catch (error) {
-            console.log('Google Error: ', error)
+            console.log('Google Error: ', error);
+            Alert.alert(
+                "Error",
+                "Hubo un problema al autenticar con Google",
+                [{ text: "OK" }]
+            );
         } finally {
             setLoadingGoogle(false);
         }

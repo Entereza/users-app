@@ -42,3 +42,35 @@ export const schemaAddInfoAddress = Yup.object().shape({
         .required('El alias de la ubicación es requerido')
         .min(3, 'El alias de la ubicación debe tener al menos 3 caracteres'),
 });
+
+export const schemaLogin = Yup.object().shape({
+    email: Yup.string()
+        .email('Email inválido')
+        .required('El email es requerido'),
+    password: Yup.string()
+        .required('La contraseña es requerida')
+        .min(6, 'La contraseña debe tener al menos 6 caracteres'),
+});
+
+export const schemaRegister = Yup.object().shape({
+    names: Yup.string()
+        .required('El nombre es requerido')
+        .min(3, 'El nombre debe tener al menos 3 caracteres'),
+    lastNames: Yup.string()
+        .required('Los apellidos son requeridos')
+        .min(3, 'Los apellidos deben tener al menos 3 caracteres'),
+    email: Yup.string()
+        .email('Email inválido')
+        .required('El email es requerido'),
+    password: Yup.string()
+        .required('La contraseña es requerida')
+        .min(6, 'La contraseña debe tener al menos 6 caracteres'),
+    confirmPassword: Yup.string()
+        .required('La confirmación de contraseña es requerida')
+        .oneOf([Yup.ref('password')], 'Las contraseñas no coinciden'),
+    phoneNumber: Yup.string()
+        .required('El número de teléfono es requerido')
+        .matches(/^[0-9]+$/, "El número de teléfono solo debe contener números")
+        .min(8, 'El número de teléfono debe tener al menos 8 caracteres')
+        .max(8, 'El número de teléfono no debe tener más de 8 caracteres'),
+});

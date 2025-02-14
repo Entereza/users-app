@@ -10,7 +10,7 @@ import { theme_textStyles } from '../theme/theme_textStyles';
 const TextInputStyled = React.forwardRef(({
     editable = true,
     value = '',
-    label = 'Label',
+    label = '',
     placeholder = 'Placeholder',
     icon = false,
     errorMessage,
@@ -41,11 +41,14 @@ const TextInputStyled = React.forwardRef(({
             backgroundColor={theme_colors.transparent}
             style={[containerStyle && containerStyle]}
         >
-            <TextStyled
-                style={[labelStyle && labelStyle]}
-            >
-                {label}
-            </TextStyled>
+            {
+                label &&
+                <TextStyled
+                    style={[labelStyle && labelStyle]}
+                >
+                    {label}
+                </TextStyled>
+            }
 
             <ViewStyled
                 backgroundColor={theme_colors.transparent}
@@ -89,7 +92,7 @@ const TextInputStyled = React.forwardRef(({
                     >
                         <ViewStyled
                             marginLeft={2}
-                            backgroundColor={theme_colors.orange}
+                            backgroundColor={theme_colors.transparent}
                             style={{
                                 width: 'auto',
                                 height: 'auto',
