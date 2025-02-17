@@ -17,6 +17,7 @@ import FollowOrder from '../../screens/private/Pedidos/FollowOrder';
 import SaveAddressScreen from '../../screens/private/Pedidos/SaveAddressScreen';
 import EmpresaProductDetails from '../../screens/private/Empresas/EmpresaProductDetails';
 import AddAddressScreen from '../../screens/private/Pedidos/AddAddressScreen';
+import EditAddressScreen from '../../screens/private/Pedidos/EditAddressScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -184,6 +185,19 @@ export default function EmpresasStack() {
                         headerShown: false,
                     }}
                 />
+
+                <Stack.Screen
+                    name={private_name_routes.empresas.editAddress}
+                    component={EditAddressScreen}
+                    options={{
+                        presentation: 'fullScreenModal',
+                        navigationBarHidden: true,
+                        animation: "slide_from_right",
+                        animationTypeForReplace: 'pop',
+                        headerShown: false,
+                    }}
+                />
+
 
                 <Stack.Screen
                     name={private_name_routes.empresas.saveAddress}

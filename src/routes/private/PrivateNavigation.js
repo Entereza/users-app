@@ -43,16 +43,19 @@ export default function PrivateNavigation() {
             const location = await locationService.getCurrentLocation();
             setLocation(location.coords.latitude, location.coords.longitude);
 
-            const department = await locationService.getDepartmentFromCoords(
+            const departmentInfo = await locationService.getDepartmentFromCoords(
                 location.coords.latitude,
                 location.coords.longitude
             );
-            setDepartment(department, null);
+
+            if (departmentInfo) {
+                setDepartment(departmentInfo.name, departmentInfo.id);
+            }
 
             console.log('Location initialized:', {
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
-                department
+                department: departmentInfo
             });
         } catch (error) {
             console.error('Error initializing location:', error);
