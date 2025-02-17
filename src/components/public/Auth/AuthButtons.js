@@ -73,7 +73,6 @@ export default function AuthButtons() {
                         signupResponse.msg || "Registro exitoso",
                         [{ text: "OK" }]
                     );
-                    setUserDataFake(signupResponse.token)
                     return;
                 }
             } catch (signupError) {
@@ -101,7 +100,20 @@ export default function AuthButtons() {
                         loginResponse.msg || "Inicio de sesión exitoso",
                         [{ text: "OK" }]
                     );
-                    setUserDataFake(loginResponse.token)
+                    AsyncStorage.setItem('token', loginResponse.token)
+                    setUserData({
+                        id: loginResponse.client.id,
+                        names: loginResponse.client.names,
+                        lastNames: loginResponse.client.lastnames,
+                        phoneNumber: loginResponse.client.phoneNumber,
+                        ci: loginResponse.client.carnet,
+                        cashback: loginResponse.client.cashback,
+                        email: loginResponse.client.email,
+                        image: loginResponse.client.img,
+                        password: loginResponse.client.password,
+                        status: loginResponse.client.status,
+                        username: loginResponse.client.username,
+                    });
                 } else {
                     Alert.alert(
                         "Error",

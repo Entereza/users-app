@@ -33,70 +33,51 @@ export default function LoginScreen() {
         validationSchema: schemaLogin,
         validateOnChange: true,
         onSubmit: async (values) => {
-            setUserData({
-                names: "Anelisse",
-                lastNames: "Rocabado",
-                phoneNumber: 75469425,
-                ci: 7820697,
-                cashback: 50,
-                email: values.email,
-                password: values.password,
-                image: ""
-            });
+            try {
+                setLoading(true);
+                const response = await authService.login({
+                    nick: values.email,
+                    password: values.password
+                });
 
-            // try {
-            //     setLoading(true);
-            //     const response = await authService.login({
-            //         nick: values.email,
-            //         password: values.password
-            //     });
+                console.log('Login Response: ', response)
                 
-            //     console.log('Response: ', response)
-
-            //     setUserData({
-            //         names: "Anelisse",
-            //         lastNames: "Rocabado",
-            //         phoneNumber: 75469425,
-            //         ci: 7820697,
-            //         cashback: 50,
-            //         email: values.email,
-            //         password: values.password,
-            //         image: ""
-            //     });
-
-            //     if (response.code === 'COD200') {
-            //         Alert.alert(
-            //             "Éxito",
-            //             response.msg || "Inicio de sesión exitoso",
-            //             [{ text: "OK" }]
-            //         );
-            //         setUserData({
-            //             names: "Anelisse",
-            //             lastNames: "Rocabado",
-            //             phoneNumber: 75469425,
-            //             ci: 7820697,
-            //             cashback: 50,
-            //             email: values.email,
-            //             password: values.password,
-            //             image: ""
-            //         });
-            //     } else {
-            //         Alert.alert(
-            //             "Error",
-            //             response.msg || "Error al iniciar sesión",
-            //             [{ text: "OK" }]
-            //         );
-            //     }
-            // } catch (error) {
-            //     console.error('Error during login:', error);
-            //     Alert.alert(
-            //         "Error",
-            //         error.message || "Hubo un problema al intentar iniciar sesión",
-            //         [{ text: "OK" }]
-            //     );
-            // } finally {
-            //     setLoading(false);
-            // }
+                if (response.code === 'COD200') {
+                    Alert.alert(
+                        "Éxito",
+                        response.msg || "Inicio de sesión exitoso",
+                        [{ text: "OK" }]
+                    );
+                    setUserData({
+                        id: response.client.id,
+                        names: response.client.names,
+                        lastNames: response.client.lastnames,
+                        phoneNumber: response.client.phoneNumber,
+                        ci: response.client.carnet,
+                        cashback: response.client.cashback,
+                        email: response.client.email,
+                        image: response.client.img,
+                        password: response.client.password,
+                        status: response.client.status,
+                        username: response.client.username,
+                    });
+                } else {
+                    Alert.alert(
+                        "Error",
+                        response.msg || "Error al iniciar sesión",
+                        [{ text: "OK" }]
+                    );
+                }
+            } catch (error) {
+                console.error('Error during login:', error);
+                Alert.alert(
+                    "Error",
+                    error.message || "Hubo un problema al intentar iniciar sesión",
+                    [{ text: "OK" }]
+                );
+            } finally {
+                setLoading(false);
+            }
         }
     });
 

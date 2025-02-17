@@ -7,7 +7,7 @@ import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 export default function ProfileData({
   userData,
 }) {
-  console.log('userData: ', userData)
+  // console.log('userData: ', userData)
 
   return (
     <ViewStyled
