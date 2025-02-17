@@ -1,5 +1,6 @@
 import * as Location from 'expo-location';
 import * as Tracking from 'expo-tracking-transparency';
+import { citiesService } from '../api/empresas/citiesService';
 
 export const locationService = {
     // Solicitar permisos de ubicación
@@ -40,7 +41,12 @@ export const locationService = {
             });
 
             if (response && response.length > 0) {
-                return response[0].city;
+                const city = response[0].city;
+                const cityId = await citiesService.getCityIdByName(city);
+                return {
+                    name: city,
+                    id: cityId
+                };
             }
             return null;
         } catch (error) {
