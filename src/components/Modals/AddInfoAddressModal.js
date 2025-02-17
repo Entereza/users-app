@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Modal, Pressable } from 'react-native'
 import { theme_colors } from '../../utils/theme/theme_colors'
 import ViewStyled from '../../utils/ui/ViewStyled'
@@ -19,20 +19,21 @@ export default function AddInfoAddressModal({
     handleCloseModal,
     goBackNavigation,
     dataLocation,
-    handleMessage
+    initialData,
+    isEditing = false
 }) {
-    const [isLoading, setIsLoading] = useState(false)
-    const { user } = useAuthStore()
+    const [isLoading, setIsLoading] = useState(false);
+    const { user } = useAuthStore();
 
     const formik = useFormik({
         initialValues: {
-            nameAddress: "",
-            referencesAddress: "",
+            nameAddress: isEditing ? initialData.nameAddress : "",
+            referencesAddress: isEditing ? initialData.referencesAddress : "",
         },
         validationSchema: schemaAddInfoAddress,
         validateOnChange: true,
         onSubmit: async (values) => {
-            setIsLoading(true)
+            setIsLoading(true);
             try {
                 const locationData = {
                     clientId: user.id,
@@ -42,23 +43,32 @@ export default function AddInfoAddressModal({
                     references: values.referencesAddress
                 };
 
-                await locationsService.createLocation(locationData);
-                showToast('Ubicación guardada exitosamente', Toast.positions.BOTTOM);
+                if (isEditing) {
+                    await locationsService.updateLocation(initialData.id, locationData);
+                    showToast('Ubicación actualizada exitosamente', Toast.positions.BOTTOM);
+                } else {
+                    await locationsService.createLocation(locationData);
+                    showToast('Ubicación guardada exitosamente', Toast.positions.BOTTOM);
+                }
 
                 formik.resetForm();
                 handleCloseModal();
                 goBackNavigation();
             } catch (err) {
                 console.error('Error on saving address:', err);
-                handleCloseModal();
-                handleMessage('No se pudo guardar la ubicación', Toast.positions.TOP + 30, theme_colors.white, theme_colors.danger);
+                showToast(
+                    `No se pudo ${isEditing ? 'actualizar' : 'guardar'} la ubicación`,
+                    Toast.positions.BOTTOM,
+                    theme_colors.white,
+                    theme_colors.danger
+                );
             } finally {
                 setIsLoading(false);
             }
         }
     });
 
-    const isDisabled = (formik.dirty && !formik.isValid)
+    const isDisabled = (formik.dirty && !formik.isValid);
 
     return (
         <Modal
@@ -130,7 +140,10 @@ export default function AddInfoAddressModal({
                         withIcon={false}
                         fontSize={theme_textStyles.medium}
                         fontFamily={'SFPro-Bold'}
-                        textButton={isLoading ? 'Guardando...' : 'Guardar ubicación'}
+                        textButton={isLoading 
+                            ? (isEditing ? 'Actualizando...' : 'Guardando...') 
+                            : (isEditing ? 'Actualizar ubicación' : 'Guardar ubicación')
+                        }
                         height={6}
                         style={{
                             width: '90%',
@@ -140,5 +153,5 @@ export default function AddInfoAddressModal({
                 </ViewStyled>
             </ViewStyled>
         </Modal>
-    )
+    );
 }
