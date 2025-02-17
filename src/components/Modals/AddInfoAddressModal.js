@@ -9,16 +9,20 @@ import { useFormik } from 'formik'
 import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import adjustFontSize from '../../utils/ui/adjustText'
-import useAddressStore from '../../utils/tools/interface/addressStore'
+import { locationsService } from '../../services/api/empresas/locationsService'
+import { showToast } from '../../utils/tools/toast/toastService'
+import Toast from 'react-native-root-toast'
+import useAuthStore from '../../utils/tools/interface/authStore'
 
 export default function AddInfoAddressModal({
     open,
     handleCloseModal,
     goBackNavigation,
-    dataLocation
+    dataLocation,
+    handleMessage
 }) {
     const [isLoading, setIsLoading] = useState(false)
-    const { listAddresses, addNewAddress } = useAddressStore()
+    const { user } = useAuthStore()
 
     const formik = useFormik({
         initialValues: {
@@ -30,26 +34,26 @@ export default function AddInfoAddressModal({
         onSubmit: async (values) => {
             setIsLoading(true)
             try {
-                const dataAddInfoAddress = {
-                    id: listAddresses.length + 1,
-                    nameAddress: values.nameAddress,
-                    referencesAddress: values.referencesAddress,
-                    latitude: dataLocation.latitude,
-                    longitude: dataLocation.longitude,
+                const locationData = {
+                    clientId: user.id,
+                    lat: dataLocation.latitude,
+                    lng: dataLocation.longitude,
+                    placeName: values.nameAddress,
+                    references: values.referencesAddress
                 };
 
-                console.log(dataAddInfoAddress)
+                await locationsService.createLocation(locationData);
+                showToast('Ubicación guardada exitosamente', Toast.positions.BOTTOM);
 
-                await addNewAddress(dataAddInfoAddress)
+                formik.resetForm();
+                handleCloseModal();
+                goBackNavigation();
             } catch (err) {
-                console.log('Error on saving address: ', err)
+                console.error('Error on saving address:', err);
+                handleCloseModal();
+                handleMessage('No se pudo guardar la ubicación', Toast.positions.TOP + 30, theme_colors.white, theme_colors.danger);
             } finally {
-                setTimeout(() => {
-                    formik.resetForm()
-                    setIsLoading(false)
-                    handleCloseModal()
-                    goBackNavigation()
-                }, 1000);
+                setIsLoading(false);
             }
         }
     });

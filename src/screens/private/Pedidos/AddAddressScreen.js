@@ -13,6 +13,7 @@ import * as Tracking from 'expo-tracking-transparency'
 import ButtonWithIcon from '../../../components/Buttons/ButtonWithIcon'
 import useTabBarStore from '../../../utils/tools/interface/tabBarStore'
 import AddInfoAddressModal from '../../../components/Modals/AddInfoAddressModal'
+import Toast from 'react-native-root-toast'
 
 export default function AddAddressScreen() {
     const navigation = useNavigation()
@@ -146,6 +147,32 @@ export default function AddAddressScreen() {
         setOpenModal(false)
         changeColorStatusBar(theme_colors.transparent)
     }
+
+    const handleMessage = (message, position = Toast.positions.CENTER, textColor = theme_colors.white, backgroundColor = theme_colors.primary, duration = Toast.durations.SHORT) => {
+        Toast.show(message, {
+            duration: duration,
+            position: position,
+            backgroundColor: backgroundColor,
+            textColor: textColor,
+            shadow: true,
+            shadowColor: theme_colors.black,
+            opacity: 1,
+            containerStyle: {
+                width: "auto",
+                height: "auto",
+                paddingVertical: 15,
+                paddingHorizontal: 18,
+                borderRadius: 10,
+                justifyContent: "center",
+                alignItems: "center",
+            },
+            textStyle: {
+                fontFamily: "SFPro-SemiBold",
+                fontSize: adjustFontSize(theme_textStyles.smaller + .5),
+            },
+        });
+    };
+
 
     return (
         <>
@@ -321,6 +348,7 @@ export default function AddAddressScreen() {
                 handleCloseModal={handleCloseModal}
                 goBackNavigation={goBack}
                 dataLocation={userLocation}
+                handleMessage={handleMessage}
             />
         </>
     )

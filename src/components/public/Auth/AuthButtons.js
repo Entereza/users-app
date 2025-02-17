@@ -9,6 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 import useAuthStore from '../../../utils/tools/interface/authStore';
 import { public_name_routes } from '../../../utils/route/public_name_routes';
 import { authService } from '../../../services/api/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function AuthButtons() {
     // const navigation = useNavigation();
@@ -33,7 +34,10 @@ export default function AuthButtons() {
     }, [])
 
     // Set Fake UserData
-    const setUserDataFake = () => {
+    const setUserDataFake = (token) => {
+        if (token) {
+            AsyncStorage.setItem('token', token)
+        }
         setUserData({
             names: "Anelisse",
             lastNames: "Rocabado",
@@ -69,16 +73,7 @@ export default function AuthButtons() {
                         signupResponse.msg || "Registro exitoso",
                         [{ text: "OK" }]
                     );
-                    setUserData({
-                        names: userInfo.user.givenName,
-                        lastNames: userInfo.user.familyName,
-                        phoneNumber: 75469425,
-                        ci: 7820697,
-                        cashback: 50,
-                        email: userInfo.user.email,
-                        password: "12345678",
-                        image: userInfo.user.photo
-                    });
+                    setUserDataFake(signupResponse.token)
                     return;
                 }
             } catch (signupError) {
@@ -106,26 +101,7 @@ export default function AuthButtons() {
                         loginResponse.msg || "Inicio de sesión exitoso",
                         [{ text: "OK" }]
                     );
-                    setUserData({
-                        names: "Anelisse",
-                        lastNames: "Rocabado",
-                        phoneNumber: 75469425,
-                        ci: 7820697,
-                        cashback: 50,
-                        email: 'anelisse@gmail.com',
-                        password: '12345678',
-                        image: ""
-                    });
-                    // setUserData({
-                    //     names: userInfo.user.givenName,
-                    //     lastNames: userInfo.user.familyName,
-                    //     phoneNumber: 75469425,
-                    //     ci: 7820697,
-                    //     cashback: 50,
-                    //     email: userInfo.user.email,
-                    //     password: "12345678",
-                    //     image: userInfo.user.photo
-                    // });
+                    setUserDataFake(loginResponse.token)
                 } else {
                     Alert.alert(
                         "Error",
@@ -220,6 +196,19 @@ export default function AuthButtons() {
         }
     ]
 
+    const pass = () => {
+        setUserData({
+            names: "Anelisse",
+            lastNames: "Rocabado",
+            phoneNumber: 75469425,
+            ci: 7820697,
+            cashback: 50,
+            email: 'anelisse@gmail.com',
+            password: '12345678',
+            image: ""
+        });
+    }
+
     return (
         <ViewStyled
             width={100}
@@ -237,6 +226,7 @@ export default function AuthButtons() {
                         title={button.title}
                         image={button.icon}
                         onPress={button.onPress}
+                        // onPress={pass}
                         backgroundColor={button.backgroundColor}
                         borderColor={button.borderColor}
                         colorText={button.colorText}

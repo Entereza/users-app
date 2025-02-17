@@ -13,6 +13,7 @@ import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 import { private_name_routes } from '../../utils/route/private_name_routes'
 import { useNavigation } from '@react-navigation/native'
 import useTabBarStore from '../../utils/tools/interface/tabBarStore'
+import { showToast } from '../../utils/tools/toast/toastService'
 
 export default function ListCompletedAddressed({ listAddresses = [] }) {
     const { selectedAddress: selectedAddressStore, setSelectedAddress: setSelectedAddressStore } = useAddressStore()
@@ -31,40 +32,15 @@ export default function ListCompletedAddressed({ listAddresses = [] }) {
         }
     }
 
-    const onPressEdit = (address) => {
-        console.log('address for edit: ', address)
-    }
-
-    //
-    const handleMessage = (message, position = Toast.positions.CENTER, textColor = theme_colors.white, backgroundColor = theme_colors.primary, duration = Toast.durations.SHORT) => {
-        Toast.show(message, {
-            duration: duration,
-            position: position,
-            backgroundColor: backgroundColor,
-            textColor: textColor,
-            shadow: true,
-            shadowColor: theme_colors.black,
-            opacity: 1,
-            containerStyle: {
-                width: "auto",
-                height: "auto",
-                paddingVertical: 15,
-                paddingHorizontal: 18,
-                borderRadius: 10,
-                justifyContent: "center",
-                alignItems: "center",
-            },
-            textStyle: {
-                fontFamily: "SFPro-SemiBold",
-                fontSize: adjustFontSize(theme_textStyles.smaller + .5),
-            },
-        });
-    };
-
     const handleSelectAddress = () => {
         setIsDisabled(true)
         setSelectedAddressStore(selectedAddress)
-        handleMessage('Ubicación seleccionada', Toast.positions.BOTTOM)
+        showToast(
+            'Ubicación seleccionada',
+            Toast.positions.BOTTOM,
+            theme_colors.white,
+            theme_colors.primary
+        );
         setSelectedAddress(null)
     }
 
@@ -140,31 +116,54 @@ export default function ListCompletedAddressed({ listAddresses = [] }) {
                 }}
             />
 
-            <FlatList
-                contentContainerStyle={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    paddingBottom: heightPercentageToDP(10),
-                }}
-                horizontal={false}
-                scrollEnabled={true}
-                data={listAddresses}
-                renderItem={({ item, index }) =>
-                    <AddressSelectionCard
-                        key={index}
-                        item={item}
-                        isSelected={
-                            selectedAddress
-                                ? selectedAddress?.id === item.id
-                                : selectedAddressStore?.id === item.id
-                        }
-                        onPressSelect={() => onPressSelect(item)}
-                        onPressEdit={() => onPressEdit(item)}
-                    />
-                }
-                showsHorizontalScrollIndicator={false}
-                showsVerticalScrollIndicator={false}
-            />
+            {listAddresses.length > 0 ? (
+                <FlatList
+                    contentContainerStyle={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        paddingBottom: heightPercentageToDP(10),
+                    }}
+                    horizontal={false}
+                    scrollEnabled={true}
+                    data={listAddresses}
+                    renderItem={({ item, index }) =>
+                        <AddressSelectionCard
+                            key={index}
+                            item={item}
+                            isSelected={
+                                selectedAddress
+                                    ? selectedAddress?.id === item.id
+                                    : selectedAddressStore?.id === item.id
+                            }
+                            onPressSelect={() => onPressSelect(item)}
+                        />
+                    }
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+                />
+            ) : (
+                <ViewStyled
+                    backgroundColor={theme_colors.transparent}
+                    width={90}
+                    height={5}
+                    style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    <TextStyled
+                        fontFamily='SFPro-Italic'
+                        textAlign='center'
+                        fontSize={theme_textStyles.smedium}
+                        color={theme_colors.grey}
+                        style={{
+                            width: "100%",
+                        }}
+                    >
+                        Aún no tienes ninguna ubicación
+                    </TextStyled>
+                </ViewStyled>
+            )}
 
             <ButtonWithIcon
                 withIcon={false}

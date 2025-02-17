@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Alert } from 'react-native';
 import { private_name_routes } from '../../utils/route/private_name_routes';
 import BilleteraStack from './BilleteraStack';
 import EmpresasStack from './EmpresasStack';
@@ -8,11 +9,62 @@ import { theme_colors } from '../../utils/theme/theme_colors';
 import TabBarIcon from '../../components/TabBar/tabBarIcon';
 import useTabBarStore from '../../utils/tools/interface/tabBarStore';
 import ProfileStack from './ProfileStack';
+import { locationService } from '../../services/location/locationService';
+import useLocationStore from '../../utils/tools/interface/locationStore';
 
 const Tab = createBottomTabNavigator();
 
 export default function PrivateNavigation() {
     const { showTabBar } = useTabBarStore();
+    const { 
+        setLocation, 
+        setDepartment, 
+        setIsSearchingLocation 
+    } = useLocationStore();
+
+    useEffect(() => {
+        initializeLocation();
+    }, []);
+
+    const initializeLocation = async () => {
+        try {
+            setIsSearchingLocation(true);
+            const hasPermission = await locationService.requestLocationPermission();
+
+            if (!hasPermission) {
+                Alert.alert(
+                    "Permiso Requerido",
+                    "Necesitamos acceso a tu ubicación para brindarte un mejor servicio",
+                    [{ text: "OK" }]
+                );
+                return;
+            }
+
+            const location = await locationService.getCurrentLocation();
+            setLocation(location.coords.latitude, location.coords.longitude);
+
+            const department = await locationService.getDepartmentFromCoords(
+                location.coords.latitude,
+                location.coords.longitude
+            );
+            setDepartment(department, null);
+
+            console.log('Location initialized:', {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                department
+            });
+        } catch (error) {
+            console.error('Error initializing location:', error);
+            Alert.alert(
+                "Error",
+                "No pudimos obtener tu ubicación. Por favor, verifica que el GPS esté activado.",
+                [{ text: "OK" }]
+            );
+        } finally {
+            setIsSearchingLocation(false);
+        }
+    };
 
     const tabBarOptions = ({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {

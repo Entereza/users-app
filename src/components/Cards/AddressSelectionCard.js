@@ -3,19 +3,60 @@ import ViewStyled from '../../utils/ui/ViewStyled';
 import { theme_colors } from '../../utils/theme/theme_colors';
 import { FontAwesome6, MaterialCommunityIcons, Octicons } from '@expo/vector-icons';
 import TextStyled from '../../utils/ui/TextStyled';
-import { Pressable } from 'react-native';
+import { Alert, Pressable } from 'react-native';
 import adjustFontSize from '../../utils/ui/adjustText';
 import { theme_textStyles } from '../../utils/theme/theme_textStyles';
+import { useNavigation } from '@react-navigation/native';
+import { private_name_routes } from '../../utils/route/private_name_routes';
+import { locationsService } from '../../services/api/empresas/locationsService';
+import useAddressStore from '../../utils/tools/interface/addressStore';
 
-export default function AddressSelectionCard({ item, isSelected, onPressSelect, onPressEdit }) {
+export default function AddressSelectionCard({ item, isSelected, onPressSelect }) {
     const colorIcon = isSelected ? theme_colors.white : theme_colors.grey
     const colorText = isSelected ? theme_colors.white : theme_colors.black
     const colorSubtitle = isSelected ? theme_colors.white : theme_colors.grey
     const backgroundColor = isSelected ? theme_colors.primary : theme_colors.white
 
+    const navigation = useNavigation()
+    const { deleteAddress } = useAddressStore()
+
+    const onPressEdit = () => {
+        navigation.navigate(private_name_routes.empresas.editAddress, { location: item })
+    }
+
+    const onDelete = async () => {
+        Alert.alert(
+            "Eliminar ubicación",
+            "¿Estás seguro de que deseas eliminar esta ubicación?",
+            [
+                {
+                    text: "Cancelar",
+                    style: "cancel"
+                },
+                {
+                    text: "Eliminar",
+                    style: "destructive",
+                    onPress: async () => {
+                        try {
+                            await locationsService.deleteLocation(item.id)
+                            deleteAddress(item.id)
+                        } catch (error) {
+                            console.error('Error deleting location:', error)
+                            Alert.alert(
+                                "Error",
+                                "No se pudo eliminar la ubicación",
+                                [{ text: "OK" }]
+                            )
+                        }
+                    }
+                }
+            ]
+        )
+    }
+
     return (
         <ViewStyled
-            width={90}
+            width={95}
             height={10}
             paddingHorizontal={1}
             marginBottom={1}
@@ -26,7 +67,7 @@ export default function AddressSelectionCard({ item, isSelected, onPressSelect, 
                 alignItems: 'center',
             }}
         >
-            <Pressable onPress={onPressSelect} style={{ width: '86%', height: '100%' }}>
+            <Pressable onPress={onPressSelect} style={{ flex: 1, height: '100%', marginRight: 10 }}>
                 <ViewStyled
                     borderRadius={2}
                     paddingHorizontal={3.5}
@@ -85,26 +126,39 @@ export default function AddressSelectionCard({ item, isSelected, onPressSelect, 
                 </ViewStyled>
             </Pressable>
 
-            <Pressable
+            <ActionIcon
+                icon="pencil"
+                color={theme_colors.secondary}
                 onPress={onPressEdit}
-                style={{
-                    width: '10%',
-                    height: '70%',
-                }}
-            >
-                <ViewStyled
-                    backgroundColor={theme_colors.transparent}
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}
-                >
-                    <FontAwesome6 name={"pencil"} size={adjustFontSize(theme_textStyles.medium)} color={theme_colors.lightGrey2} />
-                </ViewStyled>
-            </Pressable>
+            />
+            <ActionIcon
+                icon="trash-can"
+                color={theme_colors.danger}
+                onPress={onDelete}
+            />
         </ViewStyled >
     );
 }
+
+const ActionIcon = ({ icon, color, onPress }) => (
+    <Pressable
+        onPress={onPress}
+        style={{
+            width: 'auto',
+            height: '70%',
+        }}
+    >
+        <ViewStyled
+            backgroundColor={theme_colors.transparent}
+            paddingHorizontal={1.2}
+            style={{
+                width: '100%',
+                height: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}
+        >
+            <FontAwesome6 name={icon} size={adjustFontSize(theme_textStyles.smedium)} color={color} />
+        </ViewStyled>
+    </Pressable>
+);

@@ -33,48 +33,70 @@ export default function LoginScreen() {
         validationSchema: schemaLogin,
         validateOnChange: true,
         onSubmit: async (values) => {
-            try {
-                setLoading(true);
-                const response = await authService.login({
-                    nick: values.email,
-                    password: values.password
-                });
-                
-                console.log('Response: ', response)
+            setUserData({
+                names: "Anelisse",
+                lastNames: "Rocabado",
+                phoneNumber: 75469425,
+                ci: 7820697,
+                cashback: 50,
+                email: values.email,
+                password: values.password,
+                image: ""
+            });
 
-                if (response.code === 'COD200') {
-                    Alert.alert(
-                        "Éxito",
-                        response.msg || "Inicio de sesión exitoso",
-                        [{ text: "OK" }]
-                    );
-                    setUserData({
-                        names: "Anelisse",
-                        lastNames: "Rocabado",
-                        phoneNumber: 75469425,
-                        ci: 7820697,
-                        cashback: 50,
-                        email: values.email,
-                        password: values.password,
-                        image: ""
-                    });
-                } else {
-                    Alert.alert(
-                        "Error",
-                        response.msg || "Error al iniciar sesión",
-                        [{ text: "OK" }]
-                    );
-                }
-            } catch (error) {
-                console.error('Error during login:', error);
-                Alert.alert(
-                    "Error",
-                    error.message || "Hubo un problema al intentar iniciar sesión",
-                    [{ text: "OK" }]
-                );
-            } finally {
-                setLoading(false);
-            }
+            // try {
+            //     setLoading(true);
+            //     const response = await authService.login({
+            //         nick: values.email,
+            //         password: values.password
+            //     });
+                
+            //     console.log('Response: ', response)
+
+            //     setUserData({
+            //         names: "Anelisse",
+            //         lastNames: "Rocabado",
+            //         phoneNumber: 75469425,
+            //         ci: 7820697,
+            //         cashback: 50,
+            //         email: values.email,
+            //         password: values.password,
+            //         image: ""
+            //     });
+
+            //     if (response.code === 'COD200') {
+            //         Alert.alert(
+            //             "Éxito",
+            //             response.msg || "Inicio de sesión exitoso",
+            //             [{ text: "OK" }]
+            //         );
+            //         setUserData({
+            //             names: "Anelisse",
+            //             lastNames: "Rocabado",
+            //             phoneNumber: 75469425,
+            //             ci: 7820697,
+            //             cashback: 50,
+            //             email: values.email,
+            //             password: values.password,
+            //             image: ""
+            //         });
+            //     } else {
+            //         Alert.alert(
+            //             "Error",
+            //             response.msg || "Error al iniciar sesión",
+            //             [{ text: "OK" }]
+            //         );
+            //     }
+            // } catch (error) {
+            //     console.error('Error during login:', error);
+            //     Alert.alert(
+            //         "Error",
+            //         error.message || "Hubo un problema al intentar iniciar sesión",
+            //         [{ text: "OK" }]
+            //     );
+            // } finally {
+            //     setLoading(false);
+            // }
         }
     });
 

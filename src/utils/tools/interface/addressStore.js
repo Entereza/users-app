@@ -1,17 +1,49 @@
 import { create } from 'zustand';
-import { directions } from '../../tools/storage/data';
 
-const useAddressStore = create((set, get) => ({
+const useAddressStore = create((set) => ({
     selectedAddress: null,
-    listAddresses: directions,
+    listAddresses: [],
+    isLoadingAddresses: false,
 
     setSelectedAddress: (address) => {
         set({ selectedAddress: address });
     },
 
-    addNewAddress: (newAddress) => {
-        set({ listAddresses: [...get().listAddresses, newAddress] });
+    setListAddresses: (addresses) => {
+        set({ listAddresses: addresses });
     },
+
+    setIsLoadingAddresses: (isLoading) => {
+        set({ isLoadingAddresses: isLoading });
+    },
+
+    addNewAddress: (newAddress) => {
+        set(state => ({ 
+            listAddresses: [...state.listAddresses, newAddress] 
+        }));
+    },
+
+    updateAddress: (updatedAddress) => {
+        set(state => ({
+            listAddresses: state.listAddresses.map(address => 
+                address.id === updatedAddress.id ? updatedAddress : address
+            )
+        }));
+    },
+
+    deleteAddress: (addressId) => {
+        set(state => ({
+            listAddresses: state.listAddresses.filter(address => address.id !== addressId)
+        }));
+    },
+
+    resetAddresses: () => {
+        set({
+            selectedAddress: null,
+            listAddresses: [],
+            isLoadingAddresses: false
+        });
+    }
 }));
 
 export default useAddressStore;
