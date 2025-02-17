@@ -1,24 +1,48 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import ViewStyled from '../../utils/ui/ViewStyled'
 import { theme_colors } from '../../utils/theme/theme_colors'
 import TextStyled from '../../utils/ui/TextStyled'
 import BusinessItem from './BusinessItem'
 import { FlatList } from 'react-native'
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP } from 'react-native-responsive-screen'
 import { useNavigation } from '@react-navigation/native'
 import { private_name_routes } from '../../utils/route/private_name_routes'
 import useTabBarStore from '../../utils/tools/interface/tabBarStore'
-import { businesses } from '../../utils/tools/storage/data'
 import { theme_textStyles } from '../../utils/theme/theme_textStyles'
+import { empresasService } from '../../services/api/empresas/empresasService'
+import { showToast } from '../../utils/tools/toast/toastService'
+import Toast from 'react-native-root-toast'
 
 export default function BusinessSection() {
   const navigation = useNavigation();
-
   const { toggleTabBar, changeColorStatusBar } = useTabBarStore();
+  const [businesses, setBusinesses] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const businessList = businesses
-    .sort((a, b) => b.cashback - a.cashback)
-    .slice(0, 4);
+  useEffect(() => {
+    fetchBusinesses();
+  }, []);
+
+  const fetchBusinesses = async () => {
+    try {
+      setIsLoading(true);
+      const response = await empresasService.getAllCompanies(0, 4);
+      const sortedBusinesses = response
+        .sort((a, b) => parseFloat(b.cashback) - parseFloat(a.cashback))
+        .slice(0, 4);
+      setBusinesses(sortedBusinesses);
+    } catch (error) {
+      console.error('Error fetching businesses:', error);
+      showToast(
+        'No se pudieron cargar las empresas',
+        Toast.positions.TOP,
+        theme_colors.white,
+        theme_colors.error
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const goToBusinessScreen = (item) => {
     changeColorStatusBar(theme_colors.transparent);
@@ -63,7 +87,7 @@ export default function BusinessSection() {
       </ViewStyled>
 
       <FlatList
-        data={businessList}
+        data={businesses}
         contentContainerStyle={{
           justifyContent: 'center',
           alignItems: 'center',
@@ -79,35 +103,31 @@ export default function BusinessSection() {
             key={index}
           />
         }
-        ListFooterComponent={() => {
-          return (
-            <ViewStyled
-              backgroundColor={theme_colors.transparent}
-              width={90}
-              height={5}
+        ListFooterComponent={() => (
+          <ViewStyled
+            backgroundColor={theme_colors.transparent}
+            width={90}
+            height={5}
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <TextStyled
+              fontFamily='SFPro-Italic'
+              textAlign='center'
+              fontSize={4}
+              color={theme_colors.grey}
               style={{
-                justifyContent: 'center',
-                alignItems: 'center',
+                width: "100%",
               }}
             >
-              <TextStyled
-                fontFamily='SFPro-Italic'
-                textAlign='center'
-                fontSize={4}
-                color={theme_colors.grey}
-                style={{
-                  width: "100%",
-                }}
-              >
-                {
-                  businessList.length > 0
-                    ? `Estas son las empresas con mayor cashback`
-                    : `Aquí aparecerán las empresas con mayor cashback`
-                }
-              </TextStyled>
-            </ViewStyled>
-          )
-        }}
+              {businesses.length > 0
+                ? `Estas son las empresas con mayor cashback`
+                : `Aquí aparecerán las empresas con mayor cashback`}
+            </TextStyled>
+          </ViewStyled>
+        )}
         horizontal={false}
         scrollEnabled={false}
         showsHorizontalScrollIndicator={false}

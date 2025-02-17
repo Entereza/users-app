@@ -10,6 +10,20 @@ import IndicatorItem from './IndicatorItem'
 import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 
 export default function BusinessItem({ item, onPress }) {
+  // {
+  //   "id": "7c4ead2e-b806-4bea-925c-ac5a7fab887a",
+  //   "status": null,
+  //   "name": "Entereza",
+  //   "categoryCode": "f2d43b0c-4c13-4a9a-8b6b-1013d0d82381",
+  //   "categoryName": "prueba5",
+  //   "email": "entereza",
+  //   "cashback": "10",
+  //   "image": "https://insightful-integrity-production.up.railway.app/images/get/7c4ead2e-b806-4bea-925c-ac5a7fab887a_image",
+  //   "imageP": "https://insightful-integrity-production.up.railway.app/images/get/7c4ead2e-b806-4bea-925c-ac5a7fab887a_imageP",
+  //   "favorite": null,
+  //   "creationDate": "2024-12-10 00:46:16"
+  // },
+
   // Ubicación falsa de la empresa
   const businessLocation = {
     latitude: -17.373889,
@@ -33,11 +47,11 @@ export default function BusinessItem({ item, onPress }) {
 
   const indicators = [
     {
-      title: `${item.estimatedPreparationTime} min`,
+      title: `15 min`,
       icon: 'clock-o',
     },
     {
-      title: `${estimatedDeliveryTime} min`,
+      title: `15 min`,
       icon: 'motorcycle',
     },
     {
@@ -88,7 +102,7 @@ export default function BusinessItem({ item, onPress }) {
               height: '100%',
               resizeMode: 'cover',
             }}
-            source={item.image ? { uri: item.image } : require('../../../assets/images/business/emptyPortrait.png')}
+            source={item.imageP ? { uri: item.imageP } : require('../../../assets/images/business/emptyPortrait.png')}
           />
 
           <LinearGradient

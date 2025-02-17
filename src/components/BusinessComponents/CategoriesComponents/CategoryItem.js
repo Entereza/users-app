@@ -3,11 +3,11 @@ import { Pressable } from 'react-native'
 import { theme_colors } from '../../../utils/theme/theme_colors'
 import TextStyled from '../../../utils/ui/TextStyled'
 import ViewStyled from '../../../utils/ui/ViewStyled'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import { private_name_routes } from '../../../utils/route/private_name_routes'
 import useTabBarStore from '../../../utils/tools/interface/tabBarStore'
 import { theme_textStyles } from '../../../utils/theme/theme_textStyles'
+import ImageStyled from '../../../utils/ui/ImageStyled'
 
 export default function CategoryItem({ item }) {
     const navigation = useNavigation()
@@ -43,13 +43,16 @@ export default function CategoryItem({ item }) {
                     borderWidth: 1,
                     backgroundColor: theme_colors.categoryGrey,
                     borderColor: theme_colors.categoryGrey,
+                    overflow: 'hidden'
                 }}
             >
-                <MaterialCommunityIcons
-                    name={item.icon}
-                    color={theme_colors.black}
-                    size={35}
-                    alignSelf='center'
+                <ImageStyled
+                    source={item.icon ? { uri: item.icon } : require('../../../../assets/images/categories/emptyCategory.png')}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        resizeMode: 'cover'
+                    }}
                 />
             </Pressable>
             <TextStyled
