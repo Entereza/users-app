@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Platform, Linking } from 'react-native'
+import { Platform, Linking, View } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 import ViewStyled from '../../../utils/ui/ViewStyled'
 import { theme_colors } from '../../../utils/theme/theme_colors'
@@ -9,6 +9,8 @@ import AlertStyled from '../../../utils/ui/AlertStyled'
 import { theme_textStyles } from '../../../utils/theme/theme_textStyles'
 import { Camera, CameraView } from 'expo-camera'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+import adjustFontSize from '../../../utils/ui/adjustText'
 
 export default function PayQrImage({
     selectedImage,
@@ -134,6 +136,82 @@ export default function PayQrImage({
         console.log('Barcode scanned:', data);
     };
 
+    const ScannerFrame = () => {
+        return (
+            <View
+                style={{
+                    position: 'absolute',
+                    width: '80%',
+                    height: '60%',
+                    borderWidth: 0,
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    zIndex: 10,
+                }}
+            >
+                {/* Fila superior */}
+                <View
+                    style={{
+                        width: '100%',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                    }}
+                >
+                    {/* Esquina superior izquierda */}
+                    <View
+                        style={{
+                            width: 40,
+                            height: 40,
+                            borderTopWidth: 4,
+                            borderLeftWidth: 4,
+                            borderColor: theme_colors.white,
+                        }}
+                    />
+                    {/* Esquina superior derecha */}
+                    <View
+                        style={{
+                            width: 40,
+                            height: 40,
+                            borderTopWidth: 4,
+                            borderRightWidth: 4,
+                            borderColor: theme_colors.white,
+                        }}
+                    />
+                </View>
+
+                {/* Fila inferior */}
+                <View
+                    style={{
+                        width: '100%',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                    }}
+                >
+                    {/* Esquina inferior izquierda */}
+                    <View
+                        style={{
+                            width: 40,
+                            height: 40,
+                            borderBottomWidth: 4,
+                            borderLeftWidth: 4,
+                            borderColor: theme_colors.white,
+                        }}
+                    />
+                    {/* Esquina inferior derecha */}
+                    <View
+                        style={{
+                            width: 40,
+                            height: 40,
+                            borderBottomWidth: 4,
+                            borderRightWidth: 4,
+                            borderColor: theme_colors.white,
+                        }}
+                    />
+                </View>
+            </View>
+        );
+    };
+
     return (
         <>
             {
@@ -164,7 +242,7 @@ export default function PayQrImage({
                 }}
             >
                 <ViewStyled
-                    backgroundColor={theme_colors.danger}
+                    backgroundColor={theme_colors.transparent}
                     style={{
                         flex: 1,
                         width: '100%',
@@ -182,16 +260,20 @@ export default function PayQrImage({
                             }}
                         />
                     ) : hasPermission ? (
-                        <CameraView
-                            barcodeScannerSettings={{
-                                barcodeTypes: ["qr"],
-                            }}
-                            onBarcodeScanned={handleBarcodeScanned}
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                            }}
-                        />
+                        <>
+                            <CameraView
+                                barcodeScannerSettings={{
+                                    barcodeTypes: ["qr"],
+                                }}
+                                onBarcodeScanned={handleBarcodeScanned}
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    position: 'relative',
+                                }}
+                            />
+                            <ScannerFrame />
+                        </>
                     ) : (
                         <ImageStyled
                             source={require('../../../../assets/images/ImageCamera.png')}

@@ -78,7 +78,7 @@ export default function WalletCard() {
                         fontFamily='Artegra-SemiBold'
                         color={theme_colors.white}
                     >
-                        BOB. {user.cashback.toFixed(2)}
+                        BOB. {user?.cashback?.toFixed(2) || 0}
                     </TextStyled>
                 </ViewStyled>
 
