@@ -39,19 +39,20 @@ export default function CategoryItem({ item }) {
                     height: 70,
                     alignSelf: 'center',
                     justifyContent: 'center',
-                    borderRadius: 15,
-                    borderWidth: 1,
-                    backgroundColor: theme_colors.categoryGrey,
-                    borderColor: theme_colors.categoryGrey,
+                    borderRadius: 500,
+                    backgroundColor: `${theme_colors.primary}20`,
                     overflow: 'hidden'
                 }}
             >
                 <ImageStyled
                     source={item.icon ? { uri: item.icon } : require('../../../../assets/images/categories/emptyCategory.png')}
                     style={{
-                        width: '100%',
-                        height: '100%',
-                        resizeMode: 'cover'
+                        width: '50%',
+                        height: '50%',
+                        resizeMode: 'cover',
+                        alignSelf: 'center',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                     }}
                 />
             </Pressable>

@@ -19,7 +19,7 @@ export default function PayContent() {
 
   return (
     <>
-      {!showDataQr
+      {showDataQr
         ? <PayQrImage
           selectedImage={selectedImage}
           setSelectedImage={setSelectedImage}

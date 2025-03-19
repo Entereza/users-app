@@ -2,31 +2,29 @@ import React, { useEffect, useState } from 'react';
 import { theme_colors } from '../../../utils/theme/theme_colors';
 import ViewStyled from '../../../utils/ui/ViewStyled';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { ScrollView, View } from 'react-native';
+import { ScrollView } from 'react-native';
 import { private_name_routes } from '../../../utils/route/private_name_routes';
 import ResumeCard from '../../../components/Cards/ResumeCard';
 import AddressCard from '../../../components/Cards/AddressCard';
 import CashbackCard from '../../../components/Cards/CashbackCard';
-import SlideButton from '../../../components/Buttons/SlideButton';
 import SwipeToConfirm from '../../../components/TransferChasbackComponents/PayComponents/SwipeToConfirm';
 import useAddressStore from '../../../utils/tools/interface/addressStore';
 import useAuthStore from '../../../utils/tools/interface/authStore';
 import useCartStore from '../../../utils/tools/interface/cartStore';
 import InfoField from '../../../components/CartComponents/InfoField';
 import HeaderDefaultScreen from '../../../components/Header/HeaderDefaultScreen';
+import { toastService } from '../../../utils/tools/interface/toastService';
 
 export default function ConfirmOrderScreen() {
     const { user } = useAuthStore();
-    const { billingInfo, paymentMethod } = useCartStore()
+    const { billingInfo, paymentMethod, tripPrice, cashbackBusiness } = useCartStore();
     const { selectedAddress } = useAddressStore();
+    const route = useRoute();
+    const { branchId } = route.params || {};
+
+    console.log('branchId', branchId)
 
     const navigation = useNavigation();
-
-    const goToConfirmationScreen = () => {
-        setTimeout(() => {
-            navigation.navigate(private_name_routes.empresas.empresasFinalConfirmation);
-        }, 800);
-    }
 
     const goToMethodScreen = () => {
         navigation.navigate(private_name_routes.empresas.methodScreen);
@@ -40,6 +38,18 @@ export default function ConfirmOrderScreen() {
 
     const goToFacturacionScreen = () => {
         navigation.navigate(private_name_routes.empresas.facturacionScreen);
+    }
+
+    const validateOrder = () => {
+        if (!selectedAddress) {
+            return false;
+        }
+
+        if (!paymentMethod?.name) {
+            return false;
+        }
+
+        return true;
     }
 
     return (
@@ -113,15 +123,15 @@ export default function ConfirmOrderScreen() {
                         onPress={goToMethodScreen}
                     />
 
-                    <ResumeCard />
+                    <ResumeCard tripPrice={tripPrice} />
 
                     <CashbackCard />
                 </ViewStyled>
 
             </ScrollView>
-            {selectedAddress &&
-                <SwipeToConfirm onConfirm={goToConfirmationScreen} />
-            }
+            {validateOrder() && branchId && (
+                <SwipeToConfirm branchId={branchId} />
+            )}
         </ViewStyled>
     );
 };

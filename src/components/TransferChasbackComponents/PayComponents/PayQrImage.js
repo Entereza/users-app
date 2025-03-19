@@ -86,19 +86,19 @@ export default function PayQrImage({
             return;
         }
 
-        let result = await ImagePicker.launchCameraAsync({
-            aspect: [5, 5],
-            allowsEditing: true,
-            quality: 1,
-        });
+        // let result = await ImagePicker.launchCameraAsync({
+        //     aspect: [5, 5],
+        //     allowsEditing: true,
+        //     quality: 1,
+        // });
 
-        if (!result.canceled) {
-            const imageUri = result.assets[0].uri;
-            setSelectedImage(imageUri);
-            setIsLoadingData(true);
-        } else {
-            console.log('Camera was canceled');
-        }
+        // if (!result.canceled) {
+        //     const imageUri = result.assets[0].uri;
+        //     setSelectedImage(imageUri);
+        //     setIsLoadingData(true);
+        // } else {
+        //     console.log('Camera was canceled');
+        // }
     };
 
     const openGallery = async () => {
@@ -127,7 +127,7 @@ export default function PayQrImage({
             console.log('Image picker was canceled');
         }
     };
-    
+
 
     // Funcion para leer el QR
     const handleBarcodeScanned = (data) => {
@@ -155,7 +155,7 @@ export default function PayQrImage({
 
             <ViewStyled
                 width={100}
-                paddingTop={10}
+                paddingTop={2}
                 backgroundColor={theme_colors.transparent}
                 style={{
                     flex: 1,
@@ -164,10 +164,10 @@ export default function PayQrImage({
                 }}
             >
                 <ViewStyled
-                    backgroundColor={theme_colors.transparent}
+                    backgroundColor={theme_colors.danger}
                     style={{
-                        width: '80%',
-                        height: '50%',
+                        flex: 1,
+                        width: '100%',
                         alignItems: 'center',
                         justifyContent: 'center',
                     }}
@@ -188,8 +188,8 @@ export default function PayQrImage({
                             }}
                             onBarcodeScanned={handleBarcodeScanned}
                             style={{
-                                width: widthPercentageToDP(80),
-                                height: heightPercentageToDP(50),
+                                width: '100%',
+                                height: '100%',
                             }}
                         />
                     ) : (

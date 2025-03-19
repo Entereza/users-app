@@ -7,10 +7,11 @@ import { empresasService } from '../../../services/api/empresas/empresasService'
 import useLocationStore from '../../../utils/tools/interface/locationStore'
 import { showToast } from '../../../utils/tools/toast/toastService'
 import Toast from 'react-native-root-toast'
+import CategorySkeleton from '../../Skeletons/CategorySkeleton'
 
-export default function CategorySection() {
+export default function CategorySection({ refreshing }) {
     const [categories, setCategories] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const { departmentId } = useLocationStore();
 
     useEffect(() => {
@@ -18,6 +19,12 @@ export default function CategorySection() {
             fetchCategories();
         }
     }, [departmentId]);
+
+    useEffect(() => {
+        if (refreshing) {
+            fetchCategories();
+        }
+    }, [refreshing]);
 
     const fetchCategories = async () => {
         try {
@@ -36,6 +43,12 @@ export default function CategorySection() {
             setIsLoading(false);
         }
     };
+
+    if (isLoading) {
+        return (
+            <CategorySkeleton showSkeleton={true} />
+        )
+    }
 
     return (
         <ViewStyled

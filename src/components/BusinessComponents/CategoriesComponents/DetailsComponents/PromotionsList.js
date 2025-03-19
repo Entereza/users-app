@@ -48,9 +48,10 @@ export default function PromotionsList({ promotions = [], onLayout }) {
 
             <FlatList
                 contentContainerStyle={{
+                    flex: 1,
                     paddingVertical: 5,
                     paddingHorizontal: 10,
-                    justifyContent: 'center',
+                    justifyContent: 'flex-start',
                     alignItems: 'center',
                 }}
                 horizontal={true}

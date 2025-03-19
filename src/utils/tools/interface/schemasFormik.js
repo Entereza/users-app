@@ -52,6 +52,12 @@ export const schemaLogin = Yup.object().shape({
         .min(6, 'La contraseña debe tener al menos 6 caracteres'),
 });
 
+export const schemaRecoverPassword = Yup.object().shape({
+    email: Yup.string()
+        .email('Correo electrónico inválido')
+        .required('El correo electrónico es requerido'),
+});
+
 export const schemaRegister = Yup.object().shape({
     names: Yup.string()
         .required('El nombre es requerido')

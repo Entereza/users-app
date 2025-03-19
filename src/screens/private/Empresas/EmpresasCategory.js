@@ -6,13 +6,12 @@ import HeaderInternalScreen from '../../../components/Header/HeaderInternalScree
 import SearchBar from '../../../components/BusinessComponents/SearchBar'
 import useAuthStore from '../../../utils/tools/interface/authStore'
 import ListBusinesses from '../../../components/BusinessComponents/CategoriesComponents/ListBusinesses'
-import { businesses } from '../../../utils/tools/storage/data'
 
 export default function EmpresasCategory({ route }) {
     const { category } = route.params
     const { user } = useAuthStore()
 
-    const businessesCategory = businesses.filter(business => business.category === category.name)
+    // const businessesCategory = businesses.filter(business => business.category === category.name)
 
     return (
         <SafeAreaStyled
@@ -24,7 +23,7 @@ export default function EmpresasCategory({ route }) {
 
             <SearchBar placeHolderActive={`¿Qué empresa o producto buscas ${user.names.split(' ')[0]}?`} active={true} onPress={null} />
 
-            <ListBusinesses businesses={businessesCategory} nameCategory={category?.name} />
+            <ListBusinesses businesses={[]} nameCategory={category?.name} />
         </SafeAreaStyled>
     )
 }

@@ -20,7 +20,10 @@ const useAuthStore = create(set => ({
   },
 
   getUserData: async () => {
-
+    const userData = await AsyncStorage.getItem('userData');
+    if (userData) {
+      set({ user: JSON.parse(userData) });
+    }
   },
 
   logout: async () => {

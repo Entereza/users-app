@@ -3,22 +3,21 @@ import CatProductsItem from './CatProductsItem'
 import ViewStyled from '../../../utils/ui/ViewStyled'
 import { FlatList } from 'react-native'
 import { theme_colors } from '../../../utils/theme/theme_colors'
-import useCategoryStore from '../../../utils/tools/interface/categoryStore'
 
-export default function CategoriesProductsList({ categories = [] }) {
+export default function CategoriesProductsList({ 
+    categories = [], 
+    selectedCategory, 
+    onCategoryPress,
+    categoriesListRef
+}) {
     const flatListRef = useRef(null)
-    const {
-        selectedCategory,
-        setSelectedCategory,
-        setCategoriesListRef,
-        scrollToCategory,
-        setIsManualSelection
-    } = useCategoryStore()
-
+    
     // Establecer la referencia del FlatList
     useEffect(() => {
-        setCategoriesListRef(flatListRef)
-    }, [])
+        if (categoriesListRef) {
+            categoriesListRef.current = flatListRef.current
+        }
+    }, [categoriesListRef])
 
     // Efecto para manejar el scroll horizontal cuando cambia la categoría seleccionada
     useEffect(() => {
@@ -32,20 +31,7 @@ export default function CategoriesProductsList({ categories = [] }) {
                 viewPosition: 0.5
             })
         }
-    }, [selectedCategory])
-
-    const handleCategoryPress = (category) => {
-        setIsManualSelection(true);
-        setSelectedCategory(category)
-        if (category === 'Menú') {
-            scrollToCategory('Promociones')
-        } else {
-            scrollToCategory(category)
-        }
-        setTimeout(() => {
-            setIsManualSelection(false);
-        }, 1000);
-    }
+    }, [selectedCategory, categories])
 
     const getItemLayout = (data, index) => ({
         length: 100,
@@ -82,7 +68,7 @@ export default function CategoriesProductsList({ categories = [] }) {
                 ref={flatListRef}
                 contentContainerStyle={{
                     paddingHorizontal: 10,
-                    justifyContent: 'center',
+                    justifyContent: 'flex-start',
                     alignItems: 'center',
                 }}
                 horizontal={true}
@@ -92,7 +78,7 @@ export default function CategoriesProductsList({ categories = [] }) {
                 renderItem={({ item }) => (
                     <CatProductsItem
                         item={item}
-                        onPress={() => handleCategoryPress(item)}
+                        onPress={() => onCategoryPress(item)}
                         isSelected={selectedCategory === item}
                     />
                 )}

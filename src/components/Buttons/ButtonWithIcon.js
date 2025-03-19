@@ -126,7 +126,7 @@ export default function ButtonWithIcon({
                     fontSize={fontSize}
                     color={colorText}
                     style={{
-                        marginBottom: 2
+                        marginTop: 2
                     }}
                 >
                     {textButton}

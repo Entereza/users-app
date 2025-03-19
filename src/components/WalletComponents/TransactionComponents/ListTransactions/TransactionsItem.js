@@ -23,7 +23,7 @@ export default function TransactionsItem({ item }) {
             }}
         >
             <ImageStyled
-                width={15}
+                width={17}
                 borderRadius={1.5}
                 source={{ uri: item?.image ? item.image : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA58xZd7va4SXB177IZj9BXL9jOLCG4hkRcuwjeHArAw&s" }}
                 style={{
@@ -33,8 +33,10 @@ export default function TransactionsItem({ item }) {
             />
 
             <ViewStyled
-                width={77}
+                marginLeft={1}
+                paddingHorizontal={1}
                 style={{
+                    flex: 1,
                     height: '70%',
                     backgroundColor: theme_colors.transparent,
                     justifyContent: 'center',
@@ -60,7 +62,7 @@ export default function TransactionsItem({ item }) {
                             textAlign: 'left',
                         }}
                     >
-                        {item.restaurant}
+                        {item.name} - {item.sectorName}
                     </TextStyled>
 
                     <TextStyled
@@ -71,7 +73,7 @@ export default function TransactionsItem({ item }) {
                             textAlign: 'right',
                         }}
                     >
-                        BOB. {item.price}
+                        BOB. {item.order.totalFinal}
                     </TextStyled>
                 </ViewStyled>
 
@@ -89,7 +91,7 @@ export default function TransactionsItem({ item }) {
                         fontSize={theme_textStyles.smaller + .5}
                         color={theme_colors.grey}
                     >
-                        {item.date}
+                        {item.order.createdAt || "Sin registro"}
                     </TextStyled>
 
                     <TextStyled

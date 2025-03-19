@@ -23,7 +23,7 @@ export default function SearchBar({
         <>
             <Pressable onPress={onPress}>
                 <ViewStyled
-                    backgroundColor={theme_colors.white}
+                    backgroundColor={"#f8f6f5"}
                     width={90}
                     height={6}
                     marginTop={1.5}
@@ -34,19 +34,30 @@ export default function SearchBar({
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-
-                        shadowColor: theme_colors.black,
-                        shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: 0.5,
-                        shadowRadius: 2,
-                        elevation: 3,
                     }}
                 >
                     <ViewStyled
-                        width={75}
-                        height={4.5}
+                        width={7}
+                        height={5}
                         backgroundColor={theme_colors.transparent}
                         style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <MaterialCommunityIcons
+                            name={withFilters ? "tune" : "magnify"}
+                            color={theme_colors.dark}
+                            size={adjustFontSize(theme_textStyles.large)}
+                        />
+                    </ViewStyled>
+
+                    <ViewStyled
+                        width={75}
+                        marginLeft={1}
+                        backgroundColor={theme_colors.transparent}
+                        style={{
+                            flex: 1,
                             justifyContent: 'center',
                             alignItems: 'flex-start',
                         }}
@@ -80,24 +91,6 @@ export default function SearchBar({
                                 </TextStyled>
                         }
                     </ViewStyled>
-
-                    {/* <Pressable onPress={active ? () => setOpenFilters(true) : null}> */}
-                    <ViewStyled
-                        width={7}
-                        height={5}
-                        backgroundColor={theme_colors.transparent}
-                        style={{
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <MaterialCommunityIcons
-                            name={withFilters ? "tune" : "magnify"}
-                            color={theme_colors.textGrey}
-                            size={adjustFontSize(theme_textStyles.large)}
-                        />
-                    </ViewStyled>
-                    {/* </Pressable> */}
                 </ViewStyled>
             </Pressable>
         </>

@@ -15,7 +15,7 @@ import { useNavigation } from '@react-navigation/native'
 import useTabBarStore from '../../utils/tools/interface/tabBarStore'
 import { showToast } from '../../utils/tools/toast/toastService'
 
-export default function ListCompletedAddressed({ listAddresses = [] }) {
+export default function ListCompletedAddressed({ listAddresses = [], goBack }) {
     const { selectedAddress: selectedAddressStore, setSelectedAddress: setSelectedAddressStore } = useAddressStore()
     const [selectedAddress, setSelectedAddress] = useState(null)
     const [isDisabled, setIsDisabled] = useState(true)
@@ -42,6 +42,7 @@ export default function ListCompletedAddressed({ listAddresses = [] }) {
             theme_colors.primary
         );
         setSelectedAddress(null)
+        goBack()
     }
 
     const goToAddAddress = () => {

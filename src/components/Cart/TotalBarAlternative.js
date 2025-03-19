@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { private_name_routes } from '../../utils/route/private_name_routes';
 import { theme_textStyles } from '../../utils/theme/theme_textStyles';
 
-export default function TotalBarAlternative({ quantity, total, title, isSelected }) {
+export default function TotalBarAlternative({ quantity, total, title, branchId, tripPrice }) {
 
     const navigation = useNavigation();
 
@@ -21,7 +21,8 @@ export default function TotalBarAlternative({ quantity, total, title, isSelected
             navigation.navigate(private_name_routes.empresas.carritoHome);
         } else if (title == "Ir a pagar"){
             navigation.navigate(private_name_routes.empresas.confirmOrder, {
-                selection: isSelected
+                branchId: branchId,
+                tripPrice: tripPrice
             });
         }
     }

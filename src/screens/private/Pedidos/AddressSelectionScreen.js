@@ -92,6 +92,7 @@ export default function AddressSelectionScreen({ route }) {
             <HeaderInternalScreen title={"Ubicación"} onPress={goBack} />
 
             <ListCompletedAddressed
+                goBack={goBack}
                 listAddresses={listAddresses}
                 isLoading={isLoadingAddresses}
                 onRefresh={fetchLocations}

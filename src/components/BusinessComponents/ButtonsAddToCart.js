@@ -11,10 +11,32 @@ import { useNavigation } from '@react-navigation/native'
 import { private_name_routes } from '../../utils/route/private_name_routes'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 
-export default function ButtonsAddToCart({ item, width = 20, height = 4, paddingHorizontal = 1.5, right = 0, bottom = 2 }) {
+export default function ButtonsAddToCart({
+    item,
+    width = 20,
+    height = 4,
+    paddingHorizontal = 1.5,
+    right = 0,
+    bottom = 2,
+    showTotalQuantity = true
+}) {
     const addToCart = useCartStore((state) => state.addToCart)
     const removeFromCart = useCartStore((state) => state.removeFromCart)
+    const cart = useCartStore((state) => state.cart)
+
+    // Buscar el item específico en el carrito (con las mismas variables)
     const cartItem = useCartStore((state) => state.cart.find(cartItem => cartItem.id === item.id))
+
+    // Calcular la cantidad total de este producto en el carrito (sumando todas las variaciones)
+    const totalQuantity = cart.reduce((total, cartItem) => {
+        if (cartItem.id === item.id) {
+            return total + (cartItem.quantity || 1);
+        }
+        return total;
+    }, 0);
+
+    // Determinar qué cantidad mostrar según la prop showTotalQuantity
+    const displayQuantity = showTotalQuantity ? totalQuantity : (cartItem ? cartItem.quantity : 0);
 
     const navigation = useNavigation()
 
@@ -42,7 +64,7 @@ export default function ButtonsAddToCart({ item, width = 20, height = 4, padding
                 !item.hasVariables &&
                 (
                     <>
-                        <TouchableOpacity onPress={() => removeFromCart(item.id)}>
+                        <TouchableOpacity onPress={() => removeFromCart(cartItem?.uniqueId || item.id)}>
                             <ViewStyled
                                 backgroundColor={theme_colors.transparent}
                                 style={{
@@ -61,9 +83,9 @@ export default function ButtonsAddToCart({ item, width = 20, height = 4, padding
                         </TouchableOpacity>
 
                         <ViewStyled
+                            marginHorizontal={1}
                             backgroundColor={theme_colors.transparent}
                             style={{
-                                flex: 1,
                                 maxWidth: '50%',
                                 height: '100%',
                                 justifyContent: 'center',
@@ -78,16 +100,17 @@ export default function ButtonsAddToCart({ item, width = 20, height = 4, padding
                                 fontSize={theme_textStyles.small}
                                 color={theme_colors.black}
                             >
-                                {cartItem ? cartItem.quantity : 0}
+                                {displayQuantity}
                             </TextStyled>
                         </ViewStyled>
                     </>
                 )
             }
 
-            <TouchableOpacity onPress={item.hasVariables ? goToDetailsProduct : () => addToCart(item)}>
+            <TouchableOpacity onPress={item.hasVariables ? goToDetailsProduct : () => addToCart({ ...item, quantity: 1 })}>
                 <ViewStyled
                     backgroundColor={theme_colors.transparent}
+                    paddingHorizontal={item.hasVariables ? 1 : 0}
                     style={{
                         width: 'auto',
                         height: '100%',
@@ -98,7 +121,7 @@ export default function ButtonsAddToCart({ item, width = 20, height = 4, padding
                     <MaterialCommunityIcons
                         name={"plus"}
                         color={theme_colors.dark}
-                        size={adjustFontSize(theme_textStyles.small + .5)}
+                        size={adjustFontSize(theme_textStyles.smedium)}
                     />
                 </ViewStyled>
             </TouchableOpacity>

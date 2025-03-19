@@ -10,59 +10,35 @@ import IndicatorItem from './IndicatorItem'
 import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 
 export default function BusinessItem({ item, onPress }) {
-  // {
-  //   "id": "7c4ead2e-b806-4bea-925c-ac5a7fab887a",
-  //   "status": null,
-  //   "name": "Entereza",
-  //   "categoryCode": "f2d43b0c-4c13-4a9a-8b6b-1013d0d82381",
-  //   "categoryName": "prueba5",
-  //   "email": "entereza",
-  //   "cashback": "10",
-  //   "image": "https://insightful-integrity-production.up.railway.app/images/get/7c4ead2e-b806-4bea-925c-ac5a7fab887a_image",
-  //   "imageP": "https://insightful-integrity-production.up.railway.app/images/get/7c4ead2e-b806-4bea-925c-ac5a7fab887a_imageP",
-  //   "favorite": null,
-  //   "creationDate": "2024-12-10 00:46:16"
-  // },
+  const price = item?.branch?.tripPrice || 0;
 
-  // Ubicación falsa de la empresa
-  const businessLocation = {
-    latitude: -17.373889,
-    longitude: -66.155833
-  }
 
-  // Ubicación falsa del usuario
-  const userLocation = {
-    latitude: -17.393889,
-    longitude: -66.165833
-  }
-
-  // Distancia en metros que viene como prop
-  const distance = item.distance // en metros
-
-  // Velocidad promedio de delivery en moto: 30 km/h = 8.33 m/s
-  const avgDeliverySpeed = 8.33 // metros por segundo
-
-  // Calculo del tiempo estimado en minutos
-  const estimatedDeliveryTime = Math.round((distance / avgDeliverySpeed) / 60)
+  // La sucursal está abierta si status es true
+  const isOpen = item.branch && item.branch.status === true;
 
   const indicators = [
     {
-      title: `15 min`,
-      icon: 'clock-o',
-    },
-    {
-      title: `15 min`,
+      title: `Bs. ${price}`,
       icon: 'motorcycle',
+      show: price > 0,
     },
     {
-      title: item.status === 'open' ? 'Abierto' : 'Cerrado',
-      icon: item.status === 'open' ? 'unlock-alt' : 'lock',
+      title: isOpen ? 'Abierto' : 'Cerrado',
+      icon: isOpen ? 'unlock' : 'lock',
+      show: true,
     }
   ]
 
+  const handlePress = () => {
+    if (isOpen) {
+      onPress();
+    }
+  }
+
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
+      style={{ opacity: isOpen ? 1 : 0.6 }}
     >
       <ViewStyled
         backgroundColor={theme_colors.white}
@@ -74,7 +50,6 @@ export default function BusinessItem({ item, onPress }) {
           alignItems: 'center',
           justifyContent: 'flex-start',
           borderRadius: 15,
-
           shadowColor: theme_colors.black,
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.5,
@@ -105,40 +80,64 @@ export default function BusinessItem({ item, onPress }) {
             source={item.imageP ? { uri: item.imageP } : require('../../../assets/images/business/emptyPortrait.png')}
           />
 
-          <LinearGradient
-            colors={[theme_colors.primary, `${theme_colors.primary}70`, theme_colors.primary]}
-            start={{ x: 0, y: 0.5 }}
-            end={{ x: 1, y: 0.5 }}
-            style={{
-              width: 'auto',
-              height: 'auto',
-              justifyContent: 'center',
-              alignItems: 'center',
-              position: 'absolute',
-              paddingHorizontal: 15,
-              paddingVertical: 10,
-              borderRadius: 15,
-              bottom: 15,
-              right: 15,
-            }}
-          >
-            <ViewStyled
-              backgroundColor={theme_colors.transparent}
+          {isOpen && (
+            <LinearGradient
+              colors={[theme_colors.primary, `${theme_colors.primary}70`, theme_colors.primary]}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
               style={{
                 width: 'auto',
                 height: 'auto',
+                justifyContent: 'center',
+                alignItems: 'center',
+                position: 'absolute',
+                paddingHorizontal: 15,
+                paddingVertical: 10,
+                borderRadius: 15,
+                bottom: 15,
+                right: 15,
+              }}
+            >
+              <ViewStyled
+                backgroundColor={theme_colors.transparent}
+                style={{
+                  width: 'auto',
+                  height: 'auto',
+                }}
+              >
+                <TextStyled
+                  fontFamily='SFPro-SemiBold'
+                  textAlign='left'
+                  fontSize={theme_textStyles.small}
+                  color={theme_colors.white}
+                >
+                  Cashback {item.cashback} %
+                </TextStyled>
+              </ViewStyled>
+            </LinearGradient>
+          )}
+
+          {!isOpen && (
+            <ViewStyled
+              backgroundColor={`${theme_colors.black}80`}
+              style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}
             >
               <TextStyled
-                fontFamily='SFPro-SemiBold'
-                textAlign='left'
-                fontSize={theme_textStyles.small}
+                fontFamily='SFPro-Bold'
+                textAlign='center'
+                fontSize={theme_textStyles.medium}
                 color={theme_colors.white}
               >
-                Cashback {item.cashback} %
+                CERRADO
               </TextStyled>
             </ViewStyled>
-          </LinearGradient>
+          )}
         </ViewStyled>
 
         <ViewStyled
@@ -155,12 +154,12 @@ export default function BusinessItem({ item, onPress }) {
             fontFamily='SFPro-Bold'
             textAlign='left'
             fontSize={theme_textStyles.smedium}
-            color={theme_colors.black}
+            color={isOpen ? theme_colors.black : theme_colors.grey}
             style={{
               width: '95%',
             }}
           >
-            {item.name}
+            {item.name} - {item.branch?.sectorName || ''}
           </TextStyled>
 
           <ViewStyled
@@ -176,7 +175,13 @@ export default function BusinessItem({ item, onPress }) {
             }}
           >
             {indicators.map((indicator, index) => (
-              <IndicatorItem key={index} indicator={indicator} />
+              indicator.show && (
+                <IndicatorItem
+                  key={index}
+                  indicator={indicator}
+                  disabled={!isOpen}
+                />
+              )
             ))}
           </ViewStyled>
         </ViewStyled>

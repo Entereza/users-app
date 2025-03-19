@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { StyleSheet, View, Text, Alert } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ViewStyled from '../../utils/ui/ViewStyled';
@@ -13,6 +13,10 @@ import adjustFontSize from '../../utils/ui/adjustText';
 import ButtonWithIcon from '../../components/Buttons/ButtonWithIcon';
 import { authService } from '../../services/api/auth';
 import useAuthStore from '../../utils/tools/interface/authStore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { toastService } from '../../utils/tools/interface/toastService';
+import { notificationService } from '../../services/notifications/notificationService';
+import useNotificationStore from '../../utils/tools/interface/notificationStore';
 
 export default function RegisterScreen() {
     const insets = useSafeAreaInsets();
@@ -20,6 +24,27 @@ export default function RegisterScreen() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const { setUserData } = useAuthStore();
+    const { setExpoPushToken, setNotificationListeners, setIsNotificationsEnabled } = useNotificationStore();
+
+    useEffect(() => {
+        return () => {
+            // Cleanup notification listeners on unmount
+            const { notificationListeners } = useNotificationStore.getState();
+            if (notificationListeners) {
+                notificationService.removeNotificationListeners(notificationListeners);
+            }
+        };
+    }, []);
+
+    const handleNotificationsSetup = async (userId) => {
+        const notificationSetup = await notificationService.initializeNotificationsAfterLogin(userId);
+        if (notificationSetup) {
+            const { token, listeners } = notificationSetup;
+            setExpoPushToken(token);
+            setNotificationListeners(listeners);
+            setIsNotificationsEnabled(true);
+        }
+    };
 
     const formik = useFormik({
         initialValues: {
@@ -45,43 +70,53 @@ export default function RegisterScreen() {
 
                 console.log('Signup response:', response);
 
-                if (response.code === '200') {
-                    Alert.alert(
-                        "Éxito",
-                        response.msg || "Registro exitoso",
-                        [{ text: "OK" }]
-                    );
-                    setUserData({
-                        names: values.names,
-                        lastNames: values.lastNames,
-                        phoneNumber: values.phoneNumber,
-                        ci: '',
-                        cashback: 0,
-                        email: values.email,
-                        password: values.password,
-                        image: ""
+                if (response.code === 'COD200') {
+                    const loginResponse = await authService.login({
+                        nick: values.email,
+                        password: values.password
                     });
+
+                    console.log('loginResponse', loginResponse)
+
+                    if (loginResponse.code === 'COD200') {
+                        let userData = {
+                            id: loginResponse.client.id,
+                            names: loginResponse.client.names,
+                            lastNames: loginResponse.client.lastnames,
+                            phoneNumber: loginResponse.client.phoneNumber,
+                            ci: loginResponse.client.carnet,
+                            cashback: loginResponse.client.cashback,
+                            email: loginResponse.client.email,
+                            image: loginResponse.client.img,
+                            password: loginResponse.client.password,
+                            status: loginResponse.client.status,
+                            username: loginResponse.client.username,
+                        }
+
+                        setUserData(userData);
+                        AsyncStorage.setItem('userData', JSON.stringify(userData));
+                        if (loginResponse.token) {
+                            AsyncStorage.setItem('token', loginResponse.token)
+                        }
+
+                        // Initialize notifications after successful registration and login
+                        await handleNotificationsSetup(loginResponse.client.id);
+                    } else {
+                        toastService.showErrorToast(loginResponse.msg || "Error al iniciar sesión");
+                    }
                 } else {
-                    Alert.alert(
-                        "Error",
-                        response.msg || "Error en el registro",
-                        [{ text: "OK" }]
-                    );
+                    toastService.showErrorToast(response.msg || "Error en el registro");
                 }
             } catch (error) {
                 console.error('Error during registration:', error);
-                Alert.alert(
-                    "Error",
-                    error.message || "Hubo un problema al intentar registrarse",
-                    [{ text: "OK" }]
-                );
+                toastService.showErrorToast(error.message || "Hubo un problema al intentar registrarse");
             } finally {
                 setLoading(false);
             }
         }
     });
 
-  return (
+    return (
         <ViewStyled
             backgroundColor={theme_colors.dark}
             style={{

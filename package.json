@@ -31,12 +31,13 @@
     "expo-checkbox": "^3.0.0",
     "expo-constants": "^16.0.2",
     "expo-dev-client": "~4.0.20",
+    "expo-device": "~6.0.2",
     "expo-file-system": "^17.0.1",
     "expo-font": "^12.0.7",
     "expo-image-picker": "~15.0.7",
     "expo-linear-gradient": "^13.0.2",
     "expo-location": "^17.0.1",
-    "expo-notifications": "~0.28.10",
+    "expo-notifications": "~0.28.19",
     "expo-sharing": "^12.0.1",
     "expo-splash-screen": "^0.27.5",
     "expo-status-bar": "^1.12.1",
@@ -45,6 +46,7 @@
     "formik": "^2.4.6",
     "metro-core": "^0.80.9",
     "metro-resolver": "^0.80.9",
+    "moti": "^0.30.0",
     "native-base": "^3.4.28",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -61,7 +63,6 @@
     "react-native-paper": "^5.12.3",
     "react-native-picker-scrollview": "^1.0.1",
     "react-native-radial-gradient": "^1.1.5",
-    "react-native-reanimated": "~3.10.1",
     "react-native-responsive-screen": "^1.4.2",
     "react-native-root-siblings": "^5.0.1",
     "react-native-root-toast": "^3.6.0",
@@ -77,6 +78,9 @@
     "redux-thunk": "^3.1.0",
     "sharp-cli": "^4.2.0",
     "yup": "^1.4.0",
-    "zustand": "^4.5.4"
+    "zustand": "^4.5.4",
+    "react-native-reanimated": "~3.10.1",
+    "expo-av": "~14.0.7",
+    "expo-media-library": "~16.0.5"
   }
 }

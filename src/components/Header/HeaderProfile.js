@@ -36,7 +36,7 @@ export default function HeaderProfile({ user, onPress }) {
                         marginBottom: 5
                     }}
                 >
-                    ¡Hola {user}!
+                    ¡Hola {user?.names?.split(' ')[0]}!
                 </TextStyled>
 
                 <TextStyled
@@ -86,7 +86,7 @@ export default function HeaderProfile({ user, onPress }) {
                         width={100}
                         height={100}
                         borderRadius={'50%'}
-                        source={{ uri: 'https://www.befunky.com/images/wp/wp-2021-01-linkedin-profile-picture-after.jpg?auto=avif,webp&format=jpg&width=944' }}
+                        source={user?.image ? { uri: user?.image } : require('../../../assets/images/DefaultProfileUser.png')}
                         style={{
                             maxHeight: 54,
                             maxWidth: 54,

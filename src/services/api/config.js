@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = 'https://ms-auth-production-5785.up.railway.app';
 
 export const handleApiResponse = async (response) => {
     if (!response.ok) {
@@ -22,12 +22,13 @@ const getAuthToken = async () => {
 
 export const createApiRequest = async (endpoint, options = {}) => {
     const token = await getAuthToken();
-    
+
     const defaultHeaders = {
         'Content-Type': 'application/json',
     };
 
     if (token) {
+        // console.log('token: ', token)
         defaultHeaders['Authorization'] = `Bearer ${token}`;
     }
 
@@ -38,6 +39,7 @@ export const createApiRequest = async (endpoint, options = {}) => {
             ...options.headers,
         },
     });
+
 
     return handleApiResponse(response);
 };

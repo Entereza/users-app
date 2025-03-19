@@ -9,20 +9,30 @@ import { TouchableOpacity } from 'react-native'
 import TextStyled from '../../../utils/ui/TextStyled'
 import { theme_textStyles } from '../../../utils/theme/theme_textStyles'
 
-export default function ProductButtonsAddToCart({ item, paddingHorizontal = 1.5, onQuantityChange }) {
-    const [quantity, setQuantity] = useState(0);
+export default function ProductButtonsAddToCart({ paddingHorizontal = 1.5, onQuantityChange, initialQuantity = 1 }) {
+    const [quantity, setQuantity] = useState(initialQuantity);
 
     useEffect(() => {
-        onQuantityChange?.(quantity);
-    }, [quantity]);
+        // Inicializar con la cantidad inicial
+        setQuantity(initialQuantity);
+    }, [initialQuantity]);
+
+    useEffect(() => {
+        // Notificar al componente padre sobre cambios en la cantidad
+        if (onQuantityChange) {
+            onQuantityChange(quantity);
+        }
+    }, [quantity, onQuantityChange]);
 
     const handleAdd = () => {
         setQuantity(prev => prev + 1);
     };
 
     const handleRemove = () => {
-        setQuantity(prev => (prev > 0 ? prev - 1 : 0));
+        setQuantity(prev => (prev > 1 ? prev - 1 : 1));
     };
+
+    const disabledRemove = quantity <= 1
 
     return (
         <ViewStyled
@@ -37,7 +47,7 @@ export default function ProductButtonsAddToCart({ item, paddingHorizontal = 1.5,
                 alignItems: 'center',
             }}
         >
-            <TouchableOpacity onPress={handleRemove}>
+            <TouchableOpacity onPress={handleRemove} disabled={disabledRemove}>
                 <ViewStyled
                     backgroundColor={theme_colors.white}
                     width={10}
@@ -47,7 +57,8 @@ export default function ProductButtonsAddToCart({ item, paddingHorizontal = 1.5,
                         alignItems: 'center',
                         borderRadius: 10,
                         borderWidth: 1,
-                        borderColor: theme_colors.semiTransparent
+                        borderColor: theme_colors.semiTransparent,
+                        opacity: disabledRemove ? 0.5 : 1
                     }}
                 >
                     <MaterialCommunityIcons

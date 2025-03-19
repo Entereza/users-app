@@ -72,35 +72,27 @@ export default function MethodScreen() {
 
                             <ViewStyled
                                 height={4}
-                                marginTop={1}
+                                marginTop={2}
+                                marginBottom={2}
                                 backgroundColor={theme_colors.transparent}
                                 style={{
                                     width: '90%',
+                                    height: 'auto',
                                     justifyContent: 'center',
                                     alignItems: 'flex-start',
                                 }}
                             >
                                 <TextStyled
-                                    fontFamily='SFPro-Bold'
+                                    fontFamily='SFPro-Regular'
                                     textAlign='left'
-                                    fontSize={theme_textStyles.medium}
-                                    color={theme_colors.primary}
-                                    numberOfLines={1}
+                                    fontSize={theme_textStyles.small + .5}
+                                    color={theme_colors.grey}
+                                    numberOfLines={2}
                                     ellipsizeMode='tail'
                                 >
-                                    Selecciona
+                                    Selecciona el método de pago para el pago de tu pedido
                                 </TextStyled>
                             </ViewStyled>
-                            <ViewStyled
-                                width={'90%'}
-                                height={'0.2%'}
-                                backgroundColor={theme_colors.greyLine}
-                                style={{
-                                    alignSelf: 'center',
-                                    marginBottom: 20,
-                                    marginTop: 10
-                                }}
-                            />
                         </>
                     )
                 }

@@ -8,12 +8,12 @@ import { TouchableOpacity } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { private_name_routes } from '../../utils/route/private_name_routes'
 
-export default function ResumeCard() {
-    const { cart, myCashback } = useCartStore();
+export default function ResumeCard({ tripPrice }) {
+    const { cart, myCashback, serviceFee } = useCartStore();
     const navigation = useNavigation()
 
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const serviceFeePrice = totalPrice < 100 ? 1 : 2;
 
     const resumeList = [
         {
@@ -22,12 +22,17 @@ export default function ResumeCard() {
         },
         {
             "text": "Envío",
-            "price": 0,
-            "freeShipping": true,
+            "price": tripPrice,
+            "freeShipping": tripPrice <= 0,
         },
+        // {
+        //     "text": "Cupón",
+        //     "price": 0,
+        // },
         {
-            "text": "Cupón",
-            "price": 0,
+            "text": "Servicio",
+            "price": serviceFeePrice,
+            "colorText": theme_colors.primary
         },
         {
             "text": "Mi Cashback",
@@ -237,7 +242,7 @@ export default function ResumeCard() {
                         width: '50%'
                     }}
                 >
-                    BOB. {totalPrice - myCashback}
+                    BOB. {totalPrice - myCashback + serviceFeePrice + tripPrice}
                 </TextStyled>
             </ViewStyled>
         </ViewStyled>

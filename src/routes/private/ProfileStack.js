@@ -15,6 +15,8 @@ export default function ProfileStack() {
                 navigationBarHidden: true,
                 animation: "slide_from_right",
                 animationTypeForReplace: 'pop',
+                gestureEnabled: true,
+                gestureDirection: 'horizontal',
             }}
             initialRouteName={private_name_routes.profile.profileHome}
         >
@@ -24,7 +26,9 @@ export default function ProfileStack() {
                 options={{
                     animation: "slide_from_right",
                     animationTypeForReplace: 'push',
-                    headerShown: false
+                    headerShown: false,
+                    gestureEnabled: true,
+                    gestureDirection: 'horizontal',
                 }}
             />
 
@@ -35,7 +39,9 @@ export default function ProfileStack() {
                     navigationBarHidden: true,
                     animation: "slide_from_right",
                     animationTypeForReplace: 'pop',
-                    headerShown: false
+                    headerShown: false,
+                    gestureEnabled: true,
+                    gestureDirection: 'horizontal',
                 }}
             />
 
@@ -46,7 +52,9 @@ export default function ProfileStack() {
                     navigationBarHidden: true,
                     animation: "slide_from_right",
                     animationTypeForReplace: 'pop',
-                    headerShown: false
+                    headerShown: false,
+                    gestureEnabled: true,
+                    gestureDirection: 'horizontal',
                 }}
             />
         </Stack.Navigator>

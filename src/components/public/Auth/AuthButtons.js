@@ -3,18 +3,21 @@ import ViewStyled from '../../../utils/ui/ViewStyled'
 import { theme_colors } from '../../../utils/theme/theme_colors'
 import ButtonAuthentication from '../../Buttons/ButtonAuthentication'
 import * as AppleAuthentication from 'expo-apple-authentication';
-import { Platform, Alert } from 'react-native';
+import { Platform } from 'react-native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useNavigation } from '@react-navigation/native';
 import useAuthStore from '../../../utils/tools/interface/authStore';
 import { public_name_routes } from '../../../utils/route/public_name_routes';
 import { authService } from '../../../services/api/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { toastService } from '../../../utils/tools/interface/toastService';
+import { notificationService } from '../../../services/notifications/notificationService';
+import useNotificationStore from '../../../utils/tools/interface/notificationStore';
 
 export default function AuthButtons() {
-    // const navigation = useNavigation();
     const { setUserData } = useAuthStore();
-    const navigation = useNavigation()
+    const navigation = useNavigation();
+    const { setExpoPushToken, setNotificationListeners, setIsNotificationsEnabled } = useNotificationStore();
 
     const [loadingGoogle, setLoadingGoogle] = useState(false);
     const [loadingApple, setLoadingApple] = useState(false);
@@ -30,8 +33,25 @@ export default function AuthButtons() {
     }
 
     useEffect(() => {
-        configureGoogleSignIn()
-    }, [])
+        configureGoogleSignIn();
+        return () => {
+            // Cleanup notification listeners on unmount
+            const { notificationListeners } = useNotificationStore.getState();
+            if (notificationListeners) {
+                notificationService.removeNotificationListeners(notificationListeners);
+            }
+        };
+    }, []);
+
+    const handleNotificationsSetup = async (userId) => {
+        const notificationSetup = await notificationService.initializeNotificationsAfterLogin(userId);
+        if (notificationSetup) {
+            const { token, listeners } = notificationSetup;
+            setExpoPushToken(token);
+            setNotificationListeners(listeners);
+            setIsNotificationsEnabled(true);
+        }
+    };
 
     // Set Fake UserData
     const setUserDataFake = (token) => {
@@ -57,8 +77,6 @@ export default function AuthButtons() {
             await GoogleSignin.hasPlayServices()
 
             const userInfo = await GoogleSignin.signIn()
-            console.log('Google User Info: ', userInfo)
-
             // Try signup first
             try {
                 const signupResponse = await authService.signupWithGoogle({
@@ -68,21 +86,12 @@ export default function AuthButtons() {
                 console.log('SignupResponse: ', signupResponse)
 
                 if (signupResponse.code === 'COD200') {
-                    Alert.alert(
-                        "Éxito",
-                        signupResponse.msg || "Registro exitoso",
-                        [{ text: "OK" }]
-                    );
                     return;
                 }
             } catch (signupError) {
                 console.log('Signup failed, trying login:', signupError);
                 if (signupError.message !== 'Usuario ya existe') {
-                    Alert.alert(
-                        "Error",
-                        signupError.message || "Error en el registro",
-                        [{ text: "OK" }]
-                    );
+                    toastService.showErrorToast(signupError.message || "Error en el registro");
                 }
             }
 
@@ -95,13 +104,10 @@ export default function AuthButtons() {
                 console.log('LoginRsponse: ', loginResponse)
 
                 if (loginResponse.code === 'COD200') {
-                    Alert.alert(
-                        "Éxito",
-                        loginResponse.msg || "Inicio de sesión exitoso",
-                        [{ text: "OK" }]
-                    );
                     AsyncStorage.setItem('token', loginResponse.token)
-                    setUserData({
+                    AsyncStorage.setItem('userId', loginResponse.client.id.toString())
+
+                    let userData = {
                         id: loginResponse.client.id,
                         names: loginResponse.client.names,
                         lastNames: loginResponse.client.lastnames,
@@ -113,30 +119,23 @@ export default function AuthButtons() {
                         password: loginResponse.client.password,
                         status: loginResponse.client.status,
                         username: loginResponse.client.username,
-                    });
+                    }
+                    setUserData(userData);
+                    AsyncStorage.setItem('userData', JSON.stringify(userData));
+
+                    // Initialize notifications after successful login
+                    await handleNotificationsSetup(loginResponse.client.id);
                 } else {
-                    Alert.alert(
-                        "Error",
-                        loginResponse.msg || "Error al iniciar sesión",
-                        [{ text: "OK" }]
-                    );
+                    toastService.showErrorToast(loginResponse.msg || "Error al iniciar sesión");
                 }
             } catch (loginError) {
                 console.error('Login failed:', loginError);
-                Alert.alert(
-                    "Error",
-                    loginError.message || "Error al iniciar sesión con Google",
-                    [{ text: "OK" }]
-                );
+                toastService.showErrorToast(loginError.message || "Error al iniciar sesión con Google");
                 throw loginError;
             }
         } catch (error) {
             console.log('Google Error: ', error);
-            Alert.alert(
-                "Error",
-                "Hubo un problema al autenticar con Google",
-                [{ text: "OK" }]
-            );
+            toastService.showErrorToast("Hubo un problema al autenticar con Google");
         } finally {
             setLoadingGoogle(false);
         }
@@ -155,13 +154,20 @@ export default function AuthButtons() {
 
             // credential.user is the unique identifier for this user
             console.log('Apple Credential: ', credential);
-            setUserDataFake()
+            setUserDataFake();
+            
+            // Initialize notifications after successful Apple login
+            if (credential.user) {
+                await handleNotificationsSetup(credential.user);
+            }
+            
             return credential;
         } catch (error) {
             if (error.code === 'ERR_CANCELED') {
                 console.log('User canceled Apple Sign in');
             } else {
                 console.error('Error during Apple Sign in:', error);
+                toastService.showErrorToast("Error al iniciar sesión con Apple");
             }
         } finally {
             setLoadingApple(false);

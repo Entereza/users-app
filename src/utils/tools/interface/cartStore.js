@@ -3,29 +3,59 @@ import { create } from 'zustand';
 const useCartStore = create((set) => ({
     cart: [],
     addToCart: (product) => set((state) => {
-        const existingProduct = state.cart.find(item => item.id === product.id);
-        if (existingProduct) {
-            return {
-                cart: state.cart.map(item =>
-                    item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-                )
+        const selectedVariablesKey = product.selectedVariables ?
+            product.selectedVariables.map(v =>
+                `${v.id}_${v.selections.map(s => s.id).sort().join('_')}`
+            ).sort().join('|') : '';
+        const uniqueId = `${product.id}_${selectedVariablesKey}`;
+
+        // Calcular el precio total del producto incluyendo variables
+        const variablesPrice = product.selectedVariables ?
+            product.selectedVariables.reduce((total, variable) =>
+                total + variable.selections.reduce((varTotal, selection) =>
+                    varTotal + (selection.price || 0), 0), 0) : 0;
+        const totalPrice = product.price + variablesPrice;
+
+        // Obtener la cantidad del producto que se está agregando (por defecto 1)
+        const quantityToAdd = product.quantity || 1;
+
+        const existingProductIndex = state.cart.findIndex(item =>
+            item.uniqueId === uniqueId
+        );
+
+        if (existingProductIndex >= 0) {
+            // Si el producto existe con las mismas variables, sumar la nueva cantidad
+            const newCart = [...state.cart];
+            newCart[existingProductIndex] = {
+                ...newCart[existingProductIndex],
+                quantity: newCart[existingProductIndex].quantity + quantityToAdd
             };
+            return { cart: newCart };
         }
-        return { cart: [...state.cart, { ...product, quantity: 1 }] };
+
+        // Si es un nuevo producto o tiene diferentes variables, añadir como nuevo
+        return {
+            cart: [...state.cart, {
+                ...product,
+                uniqueId,
+                totalPrice,
+                quantity: quantityToAdd // Usar la cantidad proporcionada
+            }]
+        };
     }),
-    removeFromCart: (productId) => set((state) => {
-        const existingProduct = state.cart.find(item => item.id === productId);
+    removeFromCart: (uniqueId) => set((state) => {
+        const existingProduct = state.cart.find(item => item.uniqueId === uniqueId);
         if (existingProduct && existingProduct.quantity > 1) {
             return {
                 cart: state.cart.map(item =>
-                    item.id === productId ? { ...item, quantity: item.quantity - 1 } : item
+                    item.uniqueId === uniqueId ? { ...item, quantity: item.quantity - 1 } : item
                 )
             };
         }
-        return { cart: state.cart.filter(item => item.id !== productId) };
+        return { cart: state.cart.filter(item => item.uniqueId !== uniqueId) };
     }),
-    deleteFromCart: (productId) => set((state) => ({
-        cart: state.cart.filter(item => item.id !== productId)
+    deleteFromCart: (uniqueId) => set((state) => ({
+        cart: state.cart.filter(item => item.uniqueId !== uniqueId)
     })),
     clearCart: () => set({ cart: [] }),
 
@@ -36,12 +66,13 @@ const useCartStore = create((set) => ({
     setBillingInfo: (info) => set({ billingInfo: info }),
 
     listPaymentMethods: [
-        { name: 'Efectivo', icon: 'money-bill-wave' },
-        { name: 'QR', icon: 'qrcode' },
-        { name: 'Tarjeta', icon: 'credit-card' },
+        { id: 'cash', name: 'Efectivo', icon: 'money-bill-wave' },
+        { id: 'qr', name: 'QR', icon: 'qrcode' },
+        // { id: 'card', name: 'Tarjeta', icon: 'credit-card' },
     ],
 
     paymentMethod: {
+        id: 'cash',
         name: 'Efectivo',
         icon: 'money-bill-wave'
     },
@@ -49,6 +80,11 @@ const useCartStore = create((set) => ({
 
     myCashback: 0,
     setMyCashback: (cashback) => set({ myCashback: cashback }),
+
+    tripPrice: 0,
+    setTripPrice: (price) => set({ tripPrice: price }),
+    cashbackBusiness: 0,
+    setCashbackBusiness: (cashback) => set({ cashbackBusiness: cashback }),
 }));
 
 export default useCartStore; 

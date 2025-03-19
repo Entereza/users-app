@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import ViewStyled from '../../../utils/ui/ViewStyled'
 import { theme_colors } from '../../../utils/theme/theme_colors'
 import ImageStyled from '../../../utils/ui/ImageStyled'
@@ -7,14 +7,15 @@ import { theme_textStyles } from '../../../utils/theme/theme_textStyles'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import adjustFontSize from '../../../utils/ui/adjustText'
 import ButtonsAddToCart from '../ButtonsAddToCart'
-import { useNavigation } from '@react-navigation/native'
-import { private_name_routes } from '../../../utils/route/private_name_routes'
 
 export default function ProductsItem({ item }) {
-    const navigation = useNavigation()
+    const [isCheckingVariables, setIsCheckingVariables] = useState(false)
+    const hasVariables = item.variables && item.variables.length > 0
 
-    const goToDetailsProduct = () => {
-        navigation.navigate(private_name_routes.empresas.empresaProducto, { product: item })
+    const productWithVariables = {
+        ...item,
+        hasVariables,
+        variables: item.variables
     }
 
     return (
@@ -26,13 +27,6 @@ export default function ProductsItem({ item }) {
             style={{
                 alignItems: 'center',
                 justifyContent: 'flex-start',
-                // borderWidth: 1,
-                // borderRadius: 15,
-                // shadowColor: theme_colors.black,
-                // shadowOffset: { width: 0, height: 2 },
-                // shadowOpacity: 0.5,
-                // shadowRadius: 2,
-                // elevation: 3,
             }}
         >
             <ViewStyled
@@ -98,6 +92,8 @@ export default function ProductsItem({ item }) {
                     textAlign='left'
                     fontSize={theme_textStyles.smedium}
                     color={theme_colors.black}
+                    numberOfLines={1}
+                    ellipsizeMode='tail'
                 >
                     {item.nameProduct}
                 </TextStyled>
@@ -106,8 +102,10 @@ export default function ProductsItem({ item }) {
                     textAlign='left'
                     fontSize={theme_textStyles.small}
                     color={theme_colors.grey}
+                    numberOfLines={1}
+                    ellipsizeMode='tail'
                 >
-                    {item.type}
+                    {item.description}
                 </TextStyled>
             </ViewStyled>
 
@@ -133,7 +131,9 @@ export default function ProductsItem({ item }) {
                     Bs. {item.price}
                 </TextStyled>
 
-                <ButtonsAddToCart item={item} height={3.5} bottom={0} />
+                {!isCheckingVariables && (
+                    <ButtonsAddToCart item={productWithVariables} paddingHorizontal={2} height={4} bottom={0} />
+                )}
             </ViewStyled>
         </ViewStyled>
     )

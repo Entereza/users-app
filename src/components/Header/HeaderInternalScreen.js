@@ -41,9 +41,9 @@ export default function HeaderInternalScreen({ title, onPress }) {
                 }}
             >
                 <ViewStyled
-                    width={12}
-                    height={6}
-                    borderRadius={1.2}
+                    width={11}
+                    height={5.5}
+                    borderRadius={50}
                     backgroundColor={theme_colors.transparent}
                     style={{
                         justifyContent: 'center',

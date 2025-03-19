@@ -28,7 +28,7 @@ export default function PaymentInfo({
             <MaterialCommunityIcons
                 name={iconName}
                 size={adjustFontSize(theme_textStyles.smedium)}
-                color={theme_colors.dark}
+                color={theme_colors.primary}
                 style={{
                     marginRight: 5
                 }}
@@ -39,6 +39,9 @@ export default function PaymentInfo({
                 textAlign={'center'}
                 fontSize={theme_textStyles.small}
                 color={textColor}
+                style={{
+                    marginTop: 3
+                }}
             >
                 {text}
             </TextStyled>

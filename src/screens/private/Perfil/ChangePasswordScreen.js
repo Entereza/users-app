@@ -32,7 +32,7 @@ export default function ChangePasswordScreen() {
 
         console.log(dataChangePassword)
       } catch (err) {
-        console.log('Error on editProfile: ', err)
+        console.log('Error on ChangePasswordScreen: ', err)
       }
     }
   });

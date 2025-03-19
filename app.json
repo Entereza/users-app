@@ -12,13 +12,8 @@
       "backgroundColor": "#000000"
     },
     "scheme": "com.entereza.client",
-    "platforms": [
-      "ios",
-      "android"
-    ],
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "platforms": ["ios", "android"],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "associatedDomains": [
         "com.googleusercontent.apps.511900415351-ej15snog5mn00ikjcbuqeqa1pap18nkn"
@@ -69,7 +64,8 @@
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.DOWNLOAD_WITHOUT_NOTIFICATION",
         "android.permission.ACCESS_NETWORK_STATE",
-        "com.google.android.gms.permission.AD_ID"
+        "com.google.android.gms.permission.AD_ID",
+        "android.permission.RECEIVE_BOOT_COMPLETED"
       ],
       "googleServicesFile": "./google-services.json",
       "config": {
@@ -85,10 +81,7 @@
               "scheme": "com.entereza.client"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         }
       ]
     },
@@ -135,6 +128,14 @@
           "android": {
             "targetSdkVersion": 33
           }
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Esto permite a Entereza acceder a tus fotos para poder guardar y compartir los códigos QR generados.",
+          "savePhotosPermission": "Esto permite a Entereza guardar los códigos QR generados en tu galería de fotos para que puedas acceder a ellos cuando lo necesites.",
+          "isAccessMediaLocationEnabled": true
         }
       ],
       "expo-asset"

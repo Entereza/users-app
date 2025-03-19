@@ -19,14 +19,14 @@ export default function LocationCard() {
 
     return (
         <ViewStyled
-            width={'95%'}
             backgroundColor={theme_colors.transparent}
             style={{
-                justifyContent: 'flex-start',
+                flex: 1,
+                justifyContent: 'center',
                 alignItems: 'center'
             }}
         >
-            <SendAddressCard selectedAddress={selectedAddress?.address} onPress={goToChangeAddress} />
+            <SendAddressCard selectedAddress={selectedAddress?.nameAddress} onPress={goToChangeAddress} />
         </ViewStyled>
     );
 };

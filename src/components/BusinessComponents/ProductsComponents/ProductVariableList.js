@@ -3,20 +3,25 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { Ionicons } from '@expo/vector-icons';
 import { theme_colors } from '../../../utils/theme/theme_colors';
 
-const ProductVariableList = ({ namePv = "", variables = [], isRequired = false, maxSelect = 2 }) => {
+const ProductVariableList = ({ namePv = "", variables = [], isRequired = false, maxSelect = 2, onSelectionChange }) => {
     const [isExpanded, setIsExpanded] = useState(true);
     const [selectedItems, setSelectedItems] = useState([]);
 
     const toggleItem = (index) => {
         setSelectedItems(prev => {
+            let newSelection;
             if (prev.includes(index)) {
-                return prev.filter(item => item !== index);
+                newSelection = prev.filter(item => item !== index);
             } else {
                 if (prev.length >= maxSelect) {
                     return prev;
                 }
-                return [...prev, index];
+                newSelection = [...prev, index];
             }
+            // Llamar a onSelectionChange con los IDs de las variables seleccionadas
+            const selectedVariableIds = newSelection.map(idx => variables[idx].id);
+            onSelectionChange?.(selectedVariableIds);
+            return newSelection;
         });
     };
 
@@ -45,7 +50,6 @@ const ProductVariableList = ({ namePv = "", variables = [], isRequired = false, 
             {isExpanded && (
                 <ScrollView style={styles.itemsContainer}>
                     {variables.map((variable, index) => {
-                        console.log('Variable:', variable);
                         return (
                             <TouchableOpacity
                                 key={index}

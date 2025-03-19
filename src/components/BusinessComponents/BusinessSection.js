@@ -12,33 +12,62 @@ import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 import { empresasService } from '../../services/api/empresas/empresasService'
 import { showToast } from '../../utils/tools/toast/toastService'
 import Toast from 'react-native-root-toast'
+import BusinessSkeleton from '../Skeletons/BusinessSkeleton'
+import useLocationStore from '../../utils/tools/interface/locationStore'
+import ImageStyled from '../../utils/ui/ImageStyled'
 
-export default function BusinessSection() {
+export default function BusinessSection({ refreshing }) {
   const navigation = useNavigation();
   const { toggleTabBar, changeColorStatusBar } = useTabBarStore();
+  const { latitude, longitude, departmentId } = useLocationStore();
   const [businesses, setBusinesses] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchBusinesses();
-  }, []);
+  }, [latitude, longitude, departmentId]);
+
+  useEffect(() => {
+    if (refreshing) {
+      fetchBusinesses();
+    }
+  }, [refreshing]);
 
   const fetchBusinesses = async () => {
     try {
       setIsLoading(true);
-      const response = await empresasService.getAllCompanies(0, 4);
-      const sortedBusinesses = response
-        .sort((a, b) => parseFloat(b.cashback) - parseFloat(a.cashback))
-        .slice(0, 4);
-      setBusinesses(sortedBusinesses);
+
+      if (!departmentId || !latitude || !longitude) {
+        // showToast(
+        //   'No se pudo obtener tu ubicación',
+        //   Toast.positions.TOP,
+        //   theme_colors.white,
+        //   theme_colors.error
+        // );
+        return;
+      }
+
+      const response = await empresasService.getBranchesByCity(departmentId, latitude, longitude);
+
+      if (response && response.business) {
+        // Procesar los datos para obtener solo empresas con sucursales abiertas
+        const processedBusinesses = empresasService.processBusinessData(response);
+
+        // Limitar a 4 empresas para mostrar
+        const limitedBusinesses = processedBusinesses.slice(0, 4);
+        setBusinesses(limitedBusinesses);
+      } else {
+        setBusinesses([]);
+      }
     } catch (error) {
       console.error('Error fetching businesses:', error);
       showToast(
-        'No se pudieron cargar las empresas',
+        'No se pudieron cargar las empresas cercanas',
         Toast.positions.TOP,
         theme_colors.white,
         theme_colors.error
       );
+      setBusinesses([]);
     } finally {
       setIsLoading(false);
     }
@@ -52,19 +81,23 @@ export default function BusinessSection() {
     });
   }
 
+  if (isLoading) {
+    return <BusinessSkeleton />
+  }
+
   return (
     <ViewStyled
+      width={100}
       backgroundColor={theme_colors.transparent}
       marginTop={1}
       paddingVertical={1}
       style={{
-        width: '100%',
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
       }}
     >
       <ViewStyled
+        width={90}
         height={4}
         marginBottom={1}
         backgroundColor={theme_colors.transparent}
@@ -82,57 +115,62 @@ export default function BusinessSection() {
           numberOfLines={1}
           ellipsizeMode='tail'
         >
-          Cashbacks atractivos
+          Empresas cercanas
         </TextStyled>
       </ViewStyled>
 
-      <FlatList
-        data={businesses}
-        contentContainerStyle={{
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '100%',
-          paddingHorizontal: 5,
-          paddingTop: 2,
-          paddingBottom: heightPercentageToDP(10),
-        }}
-        renderItem={({ item, index }) =>
-          <BusinessItem
-            item={item}
-            onPress={() => goToBusinessScreen(item)}
-            key={index}
-          />
-        }
-        ListFooterComponent={() => (
-          <ViewStyled
-            backgroundColor={theme_colors.transparent}
-            width={90}
-            height={5}
+      {businesses.length > 0 ? (
+        <FlatList
+          data={businesses}
+          contentContainerStyle={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            paddingHorizontal: 5,
+            paddingTop: 2,
+            paddingBottom: heightPercentageToDP(10),
+          }}
+          renderItem={({ item, index }) =>
+            <BusinessItem
+              item={item}
+              onPress={() => goToBusinessScreen(item)}
+              key={index}
+            />
+          }
+          horizontal={false}
+          scrollEnabled={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+        />
+      ) : (
+        <ViewStyled
+          width={90}
+          height={25}
+          backgroundColor={theme_colors.transparent}
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <ImageStyled
             style={{
-              justifyContent: 'center',
-              alignItems: 'center',
+              width: '50%',
+              height: '50%',
+              resizeMode: 'contain',
             }}
+            source={require('../../../assets/gifs/closed.gif')}
+          />
+
+          <TextStyled
+            fontFamily='SFPro-Italic'
+            textAlign='center'
+            fontSize={theme_textStyles.smedium}
+            color={theme_colors.grey}
           >
-            <TextStyled
-              fontFamily='SFPro-Italic'
-              textAlign='center'
-              fontSize={4}
-              color={theme_colors.grey}
-              style={{
-                width: "100%",
-              }}
-            >
-              {businesses.length > 0
-                ? `Estas son las empresas con mayor cashback`
-                : `Aquí aparecerán las empresas con mayor cashback`}
-            </TextStyled>
-          </ViewStyled>
-        )}
-        horizontal={false}
-        scrollEnabled={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-      />
+            No hay empresas abiertas en este momento.
+          </TextStyled>
+        </ViewStyled>
+      )}
     </ViewStyled>
   )
 }

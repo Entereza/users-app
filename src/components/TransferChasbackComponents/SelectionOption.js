@@ -29,11 +29,15 @@ export default function SelectionOption({
                 nameOption={nameOption1}
             />
 
-            <SelectOptionItem
-                onPress={onPress}
-                isActive={!optionSelected}
-                nameOption={nameOption2}
-            />
+            {
+                nameOption2 && (
+                    <SelectOptionItem
+                        onPress={onPress}
+                        isActive={!optionSelected}
+                        nameOption={nameOption2}
+                    />
+                )
+            }
         </ViewStyled>
     )
 }

@@ -7,12 +7,17 @@ import { theme_textStyles } from '../../../../utils/theme/theme_textStyles'
 import ButtonsAddToCart from '../../ButtonsAddToCart'
 
 export default function PromotionsItem({ item, shadow = true }) {
+    const productWithVariables = {
+        ...item,
+        hasVariables: item.variables && item.variables.length > 0,
+        variables: item.variables
+    };
+
     return (
         <ViewStyled
             backgroundColor={theme_colors.white}
             width={90}
             height={14}
-            // marginRight={3}
             paddingHorizontal={3}
             style={{
                 flexDirection: 'row',
@@ -78,14 +83,16 @@ export default function PromotionsItem({ item, shadow = true }) {
                     >
                         {item.nameProduct}
                     </TextStyled>
-                    <TextStyled
-                        fontFamily='SFPro-Regular'
-                        textAlign='left'
-                        fontSize={theme_textStyles.small}
-                        color={theme_colors.grey}
-                    >
-                        {item.type}
-                    </TextStyled>
+                    {item.type && (
+                        <TextStyled
+                            fontFamily='SFPro-Regular'
+                            textAlign='left'
+                            fontSize={theme_textStyles.small}
+                            color={theme_colors.grey}
+                        >
+                            {item.type}
+                        </TextStyled>
+                    )}
                 </ViewStyled>
 
                 <ViewStyled
@@ -95,9 +102,8 @@ export default function PromotionsItem({ item, shadow = true }) {
                     style={{
                         width: '100%',
                         flex: 1,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        alignItems: 'flex-start',
                         position: 'relative'
                     }}
                 >
@@ -110,7 +116,7 @@ export default function PromotionsItem({ item, shadow = true }) {
                         Bs. {item.price}
                     </TextStyled>
 
-                    <ButtonsAddToCart item={item} />
+                    <ButtonsAddToCart item={productWithVariables} />
                 </ViewStyled>
             </ViewStyled>
         </ViewStyled>

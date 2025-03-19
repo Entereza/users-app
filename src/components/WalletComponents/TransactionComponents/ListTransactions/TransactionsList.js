@@ -5,11 +5,15 @@ import TransactionsItem from './TransactionsItem'
 import { FlatList } from 'react-native'
 import TextStyled from '../../../../utils/ui/TextStyled'
 import { theme_textStyles } from '../../../../utils/theme/theme_textStyles'
+import useOrdersStore from '../../../../utils/tools/interface/ordersStore'
+import ActiveOrderItem from './ActiveOrderItem'
 
 export default function TransactionsList({
-  showOrdersRestaurant,
   orders = [],
-  ordersRestaurant = [],
+  isLoading,
+  onRefresh,
+  isRefreshing,
+  onOrderPress
 }) {
   const flatListRef = useRef(null);
 
@@ -17,7 +21,19 @@ export default function TransactionsList({
     if (flatListRef.current) {
       flatListRef.current.scrollToOffset({ offset: 0, animated: true });
     }
-  }, [showOrdersRestaurant]);
+  }, []);
+
+  // const renderHeader = () => {
+  //   if (activeOrder) {
+  //     return (
+  //       <ActiveOrderItem
+  //         order={activeOrder}
+  //         onPress={() => onOrderPress(activeOrder)}
+  //       />
+  //     );
+  //   }
+  //   return null;
+  // };
 
   return (
     <ViewStyled
@@ -32,9 +48,11 @@ export default function TransactionsList({
     >
       <FlatList
         ref={flatListRef}
-        data={!showOrdersRestaurant ? orders : ordersRestaurant}
+        data={orders}
         showsVerticalScrollIndicator={false}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.order.id}
+        onRefresh={onRefresh}
+        refreshing={isRefreshing}
         contentContainerStyle={{
           justifyContent: 'center',
           alignItems: 'center',
@@ -45,7 +63,7 @@ export default function TransactionsList({
             <ViewStyled
               backgroundColor={theme_colors.transparent}
               width={90}
-              height={5}
+              height={orders.length === 0 ? 35 : 5}
               style={{
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -60,15 +78,19 @@ export default function TransactionsList({
                   width: "100%",
                 }}
               >
-                {`¡Sigue comprando con Entereza!`}
+                {
+                  orders.length === 0
+                    ? `Aún no tienes pedidos realizados`
+                    : `¡Sigue comprando con Entereza!`
+                }
               </TextStyled>
             </ViewStyled>
           )
         }}
-        renderItem={({ item, index }) => (
+        renderItem={({ item }) => (
           <TransactionsItem
-            key={index}
             item={item}
+            onPress={() => onOrderPress(item)}
           />
         )}
       />

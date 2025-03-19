@@ -10,14 +10,19 @@ import ButtonWithIcon from './ButtonWithIcon';
 import { useNavigation } from '@react-navigation/native';
 import { private_name_routes } from '../../utils/route/private_name_routes';
 
-export default function ButtonGoToCart() {
-    const cart = useCartStore((state) => state.cart);
+export default function ButtonGoToCart({ branchId, tripPrice, cashbackBusiness }) {
+    const { cart, setTripPrice, setCashbackBusiness } = useCartStore();
     const translateY = useRef(new Animated.Value(100)).current;
     const opacity = useRef(new Animated.Value(0)).current;
 
     const navigation = useNavigation()
+
     const goToCartScreen = () => {
-        navigation.navigate(private_name_routes.empresas.carritoHome)
+        navigation.navigate(private_name_routes.empresas.carritoHome, {
+            branchId: branchId,
+        })
+        setTripPrice(tripPrice)
+        setCashbackBusiness(cashbackBusiness)
     }
 
     useEffect(() => {
@@ -50,8 +55,13 @@ export default function ButtonGoToCart() {
         }
     }, [cart]);
 
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+
+    const totalPrice = cart.reduce((sum, item) => {
+        const itemPrice = item.price || 0;
+        const itemQuantity = item.quantity || 1;
+        return sum + (itemPrice * itemQuantity);
+    }, 0);
 
     return (
         <Animated.View
@@ -93,7 +103,7 @@ export default function ButtonGoToCart() {
                     fontSize={theme_textStyles.small}
                     color={theme_colors.textGrey}
                 >
-                    {`${totalItems} productos`}
+                    {`${totalItems} ${totalItems === 1 ? 'producto' : 'productos'}`}
                 </TextStyled>
                 <TextStyled
                     fontFamily='SFPro-Bold'
@@ -101,7 +111,7 @@ export default function ButtonGoToCart() {
                     fontSize={theme_textStyles.large}
                     color={theme_colors.white}
                 >
-                    {`BOB. ${totalPrice}`}
+                    {`BOB. ${totalPrice.toFixed(2)}`}
                 </TextStyled>
             </ViewStyled>
 

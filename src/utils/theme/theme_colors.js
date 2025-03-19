@@ -31,6 +31,7 @@ export const theme_colors = {
 
     success: '#28a745',
     danger: '#dc3545',
+    error: '#FF0000',
     warning: '#ffc107',
     info: '#0116FF'
 }

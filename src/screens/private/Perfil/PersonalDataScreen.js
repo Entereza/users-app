@@ -16,10 +16,51 @@ import { ActivityIndicator, StyleSheet } from 'react-native';
 import TextStyled from '../../../utils/ui/TextStyled';
 import ButtonWithIcon from '../../../components/Buttons/ButtonWithIcon';
 import { theme_textStyles } from '../../../utils/theme/theme_textStyles';
+import { userService } from '../../../services/api/users/userService';
+import { showToast } from '../../../utils/tools/toast/toastService';
+import * as ImagePicker from 'expo-image-picker';
+import Toast from 'react-native-root-toast';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function PersonalDataScreen() {
-    const { user } = useAuthStore()
+    const { user, setUserData } = useAuthStore()
     const [isDisabled, setIsDisabled] = useState(true)
+    const [isLoading, setIsLoading] = useState(false)
+    const [selectedImage, setSelectedImage] = useState(null)
+    const navigation = useNavigation();
+    const isGoingBack = useRef(false);
+
+    useFocusEffect(
+        useCallback(() => {
+            const onBackPress = (e) => {
+                if (!isGoingBack.current) {
+                    isGoingBack.current = true;
+                    e.preventDefault();
+                    navigation.goBack();
+                }
+            };
+
+            navigation.addListener('beforeRemove', onBackPress);
+
+            return () => {
+                navigation.removeListener('beforeRemove', onBackPress);
+                isGoingBack.current = false;
+            };
+        }, [navigation])
+    );
+
+    const handleImagePick = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.8,
+        });
+
+        if (!result.canceled) {
+            setSelectedImage(result.assets[0]);
+        }
+    };
 
     const formik = useFormik({
         initialValues: {
@@ -27,20 +68,62 @@ export default function PersonalDataScreen() {
             lastNames: "",
             phoneNumber: "",
             email: "",
+            carnet: "",
         },
         validationSchema: schemaEditProfile,
         validateOnChange: true,
         onSubmit: async (values) => {
             try {
+                setIsLoading(true);
+                setIsDisabled(true);
+
                 const dataEditProfile = {
                     names: values.names,
-                    lastNames: values.lastNames,
+                    lastnames: values.lastNames,
                     email: values.email,
                     phoneNumber: values.phoneNumber,
+                    carnet: values.carnet || "",
                 };
 
+                if (selectedImage) {
+                    dataEditProfile.image = selectedImage;
+                }
+
+                const response = await userService.updateProfile(user.id, dataEditProfile);
+
+                console.log('updateProfile: ', response);
+
+                if (response && response.code === 'COD200') {
+                    // Actualizar los datos del usuario en el estado global y AsyncStorage
+                    const updatedUserData = {
+                        ...user,
+                        names: response.client.names,
+                        lastNames: response.client.lastnames,
+                        email: response.client.email,
+                        phoneNumber: response.client.phoneNumber,
+                        carnet: response.client.carnet || "",
+                        image: response.client.img || null,
+                        cashback: response.client.cashback,
+                        expo: response.client.expo,
+                        google: response.client.google,
+                        appleId: response.client.appleId,
+                        recover: response.client.recover,
+                        status: response.client.status
+                    };
+
+                    setUserData(updatedUserData);
+                    await AsyncStorage.setItem('userData', JSON.stringify(updatedUserData));
+
+                    navigation.goBack();
+                    showToast(response.msg, Toast.positions.BOTTOM, theme_colors.white, theme_colors.success);
+                } else {
+                    showToast(response?.msg || 'Error al actualizar datos', Toast.positions.BOTTOM, theme_colors.white, theme_colors.danger);
+                }
             } catch (err) {
-                console.log('Error on editProfile: ', err)
+                console.log('Error on editProfile: ', err);
+                showToast('Error al actualizar datos', Toast.positions.BOTTOM, theme_colors.white, theme_colors.danger);
+            } finally {
+                setIsLoading(false);
             }
         }
     });
@@ -50,8 +133,9 @@ export default function PersonalDataScreen() {
             formik.setValues({
                 names: user?.names || "",
                 lastNames: user?.lastNames || "",
-                phoneNumber: user?.phoneNumber.toString() || "",
+                phoneNumber: user?.phoneNumber?.toString() || "",
                 email: user?.email || "",
+                carnet: user?.carnet || "",
             });
         } else {
             formik.setValues({
@@ -59,6 +143,7 @@ export default function PersonalDataScreen() {
                 lastNames: "",
                 phoneNumber: "",
                 email: "",
+                carnet: "",
             });
         }
     }, [user]);
@@ -69,11 +154,13 @@ export default function PersonalDataScreen() {
             formValues.names !== (user?.names || "") ||
             formValues.lastNames !== (user?.lastNames || "") ||
             formValues.phoneNumber !== (user?.phoneNumber?.toString() || "") ||
-            formValues.email !== (user?.email || "")
+            formValues.email !== (user?.email || "") ||
+            formValues.carnet !== (user?.carnet || "") ||
+            selectedImage !== null
         );
 
-        setIsDisabled(!hasChanges);
-    }, [formik.values, user]);
+        setIsDisabled(!hasChanges || isLoading);
+    }, [formik.values, user, selectedImage, isLoading]);
 
     return (
         <ViewStyled
@@ -121,29 +208,36 @@ export default function PersonalDataScreen() {
                             />
                         </ViewStyled>
                         : <>
-                            <ProfileImage image={user?.image} canEdit />
+                            <ProfileImage
+                                image={selectedImage?.uri || user?.image}
+                                canEdit
+                                onImagePress={handleImagePick}
+                            />
 
                             <ProfileData userData={user} />
 
                             <ProfilePersonalData formik={formik} />
 
-                            <ButtonWithIcon
-                                disabled={isDisabled}
-                                backgroundColor={isDisabled ? `${theme_colors.grey}22` : theme_colors.primary}
-                                borderWidth={0}
-                                colorText={theme_colors.white}
-                                onPress={formik.handleSubmit}
-                                borderRadius={1.5}
-                                withIcon={false}
-                                fontSize={theme_textStyles.medium}
-                                fontFamily={'SFPro-Bold'}
-                                textButton={'Guardar cambios'}
-                                height={6}
-                                style={{
-                                    width: '95%',
-                                    marginTop: 150
-                                }}
-                            />
+                            {
+                                !isDisabled &&
+                                <ButtonWithIcon
+                                    disabled={isDisabled}
+                                    backgroundColor={isDisabled ? `${theme_colors.grey}22` : theme_colors.primary}
+                                    borderWidth={0}
+                                    colorText={theme_colors.white}
+                                    onPress={formik.handleSubmit}
+                                    borderRadius={1.5}
+                                    withIcon={false}
+                                    fontSize={theme_textStyles.medium}
+                                    fontFamily={'SFPro-Bold'}
+                                    textButton={isLoading ? 'Guardando...' : 'Guardar cambios'}
+                                    height={6}
+                                    style={{
+                                        width: '95%',
+                                        marginTop: 150
+                                    }}
+                                />
+                            }
                         </>
                 }
             </KeyboardAwareScrollView>

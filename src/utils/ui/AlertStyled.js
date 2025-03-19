@@ -12,6 +12,7 @@ const alertTypes = {
     error: { color: theme_colors.danger, icon: "alert-circle" },
     warning: { color: theme_colors.warning, icon: "alert" },
     info: { color: theme_colors.info, icon: "information" },
+    dark: { color: theme_colors.black, icon: "alert-circle" },
 };
 
 export default function AlertStyled({

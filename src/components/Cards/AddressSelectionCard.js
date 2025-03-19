@@ -88,6 +88,7 @@ export default function AddressSelectionCard({ item, isSelected, onPressSelect }
                     <Octicons name={"location"} size={adjustFontSize(theme_textStyles.large)} color={colorIcon} />
 
                     <ViewStyled
+                        marginLeft={1}
                         paddingHorizontal={2}
                         height={7}
                         backgroundColor={theme_colors.transparent}

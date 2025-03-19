@@ -36,7 +36,7 @@ export default function FacturacionScreen() {
 
                 setBillingInfo(dataFacturation)
             } catch (err) {
-                console.log('Error on editProfile: ', err)
+                console.log('Error on FacturacionScreen: ', err)
             } finally {
                 setTimeout(() => {
                     setIsLoading(false)
@@ -72,32 +72,6 @@ export default function FacturacionScreen() {
                 alignItems: 'center',
             }}
         >
-            <ViewStyled
-                paddingVertical={1.5}
-                paddingHorizontal={1}
-                backgroundColor={theme_colors.transparent}
-                style={{
-                    width: '90%',
-                    height: 'auto',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    borderBottomWidth: 0.2,
-                    borderColor: theme_colors.primary
-                }}
-            >
-                <TextStyled
-                    fontFamily='SFPro-Bold'
-                    textAlign='left'
-                    fontSize={theme_textStyles.medium}
-                    color={theme_colors.primary}
-                    numberOfLines={1}
-                    ellipsizeMode='tail'
-                >
-                    Datos de Facturación
-                </TextStyled>
-            </ViewStyled>
-
             <TextInputStyled
                 value={formik.values.name}
                 label='Nombre / Razón Social *'

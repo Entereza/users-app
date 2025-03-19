@@ -5,10 +5,13 @@ import ImageStyled from '../../utils/ui/ImageStyled'
 import { MaterialIcons } from '@expo/vector-icons'
 import adjustFontSize from '../../utils/ui/adjustText'
 import { theme_textStyles } from '../../utils/theme/theme_textStyles'
+import { Pressable } from 'react-native'
+import { heightPercentageToDP } from 'react-native-responsive-screen'
 
 export default function ProfileImage({
     image,
     canEdit = false,
+    onImagePress,
 }) {
     return (
         <ViewStyled
@@ -38,11 +41,8 @@ export default function ProfileImage({
             />
 
             {canEdit &&
-                <ViewStyled
-                    borderRadius={1}
-                    paddingHorizontal={1}
-                    paddingVertical={0.5}
-                    backgroundColor={theme_colors.white}
+                <Pressable
+                    onPress={onImagePress}
                     style={{
                         width: 'auto',
                         height: 'auto',
@@ -51,16 +51,24 @@ export default function ProfileImage({
                         borderWidth: 1,
                         borderColor: theme_colors.primary,
                         position: "absolute",
+                        borderRadius: heightPercentageToDP(1),
                         bottom: -5,
                         right: -5
                     }}
                 >
-                    <MaterialIcons
-                        name="edit"
-                        size={adjustFontSize(theme_textStyles.medium)}
-                        color={theme_colors.primary}
-                    />
-                </ViewStyled>
+                    <ViewStyled
+                        borderRadius={1}
+                        paddingHorizontal={1}
+                        paddingVertical={0.5}
+                        backgroundColor={theme_colors.white}
+                    >
+                        <MaterialIcons
+                            name="edit"
+                            size={adjustFontSize(theme_textStyles.medium)}
+                            color={theme_colors.primary}
+                        />
+                    </ViewStyled>
+                </Pressable>
             }
         </ViewStyled>
     )

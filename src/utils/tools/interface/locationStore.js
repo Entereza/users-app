@@ -7,6 +7,9 @@ const useLocationStore = create((set) => ({
     department: null,
     departmentId: null,
     isSearchingLocation: false,
+    country: null,
+    isDepartmentEnabled: false,
+    isCountryEnabled: false,
 
     // Acciones
     setLocation: (latitude, longitude) => set({
@@ -19,6 +22,18 @@ const useLocationStore = create((set) => ({
         departmentId
     }),
 
+    setCountry: (country) => set({
+        country
+    }),
+
+    setIsCountryEnabled: (isEnabled) => set({
+        isCountryEnabled: isEnabled
+    }),
+
+    setIsDepartmentEnabled: (isEnabled) => set({
+        isDepartmentEnabled: isEnabled
+    }),
+
     setIsSearchingLocation: (isSearchingLocation) => set({
         isSearchingLocation
     }),
@@ -29,7 +44,9 @@ const useLocationStore = create((set) => ({
         longitude: null,
         department: null,
         departmentId: null,
-        isSearchingLocation: false
+        isSearchingLocation: false,
+        country: null,
+        isDepartmentEnabled: false
     }),
 }));
 

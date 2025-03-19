@@ -34,14 +34,16 @@ export const private_name_routes = {
         newAddressMap: 'newAddressMap',
         saveAddress: 'saveAddress',
         addAddress: 'addAddress',
-        editAddress: 'editAddress'
+        editAddress: 'editAddress',
+        orderConfirmed: 'orderConfirmed'
     },
     pedidos: {
         pedidosStack: 'PedidosStack',
         pedidosStackLabel: 'Pedidos',
         pedidosHome: 'pedidosHome',
         empresasDetails: 'empresasDetails',
-
+        orderDetails: 'orderDetails',
+        orderTracking: 'orderTracking'
     },
     profile: {
         profileStack: 'ProfileStack',

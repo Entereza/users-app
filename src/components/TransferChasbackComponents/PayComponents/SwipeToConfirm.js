@@ -10,17 +10,86 @@ import adjustFontSize from '../../../utils/ui/adjustText';
 import useTabBarStore from '../../../utils/tools/interface/tabBarStore';
 import { private_name_routes } from '../../../utils/route/private_name_routes';
 import { theme_textStyles } from '../../../utils/theme/theme_textStyles';
+import useCartStore from '../../../utils/tools/interface/cartStore';
+import useAuthStore from '../../../utils/tools/interface/authStore';
+import { ordersService } from '../../../services/api/orders/ordersService';
+import { toastService } from '../../../utils/tools/interface/toastService';
+import useOrdersStore from '../../../utils/tools/interface/ordersStore';
 
-export default function SwipeToConfirm() {
+export default function SwipeToConfirm({ branchId }) {
     const navigation = useNavigation();
     const { changeColorStatusBar, changeScreenAnimationType } = useTabBarStore();
     const { height: screenHeight } = Dimensions.get('window');
     const animatedHeight = useRef(new Animated.Value(100)).current;
+    const { cart, paymentMethod, myCashback: appliedCashback, serviceFee } = useCartStore();
+    const { user } = useAuthStore();
+    const {
+        setOrders,
+        setIsLoading,
+        setError,
+        setTotalPages,
+        setCurrentPage
+    } = useOrdersStore();
 
-    const goToTransferConfirmed = () => {
-        changeColorStatusBar(theme_colors.green);
-        changeScreenAnimationType("none")
-        navigation.navigate(private_name_routes.billetera.transferConfirmedScreen);
+    const resetSwipeAnimation = () => {
+        Animated.timing(animatedHeight, {
+            toValue: 100,
+            duration: 500,
+            useNativeDriver: false,
+        }).start();
+    };
+
+    const initializeOrders = async () => {
+        try {
+            setIsLoading(true);
+            const response = await ordersService.getClientOrders(user.id);
+
+            if (response?.orders) {
+                setOrders(response.orders);
+                setTotalPages(1);
+                setCurrentPage(0);
+            }
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            setError(error);
+            toastService.showErrorToast("No pudimos cargar tus pedidos. Por favor, intenta más tarde.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const createOrder = async () => {
+        try {
+            // Formatear los datos del pedido
+            const orderData = ordersService.formatOrderData(
+                cart,
+                user.id,
+                branchId,
+                paymentMethod.id,
+                appliedCashback,
+            );
+
+            console.log('Order Data: ', orderData)
+
+            // Enviar el pedido al backend
+            const response = await ordersService.createOrder(orderData);
+
+            console.log('response createOrder: ', response)
+
+            if (response.code === 'COD200') {
+                changeColorStatusBar(theme_colors.success);
+                changeScreenAnimationType("none");
+                initializeOrders();
+                navigation.navigate(private_name_routes.empresas.orderConfirmed);
+            } else {
+                toastService.showErrorToast(response.msg || "Error al crear el pedido");
+                resetSwipeAnimation();
+            }
+        } catch (error) {
+            console.error('Error creating order:', error);
+            toastService.showErrorToast("Hubo un problema al procesar tu pedido");
+            resetSwipeAnimation();
+        }
     };
 
     const panResponder = useRef(
@@ -39,14 +108,10 @@ export default function SwipeToConfirm() {
                         duration: 300,
                         useNativeDriver: false,
                     }).start(() => {
-                        goToTransferConfirmed();
+                        createOrder();
                     });
                 } else {
-                    Animated.timing(animatedHeight, {
-                        toValue: 100,
-                        duration: 500,
-                        useNativeDriver: false,
-                    }).start();
+                    resetSwipeAnimation();
                 }
             },
         })

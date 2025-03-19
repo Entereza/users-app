@@ -8,10 +8,12 @@ import { useNavigation } from '@react-navigation/native'
 import { private_name_routes } from '../../utils/route/private_name_routes'
 import useTabBarStore from '../../utils/tools/interface/tabBarStore'
 import { theme_textStyles } from '../../utils/theme/theme_textStyles'
+import useAuthStore from '../../utils/tools/interface/authStore'
 
 export default function WalletCard() {
     const navigation = useNavigation()
     const { toggleTabBar, changeColorStatusBar } = useTabBarStore()
+    const { user } = useAuthStore()
 
     const goToCashbackInfoScreen = () => {
         toggleTabBar(false)
@@ -40,7 +42,6 @@ export default function WalletCard() {
             borderRadius={3}
             backgroundColor={theme_colors.black}
             style={{
-                justifyContent: 'center',
                 justifyContent: 'center',
                 alignItems: 'center',
             }}
@@ -77,7 +78,7 @@ export default function WalletCard() {
                         fontFamily='Artegra-SemiBold'
                         color={theme_colors.white}
                     >
-                        BOB. 27.50
+                        BOB. {user.cashback.toFixed(2)}
                     </TextStyled>
                 </ViewStyled>
 
@@ -103,11 +104,6 @@ export default function WalletCard() {
                         icon={"money-bill-transfer"}
                         onPress={goToTransferScreen}
                     />
-                    {/* <HomeButton
-                        text={"Código Compra"}
-                        icon={"lock"}
-                        onPress={goToCodeScreen}
-                    /> */}
                 </ViewStyled>
             </ImageBackground>
         </ViewStyled>

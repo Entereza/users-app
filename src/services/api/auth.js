@@ -2,10 +2,13 @@ import { createApiRequest } from './config';
 
 export const authService = {
     // Regular login
-    login: async (credentials) => {
+    login: async (email, password) => {
         return createApiRequest('/clients-op/login', {
             method: 'POST',
-            body: JSON.stringify(credentials)
+            body: JSON.stringify({
+                nick: email,
+                password: password
+            })
         });
     },
 
@@ -43,9 +46,25 @@ export const authService = {
 
     // Google signup
     signupWithGoogle: async (googleUserData) => {
+        console.log('googleUserData: ', googleUserData)
         return createApiRequest('/clients-op/signup/google', {
             method: 'POST',
             body: JSON.stringify(googleUserData)
+        });
+    },
+
+    // Register Expo push notification token
+    registerNotificationToken: async (userId, expoPushToken) => {
+        let data = {
+            id: userId,
+            token: expoPushToken
+        }
+
+        console.log('data: ', data)
+
+        return createApiRequest('/clients-op/expo', {
+            method: 'POST',
+            body: JSON.stringify(data)
         });
     }
 };

@@ -7,11 +7,11 @@ import { theme_textStyles } from '../../utils/theme/theme_textStyles';
 import useCartStore from '../../utils/tools/interface/cartStore';
 
 export default function CashbackCard() {
-    const { cart, myCashback } = useCartStore();
+    const { cart, myCashback, cashbackBusiness } = useCartStore();
     const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-    const cashback = totalPrice - myCashback
-    
+    const cashback = totalPrice * (cashbackBusiness / 100)
+
     return (
         <View
             style={{
@@ -97,7 +97,7 @@ export default function CashbackCard() {
                             fontFamily: 'SFPro-Bold',
                         }}
                     >
-                        Bs. {cashback}
+                        Bs. {cashback.toFixed(2)}
                     </TextStyled>
                 </View>
             </View>

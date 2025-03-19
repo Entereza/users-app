@@ -3,7 +3,7 @@ import ViewStyled from '../../../utils/ui/ViewStyled'
 import { theme_colors } from '../../../utils/theme/theme_colors'
 import ImageStyled from '../../../utils/ui/ImageStyled'
 import { useNavigation } from '@react-navigation/native'
-import { Pressable, Animated, ScrollView } from 'react-native'
+import { Pressable, Animated, ScrollView, ActivityIndicator } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import adjustFontSize from '../../../utils/ui/adjustText'
 import { theme_textStyles } from '../../../utils/theme/theme_textStyles'
@@ -14,28 +14,95 @@ import { widthPercentageToDP } from 'react-native-responsive-screen'
 import ButtonWithIcon from '../../../components/Buttons/ButtonWithIcon'
 import useCartStore from '../../../utils/tools/interface/cartStore'
 import ProductVariableList from '../../../components/BusinessComponents/ProductsComponents/ProductVariableList'
-import { productVariables } from '../../../utils/tools/storage/data'
+import { empresasService } from '../../../services/api/empresas/empresasService'
+import { showToast } from '../../../utils/tools/toast/toastService'
+import Toast from 'react-native-root-toast'
 
 export default function EmpresaProductDetails({ route }) {
   const { product } = route.params
-  const { image: productImage, nameProduct, price, preparationTime, hasVariables } = product
-  const [currentQuantity, setCurrentQuantity] = useState(0)
+  const { image: productImage, nameProduct, price, preparationTime } = product
+  const [currentQuantity, setCurrentQuantity] = useState(1)
   const [selectedVariables, setSelectedVariables] = useState({})
-  const addToCart = useCartStore((state) => state.addToCart)
+  const [productVariables, setProductVariables] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
 
+  const addToCart = useCartStore((state) => state.addToCart)
   const { top } = useSafeAreaInsets()
   const navigation = useNavigation()
 
-  const translateY = useRef(new Animated.Value(100)).current
+  // Inicializar las referencias con los valores correctos para que el botón empiece oculto
+  const translateY = useRef(new Animated.Value(0)).current
   const opacity = useRef(new Animated.Value(0)).current
+
+  // Cargar variables del producto
+  useEffect(() => {
+    loadProductVariables()
+  }, [])
+
+  const loadProductVariables = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      // Obtener variables del producto
+      const variables = await empresasService.getProductVariables(product.id)
+
+      if (!variables || variables.length === 0) {
+        setProductVariables([])
+        return
+      }
+
+      // Cargar precios para cada variable
+      const variablesWithPricing = await Promise.all(
+        variables.map(async (pv) => {
+          try {
+            const pricing = await empresasService.getPricingByProductVariable(pv.id)
+            // Solo retornar variables que tengan precios
+            if (!pricing || pricing.length === 0) {
+              return null
+            }
+            return {
+              id: pv.id,
+              namePv: pv.name,
+              required: pv.required,
+              canMany: pv.canMany,
+              maxSelect: pv.canMany ? pv.quantity : 1,
+              instructions: pv.instructions,
+              variables: pricing.map(price => ({
+                id: price.id,
+                name: price.name,
+                price: price.price,
+                position: price.position
+              })).sort((a, b) => a.position - b.position)
+            }
+          } catch (error) {
+            console.error(`Error loading pricing for variable ${pv.id}:`, error)
+            return null
+          }
+        })
+      )
+
+      // Filtrar variables nulas (en caso de error) y ordenar por posición
+      const validVariables = variablesWithPricing
+        .filter(v => v !== null && v.variables.length > 0)
+        .sort((a, b) => a.position - b.position)
+
+      setProductVariables(validVariables)
+    } catch (error) {
+      console.error('Error loading product variables:', error)
+      setError('Error al cargar las variables del producto')
+      showToast('Error al cargar las variables del producto',
+        Toast.positions.BOTTOM,
+        theme_colors.white,
+        theme_colors.error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleQuantityChange = (quantity) => {
     setCurrentQuantity(quantity)
-    if (quantity > 0 && areRequiredVariablesSelected()) {
-      showButton()
-    } else {
-      hideButton()
-    }
   }
 
   const handleVariableSelection = (pvId, selectedItems) => {
@@ -43,22 +110,18 @@ export default function EmpresaProductDetails({ route }) {
       ...prev,
       [pvId]: selectedItems
     }))
-    
-    if (currentQuantity > 0 && areRequiredVariablesSelected()) {
-      showButton()
-    } else {
-      hideButton()
-    }
   }
 
   const areRequiredVariablesSelected = () => {
-    if (!hasVariables) return true
+    if (productVariables.length === 0) return true
 
-    return productVariables.every(pv => {
-      if (!pv.required) return true
-      const selections = selectedVariables[pv.id] || []
-      return selections.length > 0
-    })
+    return productVariables
+      .filter(pv => pv.variables.length > 0) // Solo considerar variables con elementos
+      .every(pv => {
+        if (!pv.required) return true
+        const selections = selectedVariables[pv.id] || []
+        return selections.length > 0
+      })
   }
 
   const showButton = () => {
@@ -92,15 +155,51 @@ export default function EmpresaProductDetails({ route }) {
   }
 
   const handleAddToCart = () => {
-    if (currentQuantity > 0 && areRequiredVariablesSelected()) {
-      const productWithVariables = {
+    if (areRequiredVariablesSelected()) {
+      // Calcular el precio total de las variables seleccionadas
+      const variablesPrice = Object.entries(selectedVariables).reduce((total, [pvId, selections]) => {
+        const pv = productVariables.find(v => v.id === pvId)
+        if (pv) {
+          return total + selections.reduce((varTotal, selectionId) => {
+            const variable = pv.variables.find(v => v.id === selectionId)
+            return varTotal + (variable?.price || 0)
+          }, 0)
+        }
+        return total
+      }, 0)
+
+      // Calcular el precio unitario (base + variables)
+      const unitPrice = price + variablesPrice;
+
+      const productWithSelectedVariables = {
         ...product,
-        selectedVariables: selectedVariables
+        price: unitPrice, // Precio unitario
+        quantity: currentQuantity, // Cantidad seleccionada
+        totalPrice: unitPrice, // Precio unitario (para compatibilidad)
+        selectedVariables: Object.entries(selectedVariables).map(([pvId, selections]) => {
+          const pv = productVariables.find(v => v.id === pvId)
+          return {
+            id: pvId,
+            name: pv?.namePv,
+            namePv: pv?.namePv,
+            canMany: pv?.canMany,
+            required: pv?.required,
+            instructions: pv?.instructions,
+            position: pv?.position,
+            selections: selections.map(selectionId => {
+              const variable = pv?.variables.find(v => v.id === selectionId)
+              return {
+                id: selectionId,
+                name: variable?.name,
+                price: variable?.price || 0,
+                position: variable?.position
+              }
+            })
+          }
+        })
       }
-      
-      for (let i = 0; i < currentQuantity; i++) {
-        addToCart(productWithVariables)
-      }
+
+      addToCart(productWithSelectedVariables)
       navigation.goBack()
     }
   }
@@ -108,6 +207,16 @@ export default function EmpresaProductDetails({ route }) {
   const goBack = () => {
     navigation.goBack()
   }
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (currentQuantity >= 1 && areRequiredVariablesSelected()) {
+        showButton()
+      } else {
+        hideButton()
+      }
+    }
+  }, [isLoading, currentQuantity, selectedVariables])
 
   return (
     <ViewStyled
@@ -151,9 +260,9 @@ export default function EmpresaProductDetails({ route }) {
           }}
         >
           <ViewStyled
-            width={12}
-            height={6}
-            borderRadius={1.2}
+            width={11}
+            height={5.5}
+            borderRadius={50}
             backgroundColor={theme_colors.white}
             style={{
               justifyContent: 'center',
@@ -231,7 +340,39 @@ export default function EmpresaProductDetails({ route }) {
             initialQuantity={1}
           />
 
-          {hasVariables && (
+          {isLoading ? (
+            <ViewStyled
+              width={95}
+              backgroundColor={theme_colors.transparent}
+              style={{
+                marginTop: 20,
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: 200
+              }}
+            >
+              <ActivityIndicator size="large" color={theme_colors.primary} />
+            </ViewStyled>
+          ) : error ? (
+            <ViewStyled
+              width={95}
+              backgroundColor={theme_colors.transparent}
+              style={{
+                marginTop: 20,
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}
+            >
+              <TextStyled
+                fontFamily='SFPro-Regular'
+                textAlign='center'
+                fontSize={theme_textStyles.medium}
+                color={theme_colors.error}
+              >
+                {error}
+              </TextStyled>
+            </ViewStyled>
+          ) : productVariables.length > 0 && (
             <ViewStyled
               width={95}
               backgroundColor={theme_colors.transparent}
@@ -293,7 +434,7 @@ export default function EmpresaProductDetails({ route }) {
             fontSize={theme_textStyles.small}
             color={theme_colors.textGrey}
           >
-            {`${currentQuantity} productos`}
+            {`${currentQuantity} ${currentQuantity > 1 ? 'productos' : 'producto'}`}
           </TextStyled>
           <TextStyled
             fontFamily='SFPro-Bold'
@@ -301,7 +442,7 @@ export default function EmpresaProductDetails({ route }) {
             fontSize={theme_textStyles.large}
             color={theme_colors.white}
           >
-            {`BOB. ${price * currentQuantity}`}
+            {`BOB. ${calculateTotalPrice()}`}
           </TextStyled>
         </ViewStyled>
 
@@ -319,9 +460,31 @@ export default function EmpresaProductDetails({ route }) {
           height={6}
           fontFamily={'SFPro-Bold'}
           textButton={'Agregar'}
-          disabled={!areRequiredVariablesSelected()}
+          disabled={!areRequiredVariablesSelected() || isLoading}
+          style={{
+            opacity: areRequiredVariablesSelected() && !isLoading ? 1 : 0.5
+          }}
         />
       </Animated.View>
     </ViewStyled>
   )
+
+  function calculateTotalPrice() {
+    let total = price * currentQuantity
+
+    // Sumar precios de variables seleccionadas
+    Object.entries(selectedVariables).forEach(([pvId, selections]) => {
+      const pv = productVariables.find(v => v.id === pvId)
+      if (pv) {
+        selections.forEach(selectionId => {
+          const variable = pv.variables.find(v => v.id === selectionId)
+          if (variable) {
+            total += variable.price * currentQuantity
+          }
+        })
+      }
+    })
+
+    return total.toFixed(2)
+  }
 }

@@ -5,6 +5,7 @@ import AuthScreen from '../../screens/public/AuthScreen';
 import { theme_colors } from '../../utils/theme/theme_colors';
 import LoginScreen from '../../screens/public/LoginScreen';
 import RegisterScreen from '../../screens/public/RegisterScreen';
+import AccountRecoveryScreen from '../../screens/public/AccountRecoveryScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +24,7 @@ export default function PublicNavigation() {
             <Stack.Screen name={public_name_routes.auth.authScreen} component={AuthScreen} />
             <Stack.Screen name={public_name_routes.auth.signIn} component={LoginScreen} />
             <Stack.Screen name={public_name_routes.auth.signUp} component={RegisterScreen} />
+            <Stack.Screen name={public_name_routes.auth.accountRecovery} component={AccountRecoveryScreen} />
         </Stack.Navigator>
     )
 }

@@ -9,12 +9,17 @@ import useCartStore from '../../utils/tools/interface/cartStore';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 
 export default function CartProductsList({ products = [] }) {
-    const deleteFromCart = useCartStore((state) => state.deleteFromCart);
+    const { cart, deleteFromCart } = useCartStore()
+
+    const removeFormCart = (productId) => {
+        const cartItem = cart.find(cartItem => cartItem.id === productId)
+        deleteFromCart(cartItem?.uniqueId || productId)
+    }
 
     const renderRightActions = (productId) => {
         return (
             <TouchableOpacity
-                onPress={() => deleteFromCart(productId)}
+                onPress={() => removeFormCart(productId)}
                 activeOpacity={0.9}
             >
                 <ViewStyled

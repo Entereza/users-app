@@ -11,11 +11,13 @@ export default function ImageStyled({
   style,
   paddingHorizontal,
   paddingVertical,
+  tintColor,
   ...rest
 }) {
   return (
     <Image
       source={source}
+      tintColor={tintColor}
       style={[
         width && { width: wp(width) },
         height && { height: hp(height) },

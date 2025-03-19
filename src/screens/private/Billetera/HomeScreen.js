@@ -9,8 +9,10 @@ import WalletCard from '../../../components/WalletComponents/WalletCard';
 import WalletRechargeButton from '../../../components/WalletComponents/WalletRechargeButton';
 import WalletTransactions from '../../../components/WalletComponents/WalletTransactions';
 import useTabBarStore from '../../../utils/tools/interface/tabBarStore';
+import useAuthStore from '../../../utils/tools/interface/authStore';
 
 export default function HomeScreen() {
+    const { user } = useAuthStore();
     const navigation = useNavigation();
     const { toggleTabBar, changeNameStackBack, changeNameRouteBack } = useTabBarStore()
 
@@ -35,7 +37,7 @@ export default function HomeScreen() {
             styleView={styles.startView}
         >
             <HeaderProfile
-                user={"Anelisse"}
+                user={user}
                 onPress={goToProfileScreen}
             />
 

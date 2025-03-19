@@ -3,16 +3,12 @@ import SelectTransactionType from './SelectTransactionType';
 import ShowAllTransactions from './ShowAllTransactions';
 import ViewStyled from '../../../utils/ui/ViewStyled';
 import { theme_colors } from '../../../utils/theme/theme_colors';
+import TextStyled from '../../../utils/ui/TextStyled';
+import { theme_textStyles } from '../../../utils/theme/theme_textStyles';
 
 export default function HeaderTransactions({
-    showOrdersRestaurant,
-    setShowOrdersRestaurant,
     allOrders,
 }) {
-    const handlePress = () => {
-        setShowOrdersRestaurant(!showOrdersRestaurant);
-    }
-
     return (
         <ViewStyled
             width={95}
@@ -26,32 +22,21 @@ export default function HeaderTransactions({
                 alignItems: 'center',
             }}
         >
-            <ViewStyled
-                backgroundColor={theme_colors.transparent}
+            <TextStyled
+                fontSize={theme_textStyles.medium}
+                color={theme_colors.black}
                 style={{
-                    width: '40%',
-                    height: 'auto',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    fontFamily: 'SFPro-Bold',
                 }}
             >
-                <SelectTransactionType
-                    onPress={handlePress}
-                    type={'Pedidos'}
-                    isSelected={!showOrdersRestaurant}
-                />
+                Tus pedidos
+            </TextStyled>
 
-                <SelectTransactionType
-                    onPress={handlePress}
-                    type={'En el local'}
-                    isSelected={showOrdersRestaurant}
+            {allOrders && allOrders.length > 10 && (
+                <ShowAllTransactions
+                    allOrders={allOrders}
                 />
-            </ViewStyled>
-
-            <ShowAllTransactions
-                allOrders={allOrders}
-            />
+            )}
         </ViewStyled>
     )
 }

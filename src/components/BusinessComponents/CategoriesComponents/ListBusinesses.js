@@ -6,10 +6,21 @@ import { heightPercentageToDP } from 'react-native-responsive-screen'
 import BusinessItem from '../BusinessItem'
 import TextStyled from '../../../utils/ui/TextStyled'
 import { theme_textStyles } from '../../../utils/theme/theme_textStyles'
+import useTabBarStore from '../../../utils/tools/interface/tabBarStore'
+import { useNavigation } from '@react-navigation/native'
+import { private_name_routes } from '../../../utils/route/private_name_routes'
 
 export default function ListBusinesses({ businesses = [], nameCategory = '' }) {
+    const { toggleTabBar, changeColorStatusBar } = useTabBarStore();
+    const navigation = useNavigation();
+
     const goToBusinessScreen = (item) => {
-        console.log(item)
+        console.log('goToBusinessScreen', item)
+        changeColorStatusBar(theme_colors.transparent);
+        toggleTabBar(false);
+        navigation.navigate(private_name_routes.empresas.empresasDetails, {
+            business: item
+        });
     }
 
     return (
