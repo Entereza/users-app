@@ -52,8 +52,13 @@ export const locationService = {
                 ]);
 
                 if (response && response.length > 0) {
-                    const city = response[0].city;
+                    console.log('reverseGeocodeAsync: ', response)
+
+                    const region = response[0].region;
                     const country = response[0].country;
+
+                    // Extraer el nombre del departamento removiendo "Departamento de "
+                    const city = region.replace('Departamento de ', '');
 
                     if (!city || !country) {
                         console.warn('No se encontró ciudad o país en las coordenadas proporcionadas');

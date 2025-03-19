@@ -55,7 +55,7 @@ export default function PrivateNavigation() {
     useEffect(() => {
         const notificationListener = Notifications.addNotificationReceivedListener(notification => {
             console.log('Notification received:', notification.request.content.data);
-            
+
             // Check if notification contains order data and reinitialize orders
             if (notification.request.content.data?.order) {
                 initializeOrders();
@@ -64,7 +64,7 @@ export default function PrivateNavigation() {
 
         const responseListener = Notifications.addNotificationResponseReceivedListener(response => {
             console.log('Notification response:', response);
-            
+
             // Check if notification response contains order data and reinitialize orders
             if (response.notification.request.content.data?.order) {
                 initializeOrders();
@@ -112,6 +112,14 @@ export default function PrivateNavigation() {
             }
 
             const location = await locationService.getCurrentLocation();
+            // const location = {
+            //     coords: {
+            //         latitude: -21.529068889259516,
+            //         longitude: -64.73332798357082
+            //     }
+            // };
+
+
 
             setLocation(location.coords.latitude, location.coords.longitude);
 
