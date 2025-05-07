@@ -84,23 +84,27 @@ export default function ModalCalculator({
 
     const handlePress = (value) => {
         if (value === '<') {
-            setAmmountTransfer(ammountTransfer.slice(0, -1));
+            setAmmountTransfer(prev => prev.slice(0, -1));
         } else if (value === '.') {
             if (!ammountTransfer.includes('.')) {
-                if (ammountTransfer > 0) {
-                    setAmmountTransfer(ammountTransfer + value);
+                if (ammountTransfer && parseFloat(ammountTransfer) > 0) {
+                    setAmmountTransfer(prev => prev + value);
                 } else {
-                    setAmmountTransfer(0 + value);
+                    setAmmountTransfer('0.');
                 }
             }
         } else {
-            let newAmmount = parseFloat(ammountTransfer) + parseFloat(value);
+            // Si es el primer número y es 0, reemplazarlo
+            if (ammountTransfer === '0' && value !== '.') {
+                setAmmountTransfer(value);
+                return;
+            }
 
-            // Convert newAmmount to a string for indexOf
-            let newAmmountStr = newAmmount.toString();
+            const newAmount = ammountTransfer + value;
+            const numericAmount = parseFloat(newAmount);
 
-            // Validate if the new amount is greater than 9999
-            if (parseFloat(newAmmount) > 9999) {
+            // Validar si el nuevo monto es mayor a 9999
+            if (numericAmount > 9999) {
                 setShowAlert(true);
                 setAlertText({
                     title: 'Monto inválido',
@@ -112,9 +116,9 @@ export default function ModalCalculator({
                 return;
             }
 
-            // Validate if the new amount has more than 2 decimal places
-            let decimalIndex = newAmmountStr.indexOf('.');
-            if (decimalIndex !== -1 && newAmmountStr.length - decimalIndex - 1 > 2) {
+            // Validar decimales
+            const [integer, decimal] = newAmount.split('.');
+            if (decimal && decimal.length > 2) {
                 setShowAlert(true);
                 setAlertText({
                     title: 'Monto inválido',
@@ -126,7 +130,7 @@ export default function ModalCalculator({
                 return;
             }
 
-            setAmmountTransfer(newAmmountStr);
+            setAmmountTransfer(newAmount);
         }
     };
 

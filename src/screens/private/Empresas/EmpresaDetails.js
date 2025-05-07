@@ -26,7 +26,7 @@ import { heightPercentageToDP } from 'react-native-responsive-screen'
 import AlertStyled from '../../../utils/ui/AlertStyled'
 
 export default function EmpresaDetails({ route }) {
-    const { business } = route.params
+    const { business, showTabBar = true } = route.params
     const { image: businessImage, name: businessName, branch, distance, cashback } = business
     const { id, companyID: businessId, lat, long, sectorName, tripPrice } = branch
 
@@ -341,7 +341,9 @@ export default function EmpresaDetails({ route }) {
     const alertDeleteCart = () => {
         if (cart.length === 0) {
             isGoingBack.current = true;
-            toggleTabBar(true)
+            if (showTabBar) {
+                toggleTabBar(true)
+            }
             navigation.goBack()
             return
         }
@@ -511,7 +513,7 @@ export default function EmpresaDetails({ route }) {
                             <TextStyled
                                 fontFamily='SFPro-Bold'
                                 textAlign='left'
-                                fontSize={theme_textStyles.xlarge + 1}
+                                fontSize={theme_textStyles.large}
                                 color={theme_colors.black}
                                 numberOfLines={1}
                                 ellipsizeMode='tail'
@@ -543,7 +545,7 @@ export default function EmpresaDetails({ route }) {
                                 }}
                             >
                                 {indicators.map((indicator, index) => (
-                                    <IndicatorItem key={index} indicator={indicator} iconSize={18} fontSize={theme_textStyles.smedium} />
+                                    <IndicatorItem key={index} indicator={indicator} iconSize={18} fontSize={theme_textStyles.smedium} iconColor={theme_colors.primary} />
                                 ))}
                             </ViewStyled>
 

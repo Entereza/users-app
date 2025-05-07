@@ -59,5 +59,20 @@ export const userService = {
         return createApiRequest(`/clients-op/forget-password?${queryParams.toString()}`, {
             method: 'GET'
         });
+    },
+
+    // Change password
+    changePassword: async (email, oldPassword, newPassword) => {
+        return createApiRequest('/clients-op/new-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email,
+                oldPassword,
+                newPassword
+            })
+        });
     }
 }; 

@@ -5,7 +5,7 @@ import { Skeleton } from 'moti/skeleton'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import { FlatList } from 'react-native'
 
-export default function BusinessSkeleton() {
+export default function BusinessSkeleton({ showSkeletonText = true }) {
   const numberOfSkeletons = 3;
 
   return (
@@ -20,18 +20,24 @@ export default function BusinessSkeleton() {
         alignItems: 'center',
       }}
     >
-      <Skeleton
-        show={true}
-        width={widthPercentageToDP(90)}
-        height={heightPercentageToDP(4)}
-        colorMode='light'
-        backgroundColor={theme_colors.semiTransparent}
-      />
+      {
+        showSkeletonText && (
+          <>
+            <Skeleton
+              show={true}
+              width={widthPercentageToDP(90)}
+              height={heightPercentageToDP(4)}
+              colorMode='light'
+              backgroundColor={theme_colors.semiTransparent}
+            />
 
-      <ViewStyled
-        backgroundColor={theme_colors.transparent}
-        marginBottom={2}
-      />
+            <ViewStyled
+              backgroundColor={theme_colors.transparent}
+              marginBottom={2}
+            />
+          </>
+        )
+      }
 
       <FlatList
         data={Array.from({ length: numberOfSkeletons }, (_, index) => index)}

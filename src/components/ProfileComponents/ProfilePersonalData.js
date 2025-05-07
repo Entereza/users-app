@@ -66,7 +66,7 @@ export default function ProfilePersonalData({
                 returnKeyType='next'
             />
 
-            <TextInputStyled
+            {/* <TextInputStyled
                 value={formik.values.email}
                 label='Correo electrónico *'
                 placeholder="Ingresa tu correo electrónico"
@@ -79,7 +79,7 @@ export default function ProfilePersonalData({
                 inputStyle={styles.inputText}
                 errorStyle={styles.errorText}
                 returnKeyType='next'
-            />
+            /> */}
         </ViewStyled>
     )
 }

@@ -15,10 +15,7 @@ export default function SearchBar({
     setSearchValue,
     active = false,
     autoFocus = false,
-    withFilters = false,
 }) {
-    const [openFilters, setOpenFilters] = React.useState(false)
-
     return (
         <>
             <Pressable onPress={onPress}>
@@ -46,7 +43,7 @@ export default function SearchBar({
                         }}
                     >
                         <MaterialCommunityIcons
-                            name={withFilters ? "tune" : "magnify"}
+                            name={"magnify"}
                             color={theme_colors.dark}
                             size={adjustFontSize(theme_textStyles.large)}
                         />
@@ -71,6 +68,7 @@ export default function SearchBar({
                                     keyboardType={"default"}
                                     placeholder={placeHolderActive}
                                     returnKeyType='search'
+                                    onSubmitEditing={onPress}
                                     style={{
                                         fontFamily: 'SFPro-Regular',
                                         fontSize: adjustFontSize(theme_textStyles.smaller + .5),

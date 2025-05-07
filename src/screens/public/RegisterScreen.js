@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, View, Text, Alert } from 'react-native'
+import { StyleSheet, View, Text, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ViewStyled from '../../utils/ui/ViewStyled';
 import { theme_colors } from '../../utils/theme/theme_colors';
@@ -71,39 +71,12 @@ export default function RegisterScreen() {
                 console.log('Signup response:', response);
 
                 if (response.code === 'COD200') {
-                    const loginResponse = await authService.login({
-                        nick: values.email,
-                        password: values.password
-                    });
-
-                    console.log('loginResponse', loginResponse)
-
-                    if (loginResponse.code === 'COD200') {
-                        let userData = {
-                            id: loginResponse.client.id,
-                            names: loginResponse.client.names,
-                            lastNames: loginResponse.client.lastnames,
-                            phoneNumber: loginResponse.client.phoneNumber,
-                            ci: loginResponse.client.carnet,
-                            cashback: loginResponse.client.cashback,
-                            email: loginResponse.client.email,
-                            image: loginResponse.client.img,
-                            password: loginResponse.client.password,
-                            status: loginResponse.client.status,
-                            username: loginResponse.client.username,
-                        }
-
-                        setUserData(userData);
-                        AsyncStorage.setItem('userData', JSON.stringify(userData));
-                        if (loginResponse.token) {
-                            AsyncStorage.setItem('token', loginResponse.token)
-                        }
-
-                        // Initialize notifications after successful registration and login
-                        await handleNotificationsSetup(loginResponse.client.id);
-                    } else {
-                        toastService.showErrorToast(loginResponse.msg || "Error al iniciar sesión");
-                    }
+                    console.log('Register success')
+                    handleLogin(values.email, values.password)
+                } else if (response.code === 'COD353') {
+                    toastService.showWarningToast("El correo electrónico ya está en uso");
+                } else if (response.code === 'COD354') {
+                    toastService.showWarningToast("El número de teléfono ya está en uso");
                 } else {
                     toastService.showErrorToast(response.msg || "Error en el registro");
                 }
@@ -116,188 +89,237 @@ export default function RegisterScreen() {
         }
     });
 
+    const handleLogin = async (email, password) => {
+        try {
+            const response = await authService.login(email, password);
+
+            console.log('response handleLogin: ', response)
+
+            if (response.code === 'COD200') {
+                console.log('Login success')
+
+                const userData = {
+                    id: response.client.id,
+                    names: response.client.names,
+                    lastNames: response.client.lastNames,
+                    phoneNumber: response.client.phoneNumber,
+                    ci: response.client.carnet,
+                    cashback: response.client.cashback,
+                    email: response.client.email,
+                    image: response.client.img,
+                    password: response.client?.password || response.client?.plainPassword || "",
+                    status: response.client.status,
+                    username: response.client.username,
+                }
+
+                setUserData(userData);
+                AsyncStorage.setItem('userData', JSON.stringify(userData));
+                if (response.token) {
+                    AsyncStorage.setItem('token', response.token)
+                }
+
+                await handleNotificationsSetup(response.client.id);
+            } else {
+                toastService.showErrorToast(response.msg || "Error al iniciar sesión");
+            }
+        } catch (error) {
+            console.error('Error during login:', error);
+            toastService.showErrorToast("Hubo un problema al intentar iniciar sesión");
+        }
+    }
+
     return (
-        <ViewStyled
-            backgroundColor={theme_colors.dark}
-            style={{
-                width: '100%',
-                height: '100%',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                position: 'relative',
-                paddingTop: insets.top + heightPercentageToDP(5),
-                paddingBottom: insets.bottom,
-            }}
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1 }}
         >
-            <TextStyled
-                textAlign='center'
-                fontFamily='Artegra-Light'
-                fontSize={theme_textStyles.medium}
-                color={theme_colors.white}
+            <ViewStyled
+                backgroundColor={theme_colors.dark}
                 style={{
-                    marginBottom: 10,
-                    width: "100%",
+                    width: '100%',
+                    height: '100%',
+                    position: 'relative',
                 }}
             >
-                {'Crea tu cuenta con '}
-                <TextStyled
-                    fontFamily='Artegra-Bold'
-                    textAlign='center'
-                    fontSize={theme_textStyles.large}
-                    color={theme_colors.primary}
-                    style={{
-                        width: "100%",
+                <ScrollView
+                    contentContainerStyle={{
+                        flexGrow: 1,
+                        alignItems: 'center',
+                        paddingTop: insets.top + heightPercentageToDP(2),
+                        paddingBottom: insets.bottom,
                     }}
+                    keyboardShouldPersistTaps="handled"
                 >
-                    {'Entereza'}
-                </TextStyled>
-            </TextStyled>
-
-            <TextInputStyled
-                value={formik.values.names}
-                label='Nombres'
-                placeholder="Ingresa tus nombres"
-                onChangeText={text => formik.setFieldValue('names', text)}
-                onBlur={() => formik.setFieldTouched('names')}
-                errorMessage={formik.touched.names && formik.errors.names}
-                placeholderTextColor={styles.textPlaceholder}
-                labelStyle={styles.labelInput}
-                containerStyle={styles.containerInput}
-                inputStyle={styles.inputText}
-                errorStyle={styles.errorText}
-                returnKeyType='next'
-            />
-
-            <TextInputStyled
-                value={formik.values.lastNames}
-                label='Apellidos'
-                placeholder="Ingresa tus apellidos"
-                onChangeText={text => formik.setFieldValue('lastNames', text)}
-                onBlur={() => formik.setFieldTouched('lastNames')}
-                errorMessage={formik.touched.lastNames && formik.errors.lastNames}
-                placeholderTextColor={styles.textPlaceholder}
-                labelStyle={styles.labelInput}
-                containerStyle={styles.containerInput}
-                inputStyle={styles.inputText}
-                errorStyle={styles.errorText}
-                returnKeyType='next'
-            />
-
-            <TextInputStyled
-                value={formik.values.email}
-                label='Correo electrónico'
-                placeholder="Ingresa tu correo electrónico"
-                onChangeText={text => formik.setFieldValue('email', text)}
-                onBlur={() => formik.setFieldTouched('email')}
-                errorMessage={formik.touched.email && formik.errors.email}
-                placeholderTextColor={styles.textPlaceholder}
-                labelStyle={styles.labelInput}
-                containerStyle={styles.containerInput}
-                inputStyle={styles.inputText}
-                errorStyle={styles.errorText}
-                returnKeyType='next'
-                keyboardType='email-address'
-                autoCapitalize='none'
-            />
-
-            <TextInputStyled
-                value={formik.values.password}
-                label='Contraseña'
-                placeholder="Ingresa tu contraseña"
-                onChangeText={text => formik.setFieldValue('password', text)}
-                onBlur={() => formik.setFieldTouched('password')}
-                errorMessage={formik.touched.password && formik.errors.password}
-                placeholderTextColor={styles.textPlaceholder}
-                labelStyle={styles.labelInput}
-                containerStyle={styles.containerInput}
-                inputStyle={styles.passwordInputText}
-                errorStyle={styles.errorText}
-                returnKeyType='next'
-                isSecure={!showPassword}
-                icon={showPassword ? 'eye-off' : 'eye'}
-                handleVisible={() => setShowPassword(!showPassword)}
-            />
-
-            <TextInputStyled
-                value={formik.values.confirmPassword}
-                label='Confirmar contraseña'
-                placeholder="Confirma tu contraseña"
-                onChangeText={text => formik.setFieldValue('confirmPassword', text)}
-                onBlur={() => formik.setFieldTouched('confirmPassword')}
-                errorMessage={formik.touched.confirmPassword && formik.errors.confirmPassword}
-                placeholderTextColor={styles.textPlaceholder}
-                labelStyle={styles.labelInput}
-                containerStyle={styles.containerInput}
-                inputStyle={styles.passwordInputText}
-                errorStyle={styles.errorText}
-                returnKeyType='next'
-                isSecure={!showConfirmPassword}
-                icon={showConfirmPassword ? 'eye-off' : 'eye'}
-                handleVisible={() => setShowConfirmPassword(!showConfirmPassword)}
-            />
-
-            <ViewStyled
-                backgroundColor={theme_colors.transparent}
-                style={styles.phoneContainer}
-            >
-                <TextStyled
-                    style={styles.labelInput}
-                >
-                    {'Número de celular'}
-                </TextStyled>
-
-                <ViewStyled
-                    backgroundColor={theme_colors.transparent}
-                    style={styles.phoneInputContainer}
-                >
-                    <ViewStyled
-                        backgroundColor={theme_colors.transparent}
-                        style={styles.countryCode}
+                    <TextStyled
+                        textAlign='center'
+                        fontFamily='Artegra-Light'
+                        fontSize={theme_textStyles.medium}
+                        color={theme_colors.white}
+                        style={{
+                            marginBottom: 10,
+                            width: "100%",
+                        }}
                     >
+                        {'Crea tu cuenta con '}
                         <TextStyled
-                            color={theme_colors.white}
-                            fontSize={theme_textStyles.small + .5}
+                            fontFamily='Artegra-Bold'
+                            textAlign='center'
+                            fontSize={theme_textStyles.large}
+                            color={theme_colors.primary}
+                            style={{
+                                width: "100%",
+                            }}
                         >
-                            {'🇧🇴 +591'}
+                            {'Entereza'}
                         </TextStyled>
-                    </ViewStyled>
+                    </TextStyled>
 
                     <TextInputStyled
-                        value={formik.values.phoneNumber}
-                        placeholder="Ej: 76647839"
-                        onChangeText={text => formik.setFieldValue('phoneNumber', text)}
-                        onBlur={() => formik.setFieldTouched('phoneNumber')}
-                        errorMessage={formik.touched.phoneNumber && formik.errors.phoneNumber}
+                        value={formik.values.names}
+                        label='Nombres'
+                        placeholder="Ingresa tus nombres"
+                        onChangeText={text => formik.setFieldValue('names', text)}
+                        onBlur={() => formik.setFieldTouched('names')}
+                        errorMessage={formik.touched.names && formik.errors.names}
                         placeholderTextColor={styles.textPlaceholder}
-                        containerStyle={styles.phoneInputField}
+                        labelStyle={styles.labelInput}
+                        containerStyle={styles.containerInput}
                         inputStyle={styles.inputText}
                         errorStyle={styles.errorText}
-                        returnKeyType='done'
-                        keyboardType='phone-pad'
+                        returnKeyType='next'
                     />
-                </ViewStyled>
-            </ViewStyled>
 
-            <ButtonWithIcon
-                disabled={!formik.isValid || !formik.dirty || loading}
-                backgroundColor={!formik.isValid || !formik.dirty ? `${theme_colors.grey}22` : theme_colors.primary}
-                borderWidth={0}
-                colorText={!formik.isValid || !formik.dirty ? theme_colors.textGrey : theme_colors.white}
-                onPress={formik.handleSubmit}
-                borderRadius={2}
-                withIcon={false}
-                fontSize={theme_textStyles.smedium}
-                fontFamily={'SFPro-SemiBold'}
-                textButton={'Crear cuenta'}
-                height={7}
-                loading={loading}
-                style={{
-                    width: '95%',
-                    marginTop: 'auto',
-                    marginBottom: 10,
-                }}
-            />
-        </ViewStyled>
+                    <TextInputStyled
+                        value={formik.values.lastNames}
+                        label='Apellidos'
+                        placeholder="Ingresa tus apellidos"
+                        onChangeText={text => formik.setFieldValue('lastNames', text)}
+                        onBlur={() => formik.setFieldTouched('lastNames')}
+                        errorMessage={formik.touched.lastNames && formik.errors.lastNames}
+                        placeholderTextColor={styles.textPlaceholder}
+                        labelStyle={styles.labelInput}
+                        containerStyle={styles.containerInput}
+                        inputStyle={styles.inputText}
+                        errorStyle={styles.errorText}
+                        returnKeyType='next'
+                    />
+
+                    <TextInputStyled
+                        value={formik.values.email}
+                        label='Correo electrónico'
+                        placeholder="Ingresa tu correo electrónico"
+                        onChangeText={text => formik.setFieldValue('email', text)}
+                        onBlur={() => formik.setFieldTouched('email')}
+                        errorMessage={formik.touched.email && formik.errors.email}
+                        placeholderTextColor={styles.textPlaceholder}
+                        labelStyle={styles.labelInput}
+                        containerStyle={styles.containerInput}
+                        inputStyle={styles.inputText}
+                        errorStyle={styles.errorText}
+                        returnKeyType='next'
+                        keyboardType='email-address'
+                        autoCapitalize='none'
+                    />
+
+                    <TextInputStyled
+                        value={formik.values.password}
+                        label='Contraseña'
+                        placeholder="Ingresa tu contraseña"
+                        onChangeText={text => formik.setFieldValue('password', text)}
+                        onBlur={() => formik.setFieldTouched('password')}
+                        errorMessage={formik.touched.password && formik.errors.password}
+                        placeholderTextColor={styles.textPlaceholder}
+                        labelStyle={styles.labelInput}
+                        containerStyle={styles.containerInput}
+                        inputStyle={styles.passwordInputText}
+                        errorStyle={styles.errorText}
+                        returnKeyType='next'
+                        isSecure={!showPassword}
+                        icon={showPassword ? 'eye-off' : 'eye'}
+                        handleVisible={() => setShowPassword(!showPassword)}
+                    />
+
+                    <TextInputStyled
+                        value={formik.values.confirmPassword}
+                        label='Confirmar contraseña'
+                        placeholder="Confirma tu contraseña"
+                        onChangeText={text => formik.setFieldValue('confirmPassword', text)}
+                        onBlur={() => formik.setFieldTouched('confirmPassword')}
+                        errorMessage={formik.touched.confirmPassword && formik.errors.confirmPassword}
+                        placeholderTextColor={styles.textPlaceholder}
+                        labelStyle={styles.labelInput}
+                        containerStyle={styles.containerInput}
+                        inputStyle={styles.passwordInputText}
+                        errorStyle={styles.errorText}
+                        returnKeyType='next'
+                        isSecure={!showConfirmPassword}
+                        icon={showConfirmPassword ? 'eye-off' : 'eye'}
+                        handleVisible={() => setShowConfirmPassword(!showConfirmPassword)}
+                    />
+
+                    <ViewStyled
+                        backgroundColor={theme_colors.transparent}
+                        style={styles.phoneContainer}
+                    >
+                        <TextStyled
+                            style={styles.labelInput}
+                        >
+                            {'Número de celular'}
+                        </TextStyled>
+
+                        <ViewStyled
+                            backgroundColor={theme_colors.transparent}
+                            style={styles.phoneInputContainer}
+                        >
+                            <ViewStyled
+                                backgroundColor={theme_colors.transparent}
+                                style={styles.countryCode}
+                            >
+                                <TextStyled
+                                    color={theme_colors.white}
+                                    fontSize={theme_textStyles.small + .5}
+                                >
+                                    {'🇧🇴 +591'}
+                                </TextStyled>
+                            </ViewStyled>
+
+                            <TextInputStyled
+                                value={formik.values.phoneNumber}
+                                placeholder="Ej: 76647839"
+                                onChangeText={text => formik.setFieldValue('phoneNumber', text)}
+                                onBlur={() => formik.setFieldTouched('phoneNumber')}
+                                errorMessage={formik.touched.phoneNumber && formik.errors.phoneNumber}
+                                placeholderTextColor={styles.textPlaceholder}
+                                containerStyle={styles.phoneInputField}
+                                inputStyle={styles.inputText}
+                                errorStyle={styles.errorText}
+                                returnKeyType='done'
+                                keyboardType='phone-pad'
+                            />
+                        </ViewStyled>
+                    </ViewStyled>
+
+                    <ButtonWithIcon
+                        disabled={!formik.isValid || !formik.dirty || loading}
+                        backgroundColor={!formik.isValid || !formik.dirty ? `${theme_colors.grey}22` : theme_colors.primary}
+                        borderWidth={0}
+                        colorText={!formik.isValid || !formik.dirty ? theme_colors.textGrey : theme_colors.white}
+                        onPress={formik.handleSubmit}
+                        borderRadius={2}
+                        withIcon={false}
+                        fontSize={theme_textStyles.smedium}
+                        fontFamily={'SFPro-SemiBold'}
+                        textButton={'Crear cuenta'}
+                        height={7}
+                        loading={loading}
+                        style={{
+                            width: '95%',
+                            marginTop: 15,
+                        }}
+                    />
+                </ScrollView>
+            </ViewStyled>
+        </KeyboardAvoidingView>
     )
 }
 

@@ -1,69 +1,175 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import useOrdersStore from '../../../utils/tools/interface/ordersStore'
 import useTabBarStore from '../../../utils/tools/interface/tabBarStore';
+import useDeliveryLocationStore from '../../../utils/tools/interface/deliveryLocationStore';
+import { socketService } from '../../../utils/services/socket/socketService';
 import { useNavigation } from '@react-navigation/native';
 import { theme_colors } from '../../../utils/theme/theme_colors';
 import ViewStyled from '../../../utils/ui/ViewStyled';
-import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { heightPercentageToDP } from 'react-native-responsive-screen';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Pressable } from 'react-native';
+import { ActivityIndicator, Pressable, TouchableOpacity } from 'react-native';
 import { private_name_routes } from '../../../utils/route/private_name_routes';
-import { FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import adjustFontSize from '../../../utils/ui/adjustText';
 import { theme_textStyles } from '../../../utils/theme/theme_textStyles';
 import TextStyled from '../../../utils/ui/TextStyled';
 import OrderProgressBar from '../../../components/BusinessComponents/OrderProgressBar';
+import LocationTracker from '../../../components/Tracking/LocationTracker';
+import useLocationStore from '../../../utils/tools/interface/locationStore';
+import { toastService } from '../../../utils/tools/interface/toastService';
+import DetailsOrderModal from '../../../components/Modals/DetailsOrderModal';
 
 export default function OrderTrackingScreen({ route }) {
-    const { top } = useSafeAreaInsets()
-    const { order } = route.params;
-    const { getOrderStatusText, getOrderStatusSubtle } = useOrdersStore();
-    const { toggleTabBar } = useTabBarStore();
+    const { getOrderById } = useOrdersStore();
+    const orderId = route.params?.orderId;
+    const activeOrder = orderId ? getOrderById(orderId) : null;
     const navigation = useNavigation();
 
-    const statusOrders = {
-        created: "created",
-        accepted: "accepted",
-        pickup: "pickup",
-        store: "store",
-        taken: "taken",
-        delivering: "delivering",
-        arrived: "arrived",
-        completed: "completed"
-    }
+    // Store disconnectSocket function for cleanup
+    const { disconnectSocket } = useDeliveryLocationStore();
 
-    const status = order.status;
-    // const status = statusOrders.arrived;
+    useEffect(() => {
+        if (!activeOrder) {
+            toastService.showInfoToast("El pedido ya fue entregado.");
+            navigation.navigate(private_name_routes.empresas.empresasHome);
+            toggleTabBar(true);
+            return;
+        } else {
+            zoomToFit();
+        }
+
+        // Cleanup function when component unmounts
+        return () => {
+            // Ensure socket is disconnected when leaving this screen
+            disconnectSocket();
+        };
+    }, [activeOrder]);
+
+    const { top } = useSafeAreaInsets()
+    const { getOrderStatusText, getOrderStatusSubtle } = useOrdersStore();
+    const { toggleTabBar } = useTabBarStore();
+    const [isDragging, setIsDragging] = useState(false);
+    const {
+        latitude,
+        longitude,
+        isSocketConnected,
+        connectSocket
+    } = useDeliveryLocationStore();
+
+    const [showDetailsOrder, setShowDetailsOrder] = useState(false);
+
+    // Debug socket connection
+    useEffect(() => {
+        const initializeSocket = async () => {
+            try {
+                console.log("OrderTrackingScreen: Checking socket connection");
+
+                // Ensure socket is connected
+                if (!isSocketConnected) {
+                    console.log("OrderTrackingScreen: Socket not connected, connecting now");
+                    await connectSocket();
+
+                    // Verify connection status after attempting to connect
+                    const connected = socketService.isConnected();
+                    console.log("OrderTrackingScreen: Socket connection status after connect attempt:", connected);
+                }
+
+                // Debug - if order exists, try to manually trigger a test event
+                if (activeOrder && window.DEBUG_SOCKET) {
+                    console.log("OrderTrackingScreen: Creating test event for debugging");
+                    const testEvent = new CustomEvent('mockSocketEvent', {
+                        detail: {
+                            type: 'subscribeToOrder',
+                            data: {
+                                orderId: activeOrder?.order?.id,
+                                latitude: -17.783330 + Math.random() * 0.01,
+                                longitude: -63.182126 + Math.random() * 0.01
+                            }
+                        }
+                    });
+                    document.dispatchEvent(testEvent);
+                }
+            } catch (error) {
+                console.error("OrderTrackingScreen: Error initializing socket:", error);
+            }
+        };
+
+        initializeSocket();
+    }, []);
+
+    const userLat = activeOrder?.order?.userLat || null;
+    const userLng = activeOrder?.order?.userLng || null;
+
+    const restaurantLat = activeOrder?.latEnt || null;
+    const restaurantLng = activeOrder?.lngEnt || null;
 
     const mapRef = useRef(null);
     const [initialRegion, setInitialRegion] = useState({
-        latitude: -17.783330,
-        longitude: -63.182126,
+        latitude: userLat || restaurantLat || latitude || 0,
+        longitude: userLng || restaurantLng || longitude || 0,
         latitudeDelta: 0.0222,
         longitudeDelta: 0.0121,
     });
 
-    const restaurantLocation = {
-        latitude: -17.785335478650975,
-        longitude: -63.17709196897813,
-        title: "Restaurante",
-        iconName: "building"
+    const hasLocations = () => {
+        return (
+            (!!latitude && !!longitude) ||
+            (!!userLat && !!userLng) ||
+            (!!restaurantLat && !!restaurantLng)
+        );
     };
+    // On render Component
+    async function zoomToFit() {
+        if (mapRef.current) {
+            const coordinates = [];
 
+            // Add driver location if available
+            if (latitude && longitude) {
+                coordinates.push({ latitude, longitude });
+            }
+
+            // Add user location if available
+            if (userLat && userLng) {
+                coordinates.push({ latitude: userLat, longitude: userLng });
+            }
+
+            // Add restaurant location if available
+            if (restaurantLat && restaurantLng) {
+                coordinates.push({ latitude: restaurantLat, longitude: restaurantLng });
+            }
+
+            if (coordinates.length >= 2) {
+                mapRef.current.fitToCoordinates(coordinates, {
+                    edgePadding: { top: heightPercentageToDP(35), right: 50, bottom: 20, left: 50 },
+                    animated: true,
+                });
+            }
+        }
+    }
+
+    // Markers on map
     const deliveryLocation = {
-        latitude: -17.784834691861114,
-        longitude: -63.18148193725959,
+        latitude: latitude,
+        longitude: longitude,
         title: "Repartidor",
         iconName: "motorcycle"
     };
 
+    const restaurantLocation = {
+        latitude: restaurantLat,
+        longitude: restaurantLng,
+        title: "Restaurante",
+        iconName: "store"
+    };
+
     const userLocation = {
-        latitude: -17.787613192247054,
-        longitude: -63.185369675104724,
+        latitude: userLat,
+        longitude: userLng,
         title: "Tu ubicación",
         iconName: "house-chimney-user"
-    }
+    };
 
     const goBack = () => {
         toggleTabBar(true)
@@ -71,7 +177,7 @@ export default function OrderTrackingScreen({ route }) {
     };
 
     // Map markers memorized
-    const CustomMarker = React.memo(({ coordinate, color, title, iconName }) => (
+    const CustomMarker = React.memo(({ coordinate, color, title, iconName, padding = 8 }) => (
         <Marker
             stopPropagation
             tracksViewChanges={false}
@@ -86,7 +192,7 @@ export default function OrderTrackingScreen({ route }) {
                 style={{
                     width: 'auto',
                     height: 'auto',
-                    padding: 8,
+                    padding: padding,
                     justifyContent: 'center',
                     alignItems: 'center',
                 }}
@@ -100,219 +206,296 @@ export default function OrderTrackingScreen({ route }) {
         </Marker >
     ));
 
-    return (
-        <ViewStyled
-            backgroundColor={theme_colors.white}
-            style={{
-                width: '100%',
-                flex: 1,
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                position: 'relative'
-            }}
+    const UserMarker = React.memo(({ coordinate, title }) => (
+        <Marker
+            stopPropagation
+            tracksViewChanges={false}
+            coordinate={coordinate}
+            title={title}
         >
-            {/* Mapa */}
-            <MapView
-                ref={mapRef}
-                provider={PROVIDER_GOOGLE}
-                mapType='standard'
-                style={{
-                    width: '100%',
-                    height: '100%',
-                    position: 'relative'
-                }}
-                loadingEnabled={true}
-                showsUserLocation={true}
-                showsMyLocationButton={false}
-                initialRegion={initialRegion}
-            >
-                <CustomMarker
-                    coordinate={{
-                        latitude: restaurantLocation.latitude,
-                        longitude: restaurantLocation.longitude,
-                    }}
-                    color={theme_colors.secondary}
-                    title={restaurantLocation.title}
-                    iconName={restaurantLocation.iconName}
-                />
-                <CustomMarker
-                    coordinate={{
-                        latitude: deliveryLocation.latitude,
-                        longitude: deliveryLocation.longitude,
-                    }}
-                    color={theme_colors.success}
-                    title={deliveryLocation.title}
-                    iconName={deliveryLocation.iconName}
-                />
-                <CustomMarker
-                    coordinate={{
-                        latitude: userLocation.latitude,
-                        longitude: userLocation.longitude,
-                    }}
-                    color={theme_colors.info}
-                    title={userLocation.title}
-                    iconName={userLocation.iconName}
-                />
-                <Polyline
-                    coordinates={[
-                        {
-                            latitude: restaurantLocation.latitude,
-                            longitude: restaurantLocation.longitude,
-                        },
-                        {
-                            latitude: deliveryLocation.latitude,
-                            longitude: deliveryLocation.longitude,
-                        }
-                    ]}
-                    strokeColor={theme_colors.primary}
-                    strokeWidth={3}
-                />
-                <Polyline
-                    coordinates={[
-                        {
-                            latitude: deliveryLocation.latitude,
-                            longitude: deliveryLocation.longitude,
-                        },
-                        {
-                            latitude: userLocation.latitude,
-                            longitude: userLocation.longitude,
-                        }
-                    ]}
-                    strokeColor={theme_colors.green}
-                    strokeWidth={3}
-                />
-            </MapView>
-
-            {/* Header y Tarjeta de estado */}
             <ViewStyled
-                width={95}
-                marginTop={1.5}
-                borderRadius={2}
+                borderRadius={'50%'}
+                backgroundColor={theme_colors.transparent}
+                style={{
+                    width: 'auto',
+                    height: 'auto',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+            >
+                <FontAwesome5
+                    name={'map-pin'}
+                    size={40}
+                    color={theme_colors.danger}
+                />
+            </ViewStyled>
+        </Marker >
+    ));
+
+    return (
+        <>
+            <ViewStyled
                 backgroundColor={theme_colors.white}
                 style={{
-                    height: 'auto',
-                    padding: 15,
-                    shadowColor: theme_colors.black,
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 4,
-                    elevation: 3,
-                    marginBottom: 15,
-                    position: 'absolute',
-                    top: top,
+                    width: '100%',
+                    flex: 1,
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    position: 'relative'
                 }}
             >
-                <ViewStyled
-                    backgroundColor={theme_colors.transparent}
+                {/* Location tracker component (invisible) */}
+                {
+                    activeOrder?.order?.id && (
+                        <LocationTracker orderId={activeOrder?.order?.id} />
+                    )
+                }
+
+                {/* Mapa */}
+                <MapView
+                    ref={mapRef}
+                    provider={PROVIDER_GOOGLE}
+                    mapType='standard'
                     style={{
                         width: '100%',
-                        flex: 1,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
+                        height: '100%',
+                        position: 'relative'
+                    }}
+                    loadingEnabled={true}
+                    showsMyLocationButton={false}
+                    initialRegion={initialRegion}
+                    onPanDrag={() => setIsDragging(true)}
+                    onRegionChangeComplete={() => setIsDragging(false)}
+                >
+                    {
+                        latitude && longitude && (
+                            <CustomMarker
+                                coordinate={{
+                                    latitude: deliveryLocation.latitude,
+                                    longitude: deliveryLocation.longitude,
+                                }}
+                                color={theme_colors.primary}
+                                title={deliveryLocation.title}
+                                iconName={deliveryLocation.iconName}
+
+                            />
+                        )
+                    }
+
+                    {
+                        userLat && userLng && (
+                            <UserMarker
+                                coordinate={{
+                                    latitude: userLocation.latitude,
+                                    longitude: userLocation.longitude,
+                                }}
+                                title={userLocation.title}
+                                iconName={userLocation.iconName}
+                            />
+                        )
+                    }
+
+                    {
+                        restaurantLat && restaurantLng && (
+                            <CustomMarker
+                                coordinate={{
+                                    latitude: restaurantLocation.latitude,
+                                    longitude: restaurantLocation.longitude,
+                                }}
+                                color={theme_colors.success}
+                                title={restaurantLocation.title}
+                                iconName={restaurantLocation.iconName}
+                                padding={12}
+                            />
+                        )
+                    }
+                </MapView>
+
+                {/* Zoom to fitLocations */}
+                <ViewStyled
+                    backgroundColor={theme_colors.white}
+                    borderRadius={'50%'}
+                    style={{
+                        justifyContent: 'center',
                         alignItems: 'center',
+                        position: 'absolute',
+                        right: 20,
+                        bottom: heightPercentageToDP(8),
+                        width: 'auto',
+                        height: 'auto',
+                        paddingVertical: 10,
+                        paddingHorizontal: 10,
+                        elevation: 3,
+                        shadowColor: theme_colors.black,
+                        display: !isDragging ? 'flex' : 'none'
                     }}
                 >
                     <Pressable
-                        onPress={goBack}
-                    >
-                        <ViewStyled
-                            backgroundColor={theme_colors.transparent}
-                            style={{
-                                width: 'auto',
-                                height: 'auto',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <MaterialCommunityIcons
-                                name="close"
-                                size={adjustFontSize(theme_textStyles.xlarge)}
-                                color={theme_colors.primary}
-                            />
-                        </ViewStyled>
-                    </Pressable>
-
-                    <ViewStyled
-                        width={30}
-                        backgroundColor={theme_colors.semiTransparent}
-                        borderRadius={2}
-                        paddingVertical={0.5}
-                        paddingHorizontal={2.5}
+                        disabled={!hasLocations()}
+                        onPress={zoomToFit}
                         style={{
-                            height: 'auto',
+                            width: '100%',
+                            height: '100%',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}
+                    >
+                        {
+                            hasLocations()
+                                ? <FontAwesome6
+                                    name={'route'}
+                                    size={adjustFontSize(theme_textStyles.large)}
+                                    color={theme_colors.primary}
+                                />
+                                : <ActivityIndicator
+                                    size="small"
+                                    color={theme_colors.primary}
+                                />
+                        }
+                    </Pressable>
+                </ViewStyled>
+
+                {/* Header y Tarjeta de estado */}
+                <ViewStyled
+                    width={95}
+                    marginTop={1.5}
+                    borderRadius={2}
+                    backgroundColor={theme_colors.white}
+                    style={{
+                        height: 'auto',
+                        padding: 15,
+                        shadowColor: theme_colors.black,
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 4,
+                        elevation: 3,
+                        marginBottom: 15,
+                        position: 'absolute',
+                        top: top,
+                    }}
+                >
+                    <ViewStyled
+                        backgroundColor={theme_colors.transparent}
+                        style={{
+                            width: '100%',
+                            flex: 1,
                             flexDirection: 'row',
                             justifyContent: 'space-between',
                             alignItems: 'center',
                         }}
                     >
-                        <MaterialCommunityIcons
-                            name="information"
-                            size={adjustFontSize(theme_textStyles.xlarge)}
-                            color={theme_colors.primary}
-                        />
-
-                        <TextStyled
-                            fontFamily='SFPro-Regular'
-                            textAlign='center'
-                            fontSize={theme_textStyles.smedium}
-                            color={theme_colors.black}
-                            style={{
-                                marginTop: 3
-                            }}
+                        <Pressable
+                            onPress={goBack}
                         >
-                            Detalles
-                        </TextStyled>
-                    </ViewStyled>
-                </ViewStyled>
+                            <ViewStyled
+                                backgroundColor={theme_colors.transparent}
+                                style={{
+                                    width: 'auto',
+                                    height: 'auto',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <MaterialCommunityIcons
+                                    name="close"
+                                    size={adjustFontSize(theme_textStyles.large)}
+                                    color={theme_colors.primary}
+                                />
+                            </ViewStyled>
+                        </Pressable>
 
-                <ViewStyled
-                    backgroundColor={theme_colors.transparent}
-                    marginTop={2}
-                    style={{
-                        width: '100%',
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'flex-start',
-                    }}
-                >
+                        <TouchableOpacity
+                            onPress={() => setShowDetailsOrder(true)}
+                        >
+                            <ViewStyled
+                                width={25}
+                                backgroundColor={theme_colors.semiTransparent}
+                                borderRadius={2}
+                                paddingVertical={0.5}
+                                paddingHorizontal={2.5}
+                                style={{
+                                    height: 'auto',
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <MaterialCommunityIcons
+                                    name="information"
+                                    size={adjustFontSize(theme_textStyles.smedium)}
+                                    color={theme_colors.primary}
+                                />
+
+                                <TextStyled
+                                    fontFamily='SFPro-Regular'
+                                    textAlign='center'
+                                    fontSize={theme_textStyles.small}
+                                    color={theme_colors.black}
+                                    style={{
+                                        marginTop: 3
+                                    }}
+                                >
+                                    Detalles
+                                </TextStyled>
+                            </ViewStyled>
+                        </TouchableOpacity>
+                    </ViewStyled>
+
                     <ViewStyled
                         backgroundColor={theme_colors.transparent}
-                        marginBottom={1}
+                        marginTop={1}
                         style={{
                             width: '100%',
-                            height: 'auto',
+                            flex: 1,
                             justifyContent: 'center',
                             alignItems: 'flex-start',
                         }}
                     >
-                        <TextStyled
-                            fontFamily='SFPro-SemiBold'
-                            textAlign='left'
-                            fontSize={theme_textStyles.large + .5}
-                            color={theme_colors.dark}
+                        <ViewStyled
+                            backgroundColor={theme_colors.transparent}
+                            marginBottom={1}
                             style={{
-                                marginTop: 3
+                                width: '100%',
+                                height: 'auto',
+                                justifyContent: 'center',
+                                alignItems: 'flex-start',
                             }}
                         >
-                            {getOrderStatusText(status)}
-                        </TextStyled>
+                            <TextStyled
+                                fontFamily='SFPro-SemiBold'
+                                textAlign='left'
+                                fontSize={theme_textStyles.large}
+                                color={theme_colors.dark}
+                                style={{
+                                    marginTop: 3
+                                }}
+                            >
+                                {getOrderStatusText(activeOrder?.order?.status || "completed")}
+                            </TextStyled>
 
-                        <TextStyled
-                            fontFamily='SFPro-Regular'
-                            textAlign='left'
-                            fontSize={theme_textStyles.smedium}
-                            color={theme_colors.black}
-                            style={{
-                                marginTop: 3
-                            }}
-                        >
-                            {getOrderStatusSubtle(status)}
-                        </TextStyled>
+                            <TextStyled
+                                fontFamily='SFPro-Regular'
+                                textAlign='left'
+                                fontSize={theme_textStyles.small + .5}
+                                color={theme_colors.black}
+                                style={{
+                                    marginTop: 3
+                                }}
+                            >
+                                {getOrderStatusSubtle(activeOrder?.order?.status || "completed")}
+                            </TextStyled>
+                        </ViewStyled>
+
+                        <OrderProgressBar status={activeOrder?.order?.status || "completed"} />
                     </ViewStyled>
-
-                    <OrderProgressBar status={status} />
                 </ViewStyled>
             </ViewStyled>
-        </ViewStyled>
+
+            <DetailsOrderModal
+                order={activeOrder}
+                visible={showDetailsOrder}
+                onClose={() => setShowDetailsOrder(false)}
+            />
+        </>
     )
 }

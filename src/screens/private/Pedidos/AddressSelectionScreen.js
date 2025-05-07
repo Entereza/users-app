@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import { StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react'
+import { BackHandler, StyleSheet } from 'react-native';
 import SafeAreaStyled from '../../../components/SafeAreaComponents/SafeAreaStyled'
 import { theme_colors } from '../../../utils/theme/theme_colors'
 import HeaderInternalScreen from '../../../components/Header/HeaderInternalScreen';
@@ -13,13 +13,17 @@ import Toast from 'react-native-root-toast';
 import { showToast } from '../../../utils/tools/toast/toastService';
 import adjustFontSize from '../../../utils/ui/adjustText';
 import { theme_textStyles } from '../../../utils/theme/theme_textStyles';
+import useLocationStore from '../../../utils/tools/interface/locationStore';
+import { private_name_routes } from '../../../utils/route/private_name_routes';
 
 export default function AddressSelectionScreen({ route }) {
-    const { internScreen } = route.params || false;
-    const { listAddresses, setListAddresses, setIsLoadingAddresses, isLoadingAddresses } = useAddressStore();
+    const { internScreen, canDoActions } = route.params || false;
+
+    const { listAddresses, setListAddresses, setIsLoadingAddresses, isLoadingAddresses, selectedAddress } = useAddressStore();
     const { user } = useAuthStore();
     const navigation = useNavigation();
     const { toggleTabBar } = useTabBarStore();
+    const { setLocation } = useLocationStore();
 
     useEffect(() => {
         fetchLocations();
@@ -76,6 +80,10 @@ export default function AddressSelectionScreen({ route }) {
         }
     };
 
+    const handleAddressSelection = (address) => {
+        setLocation(address.lat, address.lng);
+    };
+
     const goBack = () => {
         if (!internScreen) {
             toggleTabBar(true);
@@ -83,19 +91,51 @@ export default function AddressSelectionScreen({ route }) {
         navigation.goBack();
     };
 
+    const goToHomeScreen = () => {
+        toggleTabBar(true);
+        navigation.navigate(private_name_routes.billetera.billeteraHome);
+    };
+    
+    useFocusEffect(
+        React.useCallback(() => {
+            toggleTabBar(false);
+        }, [])
+    );
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const onBackPress = () => {
+                if (selectedAddress) {
+                    goBack();
+                } else {
+                    goToHomeScreen();
+                }
+                return true;
+            };
+
+            BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+            return () => {
+                BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+            };
+        }, [selectedAddress])
+    );
+
     return (
         <SafeAreaStyled
             backgroundColor={theme_colors.white}
             styleArea={styles.safeArea}
             styleView={styles.startView}
         >
-            <HeaderInternalScreen title={"Ubicación"} onPress={goBack} />
+            <HeaderInternalScreen title={"Ubicación"} onPress={selectedAddress ? goBack : goToHomeScreen} />
 
             <ListCompletedAddressed
                 goBack={goBack}
                 listAddresses={listAddresses}
                 isLoading={isLoadingAddresses}
                 onRefresh={fetchLocations}
+                onAddressSelected={handleAddressSelection}
+                canDoActions={canDoActions}
             />
         </SafeAreaStyled>
     );

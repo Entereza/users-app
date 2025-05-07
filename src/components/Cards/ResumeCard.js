@@ -12,7 +12,7 @@ export default function ResumeCard({ tripPrice }) {
     const { cart, myCashback, serviceFee } = useCartStore();
     const navigation = useNavigation()
 
-    const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const totalPrice = cart.reduce((sum, item) => sum + (item.totalPrice * item.quantity), 0);
     const serviceFeePrice = totalPrice < 100 ? 1 : 2;
 
     const resumeList = [
@@ -32,7 +32,6 @@ export default function ResumeCard({ tripPrice }) {
         {
             "text": "Servicio",
             "price": serviceFeePrice,
-            "colorText": theme_colors.primary
         },
         {
             "text": "Mi Cashback",

@@ -8,7 +8,7 @@ import useCartStore from '../../utils/tools/interface/cartStore';
 
 export default function CashbackCard() {
     const { cart, myCashback, cashbackBusiness } = useCartStore();
-    const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const totalPrice = cart.reduce((sum, item) => sum + (item.totalPrice * item.quantity), 0);
 
     const cashback = totalPrice * (cashbackBusiness / 100)
 

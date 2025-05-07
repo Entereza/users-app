@@ -2,7 +2,6 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { private_name_routes } from '../../utils/route/private_name_routes';
 import HomeScreen from '../../screens/private/Billetera/HomeScreen';
-import ProfileHomeScreen from '../../screens/private/Perfil/ProfileHomeScreen';
 import CodeEnterezaScreen from '../../screens/private/Billetera/CodeEnterezaScreen';
 import CashbackInfoScreen from '../../screens/private/Billetera/CashbackInfoScreen';
 import TransferScreen from '../../screens/private/Billetera/TransferScreen';
@@ -12,11 +11,16 @@ import RechargeMoneyScreen from '../../screens/private/Billetera/RechargeMoneySc
 import AllOrdersScreen from '../../screens/private/Billetera/AllOrdersScreen';
 import TransferConfirmedScreen from '../../screens/private/Billetera/TransferConfirmedScreen';
 import useTabBarStore from '../../utils/tools/interface/tabBarStore';
+import TransferSuccessScreen from '../../screens/private/Billetera/TransferSuccessScreen';
+import TransferHistoryScreen from '../../screens/private/Billetera/TransferHistoryScreen';
+import HeaderDefaultScreen from '../../components/Header/HeaderDefaultScreen';
+import { useNavigation } from '@react-navigation/native';
 
 const Stack = createNativeStackNavigator();
 
 export default function BilleteraStack() {
     const { screenAnimationType } = useTabBarStore()
+    const navigation = useNavigation();
 
     return (
         <>
@@ -76,6 +80,18 @@ export default function BilleteraStack() {
                 <Stack.Screen
                     name={private_name_routes.billetera.transferConfirmedScreen}
                     component={TransferConfirmedScreen}
+                    options={{
+                        presentation: 'modal',
+                        navigationBarHidden: true,
+                        animation: screenAnimationType,
+                        animationTypeForReplace: 'pop',
+                        headerShown: false,
+                    }}
+                />
+
+                <Stack.Screen
+                    name={private_name_routes.billetera.transferSuccessScreen}
+                    component={TransferSuccessScreen}
                     options={{
                         presentation: 'modal',
                         navigationBarHidden: true,

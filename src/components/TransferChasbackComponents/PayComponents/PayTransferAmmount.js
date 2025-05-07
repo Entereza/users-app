@@ -6,14 +6,17 @@ import ModalCalculator from '../../Modals/ModalCalculator'
 import ButtonWithIcon from '../../Buttons/ButtonWithIcon'
 import { TouchableOpacity } from 'react-native'
 import useTransferAmountStore from '../../../utils/tools/interface/transferAmountStore'
+import useAuthStore from '../../../utils/tools/interface/authStore'
 import { theme_textStyles } from '../../../utils/theme/theme_textStyles'
 
-export default function PayTransferAmmount() {
+export default function PayTransferAmmount({ initialAmount, isEditable, onAmountChange }) {
     const { toggleTabSlider } = useTransferAmountStore()
+    const { user } = useAuthStore()
     const [showCalculator, setShowCalculator] = useState(false)
-    const [ammountSelected, setAmmountSelected] = useState("")
+    const [amount, setAmount] = useState(initialAmount ? initialAmount.toString() : "")
 
     const openCalculator = () => {
+        if (!isEditable && initialAmount > 0) return
         setShowCalculator(true)
     }
 
@@ -21,13 +24,27 @@ export default function PayTransferAmmount() {
         setShowCalculator(false)
     }
 
+    const handleAmountChange = (newAmount) => {
+        if (!newAmount || newAmount === "") {
+            setAmount("")
+            onAmountChange(0)
+            return
+        }
+
+        const numAmount = parseFloat(newAmount)
+        if (!isNaN(numAmount)) {
+            setAmount(newAmount.toString())
+            onAmountChange(numAmount)
+        }
+    }
+
     useEffect(() => {
-        if (ammountSelected) {
+        if (amount && parseFloat(amount) > 0) {
             toggleTabSlider(true)
         } else {
             toggleTabSlider(false)
         }
-    }, [ammountSelected])
+    }, [amount])
 
     return (
         <>
@@ -96,55 +113,56 @@ export default function PayTransferAmmount() {
                         {`Monto a transferir`}
                     </TextStyled>
 
-                    {
-                        ammountSelected
-                            ? <TouchableOpacity
-                                onPress={openCalculator}
+                    {amount ? (
+                        <TouchableOpacity
+                            onPress={openCalculator}
+                            disabled={!isEditable && initialAmount > 0}
+                            style={{
+                                width: 'auto',
+                                height: 'auto',
+                                opacity: (!isEditable && initialAmount > 0) ? 0.5 : 1
+                            }}
+                        >
+                            <TextStyled
+                                fontFamily='SFPro-Medium'
+                                textAlign='left'
+                                fontSize={theme_textStyles.medium}
+                                color={theme_colors.primary}
                                 style={{
-                                    width: 'auto',
-                                    height: 'auto'
+                                    width: "auto",
+                                    textDecorationLine: isEditable ? 'underline' : 'none',
                                 }}
                             >
-                                <TextStyled
-                                    fontFamily='SFPro-Medium'
-                                    textAlign='left'
-                                    fontSize={theme_textStyles.medium}
-                                    color={theme_colors.primary}
-                                    style={{
-                                        width: "auto",
-                                        textDecorationLine: 'underline',
-                                    }}
-                                >
-                                    {`Bs. ${ammountSelected}`}
-                                </TextStyled>
-                            </TouchableOpacity>
-                            : <ButtonWithIcon
-                                withIcon={false}
-
-                                onPress={openCalculator}
-                                borderWidth={2}
-                                borderColor={theme_colors.greyLine}
-                                backgroundColor={theme_colors.transparent}
-                                colorText={theme_colors.primary}
-                                borderRadius={1}
-                                fontSize={theme_textStyles.smaller + .5}
-                                height={3}
-                                fontFamily={'SFPro-SemiBold'}
-                                textButton={'Agregar'}
-                                style={{
-                                    width: '26%',
-                                }}
-                            />
-                    }
+                                {`Bs. ${parseFloat(amount).toFixed(2)}`}
+                            </TextStyled>
+                        </TouchableOpacity>
+                    ) : (
+                        <ButtonWithIcon
+                            withIcon={false}
+                            onPress={openCalculator}
+                            borderWidth={2}
+                            borderColor={theme_colors.greyLine}
+                            backgroundColor={theme_colors.transparent}
+                            colorText={theme_colors.primary}
+                            borderRadius={1}
+                            fontSize={theme_textStyles.smaller + .5}
+                            height={3}
+                            fontFamily={'SFPro-SemiBold'}
+                            textButton={'Agregar'}
+                            style={{
+                                width: '26%',
+                            }}
+                        />
+                    )}
                 </ViewStyled>
             </ViewStyled>
 
             <ModalCalculator
-                cashbackUser={10}
                 open={showCalculator}
                 handleClose={closeCalculator}
-                ammountSelected={ammountSelected}
-                setAmmountSelected={setAmmountSelected}
+                ammountSelected={amount}
+                setAmmountSelected={handleAmountChange}
+                cashbackUser={user?.cashback || 0}
             />
         </>
     )

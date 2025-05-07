@@ -16,6 +16,8 @@ import { ordersService } from '../../services/api/orders/ordersService';
 import useAuthStore from '../../utils/tools/interface/authStore';
 import { notificationService } from '../../services/notifications/notificationService';
 import * as Notifications from 'expo-notifications';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { heightPercentageToDP } from 'react-native-responsive-screen';
 
 const Tab = createBottomTabNavigator();
 
@@ -29,6 +31,7 @@ Notifications.setNotificationHandler({
 
 export default function PrivateNavigation() {
     const { showTabBar } = useTabBarStore();
+    const { bottom } = useSafeAreaInsets();
 
     const { user } = useAuthStore();
     const {
@@ -37,14 +40,16 @@ export default function PrivateNavigation() {
         setIsSearchingLocation,
         setCountry,
         setIsCountryEnabled,
-        setIsDepartmentEnabled
+        setIsDepartmentEnabled,
+        setHasLocationPermissions
     } = useLocationStore();
     const {
         setOrders,
         setIsLoading,
         setError,
         setTotalPages,
-        setCurrentPage
+        setCurrentPage,
+        updateOrder
     } = useOrdersStore();
 
     useEffect(() => {
@@ -54,20 +59,32 @@ export default function PrivateNavigation() {
 
     useEffect(() => {
         const notificationListener = Notifications.addNotificationReceivedListener(notification => {
-            console.log('Notification received:', notification.request.content.data);
+            const notificationData = notification.request.content.data;
+            console.log('Notification received:', notificationData);
 
-            // Check if notification contains order data and reinitialize orders
-            if (notification.request.content.data?.order) {
-                initializeOrders();
+            // If notification contains order data, update that specific order
+            if (notificationData?.order) {
+                console.log('Updating order from notification:', {
+                    notificationName: notificationData.notificationName,
+                    orderId: notificationData.order.id,
+                    newStatus: notificationData.order.status
+                });
+                updateOrder(notificationData.order);
             }
         });
 
         const responseListener = Notifications.addNotificationResponseReceivedListener(response => {
-            console.log('Notification response:', response);
+            const notificationData = response.notification.request.content.data;
+            console.log('Notification response:', notificationData);
 
-            // Check if notification response contains order data and reinitialize orders
-            if (response.notification.request.content.data?.order) {
-                initializeOrders();
+            // If notification contains order data, update that specific order
+            if (notificationData?.order) {
+                console.log('Updating order from notification response:', {
+                    notificationName: notificationData.notificationName,
+                    orderId: notificationData.order.id,
+                    newStatus: notificationData.order.status
+                });
+                updateOrder(notificationData.order);
             }
         });
 
@@ -111,15 +128,9 @@ export default function PrivateNavigation() {
                 return;
             }
 
+            setHasLocationPermissions(true);
+
             const location = await locationService.getCurrentLocation();
-            // const location = {
-            //     coords: {
-            //         latitude: -21.529068889259516,
-            //         longitude: -64.73332798357082
-            //     }
-            // };
-
-
 
             setLocation(location.coords.latitude, location.coords.longitude);
 
@@ -177,16 +188,9 @@ export default function PrivateNavigation() {
         tabBarHideOnKeyboard: true,
         tabBarAllowFontScaling: true,
         tabBarStyle: {
-            backgroundColor: theme_colors.white,
-            borderWidth: 1,
-            borderColor: theme_colors.white,
             display: showTabBar ? 'flex' : 'none',
             position: 'absolute',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingHorizontal: 10,
-            paddingBottom: 2,
+            height: heightPercentageToDP(8.5),
             borderTopRightRadius: 25,
             borderTopLeftRadius: 25,
         },

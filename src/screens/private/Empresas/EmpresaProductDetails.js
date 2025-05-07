@@ -19,15 +19,17 @@ import { showToast } from '../../../utils/tools/toast/toastService'
 import Toast from 'react-native-root-toast'
 
 export default function EmpresaProductDetails({ route }) {
-  const { product } = route.params
-  const { image: productImage, nameProduct, price, preparationTime } = product
-  const [currentQuantity, setCurrentQuantity] = useState(1)
+  const { product, isEditing } = route.params
+  const { image: productImage, nameProduct, price, description, selectedVariables: initialSelectedVariables } = product
+  // console.log('Product: ', product)
+  const [currentQuantity, setCurrentQuantity] = useState(isEditing ? product.quantity : 1)
   const [selectedVariables, setSelectedVariables] = useState({})
   const [productVariables, setProductVariables] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
 
   const addToCart = useCartStore((state) => state.addToCart)
+  const editCartItem = useCartStore((state) => state.editCartItem)
   const { top } = useSafeAreaInsets()
   const navigation = useNavigation()
 
@@ -35,7 +37,7 @@ export default function EmpresaProductDetails({ route }) {
   const translateY = useRef(new Animated.Value(0)).current
   const opacity = useRef(new Animated.Value(0)).current
 
-  // Cargar variables del producto
+  // Cargar variables del producto y marcar las seleccionadas si estamos editando
   useEffect(() => {
     loadProductVariables()
   }, [])
@@ -89,6 +91,15 @@ export default function EmpresaProductDetails({ route }) {
         .sort((a, b) => a.position - b.position)
 
       setProductVariables(validVariables)
+
+      // Si estamos editando, marcar las variables seleccionadas
+      if (isEditing && initialSelectedVariables) {
+        const initialSelections = {};
+        initialSelectedVariables.forEach(variable => {
+          initialSelections[variable.id] = variable.selections.map(s => s.id);
+        });
+        setSelectedVariables(initialSelections);
+      }
     } catch (error) {
       console.error('Error loading product variables:', error)
       setError('Error al cargar las variables del producto')
@@ -156,50 +167,37 @@ export default function EmpresaProductDetails({ route }) {
 
   const handleAddToCart = () => {
     if (areRequiredVariablesSelected()) {
-      // Calcular el precio total de las variables seleccionadas
-      const variablesPrice = Object.entries(selectedVariables).reduce((total, [pvId, selections]) => {
-        const pv = productVariables.find(v => v.id === pvId)
-        if (pv) {
-          return total + selections.reduce((varTotal, selectionId) => {
+      const selectedVariablesArray = productVariables
+        .filter(pv => selectedVariables[pv.id] && selectedVariables[pv.id].length > 0)
+        .map(pv => ({
+          id: pv.id,
+          namePv: pv.namePv,
+          canMany: pv.canMany,
+          required: pv.required,
+          instructions: pv.instructions,
+          selections: selectedVariables[pv.id].map(selectionId => {
             const variable = pv.variables.find(v => v.id === selectionId)
-            return varTotal + (variable?.price || 0)
-          }, 0)
-        }
-        return total
-      }, 0)
+            return {
+              id: selectionId,
+              name: variable?.name,
+              price: variable?.price || 0,
+              position: variable?.position
+            }
+          })
+        }))
 
-      // Calcular el precio unitario (base + variables)
-      const unitPrice = price + variablesPrice;
-
-      const productWithSelectedVariables = {
+      const updatedProduct = {
         ...product,
-        price: unitPrice, // Precio unitario
-        quantity: currentQuantity, // Cantidad seleccionada
-        totalPrice: unitPrice, // Precio unitario (para compatibilidad)
-        selectedVariables: Object.entries(selectedVariables).map(([pvId, selections]) => {
-          const pv = productVariables.find(v => v.id === pvId)
-          return {
-            id: pvId,
-            name: pv?.namePv,
-            namePv: pv?.namePv,
-            canMany: pv?.canMany,
-            required: pv?.required,
-            instructions: pv?.instructions,
-            position: pv?.position,
-            selections: selections.map(selectionId => {
-              const variable = pv?.variables.find(v => v.id === selectionId)
-              return {
-                id: selectionId,
-                name: variable?.name,
-                price: variable?.price || 0,
-                position: variable?.position
-              }
-            })
-          }
-        })
+        quantity: currentQuantity,
+        selectedVariables: selectedVariablesArray
       }
 
-      addToCart(productWithSelectedVariables)
+      if (isEditing) {
+        editCartItem(product.uniqueId, updatedProduct)
+      } else {
+        addToCart(updatedProduct)
+      }
+
       navigation.goBack()
     }
   }
@@ -328,16 +326,30 @@ export default function EmpresaProductDetails({ route }) {
             ellipsizeMode='tail'
             style={{
               width: '90%',
-              marginBottom: 20
             }}
           >
             Bs. {price}
           </TextStyled>
 
+          <TextStyled
+            fontFamily='SFPro-Regular'
+            textAlign='center'
+            fontSize={theme_textStyles.small}
+            color={theme_colors.black}
+            numberOfLines={2}
+            ellipsizeMode='tail'
+            style={{
+              width: '90%',
+              marginBottom: 20
+            }}
+          >
+            {description || 'No hay descripción del producto.'}
+          </TextStyled>
+
           <ProductButtonsAddToCart
             item={product}
             onQuantityChange={handleQuantityChange}
-            initialQuantity={1}
+            initialQuantity={currentQuantity}
           />
 
           {isLoading ? (
@@ -387,6 +399,7 @@ export default function EmpresaProductDetails({ route }) {
                   variables={pv.variables}
                   isRequired={pv.required}
                   maxSelect={pv.maxSelect}
+                  initialSelections={isEditing ? selectedVariables[pv.id] : undefined}
                   onSelectionChange={(selectedItems) => handleVariableSelection(pv.id, selectedItems)}
                 />
               ))}
@@ -459,7 +472,7 @@ export default function EmpresaProductDetails({ route }) {
           width={40}
           height={6}
           fontFamily={'SFPro-Bold'}
-          textButton={'Agregar'}
+          textButton={isEditing ? 'Actualizar' : 'Agregar'}
           disabled={!areRequiredVariablesSelected() || isLoading}
           style={{
             opacity: areRequiredVariablesSelected() && !isLoading ? 1 : 0.5

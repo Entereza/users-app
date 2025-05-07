@@ -23,7 +23,7 @@ export default function HeaderTransactions({
             }}
         >
             <TextStyled
-                fontSize={theme_textStyles.medium}
+                fontSize={theme_textStyles.smedium}
                 color={theme_colors.black}
                 style={{
                     fontFamily: 'SFPro-Bold',

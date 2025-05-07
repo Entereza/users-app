@@ -14,13 +14,19 @@ import { private_name_routes } from '../../utils/route/private_name_routes'
 import { useNavigation } from '@react-navigation/native'
 import useTabBarStore from '../../utils/tools/interface/tabBarStore'
 import { showToast } from '../../utils/tools/toast/toastService'
+import AlertStyled from '../../utils/ui/AlertStyled'
+import useCartStore from '../../utils/tools/interface/cartStore'
 
-export default function ListCompletedAddressed({ listAddresses = [], goBack }) {
+export default function ListCompletedAddressed({ listAddresses = [], goBack, onAddressSelected, canDoActions = true }) {
     const { selectedAddress: selectedAddressStore, setSelectedAddress: setSelectedAddressStore } = useAddressStore()
     const [selectedAddress, setSelectedAddress] = useState(null)
     const [isDisabled, setIsDisabled] = useState(true)
+    const [showAlert, setShowAlert] = useState(false)
     const navigation = useNavigation()
-    const { changeColorStatusBar } = useTabBarStore()
+    const { changeColorStatusBar, toggleTabBar } = useTabBarStore()
+    const { clearCart } = useCartStore()
+
+    console.log('selectedAddressStore: ', selectedAddressStore)
 
     const onPressSelect = (address) => {
         if (selectedAddressStore?.id === address.id) {
@@ -32,17 +38,44 @@ export default function ListCompletedAddressed({ listAddresses = [], goBack }) {
         }
     }
 
-    const handleSelectAddress = () => {
+    const handleSelectAddress = async () => {
+        if (!canDoActions) {
+            setShowAlert(true)
+            return;
+        }
+
         setIsDisabled(true)
         setSelectedAddressStore(selectedAddress)
-        showToast(
-            'Ubicación seleccionada',
-            Toast.positions.BOTTOM,
-            theme_colors.white,
-            theme_colors.primary
-        );
+        if (onAddressSelected) {
+            await onAddressSelected(selectedAddress)
+        }
         setSelectedAddress(null)
+        
+        // Pequeña pausa para asegurar que el estado se actualice
+        await new Promise(resolve => setTimeout(resolve, 100));
         goBack()
+    }
+
+    const handleConfirmAddressChange = async () => {
+        setIsDisabled(true)
+        setSelectedAddressStore(selectedAddress)
+        if (onAddressSelected) {
+            await onAddressSelected(selectedAddress)
+        }
+        setSelectedAddress(null)
+
+        setShowAlert(false)
+        // Pequeña pausa para asegurar que el estado se actualice
+        await new Promise(resolve => setTimeout(resolve, 100));
+        toggleTabBar(true)
+        clearCart()
+        navigation.navigate(private_name_routes.empresas.empresasHome)
+    }
+
+    const handleCancelAddressChange = () => {
+        setShowAlert(false)
+        setSelectedAddress(null)
+        setIsDisabled(true)
     }
 
     const goToAddAddress = () => {
@@ -64,6 +97,26 @@ export default function ListCompletedAddressed({ listAddresses = [], goBack }) {
                 alignItems: 'center',
             }}
         >
+            {showAlert && (
+                <AlertStyled
+                    widthModal={90}
+                    heightModal={30}
+                    heightText={19}
+                    title="¿Cambiar ubicación?"
+                    message="Si cambias la ubicación, se borrará todo el pedido y serás redirigido a la sección de empresas."
+                    type="warning"
+                    onConfirmPressed={handleCancelAddressChange}
+                    onCancelPressed={handleConfirmAddressChange}
+                    textConfirmButton="Cancelar"
+                    textCancelButton="Aceptar"
+                    showCloseButton={false}
+                    showCancelButton={true}
+                    widthConfirm="55%"
+                    widthCancel="40%"
+                    showAlert={showAlert}
+                />
+            )}
+
             <ViewStyled
                 height={4}
                 marginBottom={1}
@@ -137,6 +190,7 @@ export default function ListCompletedAddressed({ listAddresses = [], goBack }) {
                                     : selectedAddressStore?.id === item.id
                             }
                             onPressSelect={() => onPressSelect(item)}
+                            canDoActions={canDoActions}
                         />
                     }
                     showsHorizontalScrollIndicator={false}
@@ -161,14 +215,14 @@ export default function ListCompletedAddressed({ listAddresses = [], goBack }) {
                             width: "100%",
                         }}
                     >
-                        Aún no tienes ninguna ubicación
+                        No tienes direcciones guardadas
                     </TextStyled>
                 </ViewStyled>
             )}
 
             <ButtonWithIcon
                 withIcon={false}
-
+                disabled={isDisabled}
                 onPress={handleSelectAddress}
                 borderWidth={1}
                 borderColor={isDisabled ? theme_colors.lightGrey : theme_colors.primary}

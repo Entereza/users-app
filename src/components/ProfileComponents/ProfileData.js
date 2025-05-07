@@ -7,8 +7,6 @@ import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 export default function ProfileData({
   userData,
 }) {
-  // console.log('userData: ', userData)
-
   return (
     <ViewStyled
       width={90}
@@ -29,21 +27,25 @@ export default function ProfileData({
           width: "90%",
         }}
       >
-        {userData?.names && userData?.lastNames ? `${userData.names + ' ' + userData.lastNames}` : 'Sin nombre'}
+        {userData?.names || userData?.lastNames ?
+          `${userData?.names || ''} ${userData?.lastNames || ''}`.trim()
+          : 'Sin nombre'}
       </TextStyled>
 
-      <TextStyled
-        fontFamily='SFPro-Medium'
-        textAlign='center'
-        fontSize={theme_textStyles.small}
-        color={theme_colors.grey}
-        numberOfLines={1}
-        style={{
-          width: "90%",
-        }}
-      >
-        {'CI: ' + (userData?.ci ? userData.ci : 'N/A')}
-      </TextStyled>
+      {userData?.ci &&
+        <TextStyled
+          fontFamily='SFPro-Medium'
+          textAlign='center'
+          fontSize={theme_textStyles.small}
+          color={theme_colors.grey}
+          numberOfLines={1}
+          style={{
+            width: "90%",
+          }}
+        >
+          {`CI: ${userData.ci}`}
+        </TextStyled>
+      }
     </ViewStyled>
   )
 }

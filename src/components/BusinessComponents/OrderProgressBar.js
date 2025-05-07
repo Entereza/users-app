@@ -13,15 +13,16 @@ export default function OrderProgressBar({ status }) {
     pickup: "pickup",
     store: "store",
     taken: "taken",
+    picked: "picked",
     delivering: "delivering",
     arrived: "arrived",
     completed: "completed"
   }
 
   const PROGRESS_LINES = [
-    [statusOrders.created],
-    [statusOrders.accepted, statusOrders.pickup, statusOrders.store],
-    [statusOrders.taken, statusOrders.delivering],
+    [statusOrders.created, statusOrders.accepted, statusOrders.pickup],
+    [statusOrders.store, statusOrders.taken, statusOrders.picked],
+    [statusOrders.delivering],
     [statusOrders.arrived],
   ];
 

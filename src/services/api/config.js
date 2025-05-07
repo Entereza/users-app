@@ -27,6 +27,8 @@ export const createApiRequest = async (endpoint, options = {}) => {
         'Content-Type': 'application/json',
     };
 
+    console.log('endpoint: ', endpoint)
+
     if (token) {
         // console.log('token: ', token)
         defaultHeaders['Authorization'] = `Bearer ${token}`;
@@ -39,7 +41,6 @@ export const createApiRequest = async (endpoint, options = {}) => {
             ...options.headers,
         },
     });
-
 
     return handleApiResponse(response);
 };

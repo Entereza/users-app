@@ -20,7 +20,7 @@ export default function QrSkeleton() {
                 colorMode="light"
                 backgroundColor={theme_colors.semiTransparent}
                 width={'95%'}
-                height={'60%'}
+                height={'77%'}
             />
         </ViewStyled>
     )

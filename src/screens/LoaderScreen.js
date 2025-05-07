@@ -10,9 +10,9 @@ export default function LoaderScreen() {
     return (
         <ViewStyled
             width={100}
-            height={100}
             backgroundColor={theme_colors.dark}
             style={{
+                height: '100%',
                 justifyContent: 'center',
                 alignItems: 'center',
             }}
@@ -20,7 +20,6 @@ export default function LoaderScreen() {
             <ViewStyled
                 width={50}
                 height={25}
-                marginBottom={5}
                 backgroundColor={theme_colors.transparent}
                 style={{
                     justifyContent: 'center',
@@ -28,7 +27,7 @@ export default function LoaderScreen() {
                 }}
             >
                 <ImageStyled
-                    source={require('../../assets/icons/IconColorsEntereza.png')}
+                    source={require('../../assets/icons/icon-loaderScreen.png')}
                     style={{
                         resizeMode: 'contain',
                         width: '100%',

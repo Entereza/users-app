@@ -10,15 +10,17 @@ export default function PaymentInfo({
     iconName,
     text,
     textColor = theme_colors.black,
-    style
+    style,
+    textAlign = 'left'
 }) {
     return (
         <ViewStyled
             backgroundColor={theme_colors.transparent}
             height={3}
+            paddingLeft={textAlign !== 'center' ? 3 : 0}
             style={[
                 {
-                    width: 'auto',
+                    width: textAlign !== 'center' ? 'auto' : '100%',
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -36,11 +38,12 @@ export default function PaymentInfo({
 
             <TextStyled
                 fontFamily={'SFPro-Medium'}
-                textAlign={'center'}
+                textAlign={textAlign}
                 fontSize={theme_textStyles.small}
                 color={textColor}
+                numberOfLines={1}
                 style={{
-                    marginTop: 3
+                    marginTop: 3,
                 }}
             >
                 {text}

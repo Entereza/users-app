@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import ViewStyled from '../../../utils/ui/ViewStyled'
 import { theme_colors } from '../../../utils/theme/theme_colors'
 import ImageStyled from '../../../utils/ui/ImageStyled'
@@ -13,12 +13,18 @@ import PaymentInfo from './PaymentInfo'
 import QrSkeleton from '../../Skeletons/QrSkeleton'
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
+import { private_name_routes } from '../../../utils/route/private_name_routes'
+import { useNavigation } from '@react-navigation/native';
+import TextStyled from '../../../utils/ui/TextStyled'
+import { captureRef } from 'react-native-view-shot';
+import { View } from 'react-native';
 
 export default function PaymentContent() {
   const { user } = useAuthStore();
   const [qrData, setQrData] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const qrRef = useRef();
 
   const formatDate = (date) => {
     const year = date.getFullYear();
@@ -42,13 +48,13 @@ export default function PaymentContent() {
   const generateQR = async (params) => {
     try {
       setLoading(true);
+      console.log('generateQR params: ', params)
       const response = await qrService.createQR(params);
+      console.log('generateQR: ', response)
       setQrData({
         ...response,
-        expirationDate: params.expirationDate,
-        total: params.total
+        ...params
       });
-      toastService.showSuccessToast("QR generado exitosamente");
     } catch (error) {
       console.error('Error generating QR:', error);
       toastService.showErrorToast("Error al generar el QR");
@@ -57,40 +63,11 @@ export default function PaymentContent() {
     }
   };
 
-  const shareQR = async () => {
-    try {
-      if (!qrData) return;
-
-      // Create a temporary file path for the base64 image
-      const base64Data = qrData.qr;
-      const fileName = FileSystem.documentDirectory + "temp_qr.png";
-
-      // Write base64 data to temporary file
-      await FileSystem.writeAsStringAsync(fileName, base64Data, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
-      // Share the temporary file
-      await Sharing.shareAsync(fileName, {
-        dialogTitle: 'Compartir Código QR',
-        mimeType: 'image/png',
-        UTI: 'public.png'
-      });
-
-      // Clean up temporary file
-      await FileSystem.deleteAsync(fileName);
-
-    } catch (error) {
-      console.error('Error sharing QR:', error);
-      toastService.showErrorToast("Error al compartir el QR");
-    }
-  };
-
   const saveQR = async () => {
     try {
       if (!qrData) return;
 
-      // Solicitar permisos para acceder a la galería
+      // Request gallery permissions
       const { status } = await MediaLibrary.requestPermissionsAsync();
 
       if (status !== 'granted') {
@@ -98,18 +75,16 @@ export default function PaymentContent() {
         return;
       }
 
-      // Crear un archivo temporal con la imagen base64
-      const base64Data = qrData.qr;
-      const fileName = FileSystem.documentDirectory + "temp_qr.png";
-
-      // Escribir los datos base64 en el archivo temporal
-      await FileSystem.writeAsStringAsync(fileName, base64Data, {
-        encoding: FileSystem.EncodingType.Base64,
+      // Capture the QR view as an image
+      const uri = await captureRef(qrRef, {
+        format: 'png',
+        quality: 0.8,
       });
 
-      // Guardar el archivo en la galería
-      const asset = await MediaLibrary.createAssetAsync(fileName);
+      // Save to gallery
+      const asset = await MediaLibrary.createAssetAsync(uri);
 
+      // Check if album exists, if not create it
       const album = await MediaLibrary.getAlbumAsync('Entereza');
       if (album === null) {
         await MediaLibrary.createAlbumAsync('Entereza', asset, false);
@@ -117,13 +92,32 @@ export default function PaymentContent() {
         await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
       }
 
-      // Eliminar el archivo temporal
-      await FileSystem.deleteAsync(fileName);
-
       toastService.showSuccessToast("QR guardado exitosamente en la galería");
     } catch (error) {
       console.error('Error saving QR:', error);
       toastService.showErrorToast("Error al guardar el QR en la galería");
+    }
+  };
+
+  const shareQR = async () => {
+    try {
+      if (!qrData) return;
+
+      // Capture the QR view as an image
+      const uri = await captureRef(qrRef, {
+        format: 'png',
+        quality: 0.8,
+      });
+
+      // Share the image
+      await Sharing.shareAsync(uri, {
+        mimeType: 'image/png',
+        dialogTitle: 'Compartir Código QR'
+      });
+
+    } catch (error) {
+      console.error('Error sharing QR:', error);
+      toastService.showErrorToast("Error al compartir el QR");
     }
   };
 
@@ -141,61 +135,109 @@ export default function PaymentContent() {
         justifyContent: 'flex-start',
       }}
     >
-      <ViewStyled
-        backgroundColor={theme_colors.transparent}
+      {/* QR Container that will be captured */}
+      <View
+        ref={qrRef}
         style={{
+          marginTop: 20,
+          paddingBottom: 20,
           width: '95%',
-          height: '60%',
+          backgroundColor: theme_colors.white,
+          borderRadius: 15,
           alignItems: 'center',
-          justifyContent: 'center',
+          borderWidth: 0.4,
+          borderColor: theme_colors.greyLine,
         }}
       >
-        <ImageStyled
-          source={{ uri: `data:image/png;base64,${qrData.qr}` }}
+        {/* Header with Logo */}
+        <ViewStyled
+          backgroundColor={theme_colors.primary}
           style={{
             width: '100%',
-            height: '100%',
-            resizeMode: 'contain'
+            padding: 15,
+            borderTopLeftRadius: 15,
+            borderTopRightRadius: 15,
           }}
-        />
-      </ViewStyled>
+        >
+          <TextStyled
+            color={theme_colors.white}
+            fontSize={theme_textStyles.medium}
+            fontFamily="SFPro-Bold"
+            textAlign="center"
+          >
+            ENTEREZA S.R.L.
+          </TextStyled>
+        </ViewStyled>
 
-      <ViewStyled
-        backgroundColor={theme_colors.transparent}
-        marginTop={-4}
-        style={{
-          width: '95%',
-          height: 'auto',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+        {/* QR Image */}
+        <ViewStyled
+          backgroundColor={theme_colors.transparent}
+          style={{
+            width: '80%',
+            aspectRatio: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {qrData && (
+            <ImageStyled
+              source={{ uri: `data:image/png;base64,${qrData.qr}` }}
+              style={{
+                width: '100%',
+                height: '100%',
+                resizeMode: 'cover'
+              }}
+            />
+          )}
+        </ViewStyled>
 
-        <PaymentInfo
-          iconName={'hand-coin'}
-          text={qrData.total > 0 ? 'Monto: Bs ' + qrData.total : 'Monto: Abierto'}
-        />
+        {/* Amount and Expiration */}
+        <ViewStyled
+          backgroundColor={theme_colors.transparent}
+          marginTop={-3}
+          style={{
+            width: '100%',
+            alignItems: 'center',
+            gap: 10,
+          }}
+        >
+          <PaymentInfo
+            iconName={'hand-coin'}
+            text={qrData.total > 0 ? 'Monto: Bs ' + qrData.total : 'Monto: Abierto'}
+            textAlign={'center'}
+          />
 
-        <PaymentInfo
-          iconName={'calendar-outline'}
-          text={'Válido hasta: ' + new Date(qrData.expirationDate).toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })}
-        />
-      </ViewStyled>
+          <PaymentInfo
+            iconName={'account-outline'}
+            text={user?.names + ' ' + user?.lastNames || 'Usuario'}
+            textAlign={'center'}
+          />
 
+          <PaymentInfo
+            iconName={'comment-quote-outline'}
+            text={qrData.reference || 'Sin referencia'}
+            textAlign={'center'}
+          />
+
+          <PaymentInfo
+            iconName={'calendar-outline'}
+            text={'Válido hasta: ' + new Date(qrData.expirationDate).toLocaleDateString('es-ES', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+            textAlign={'center'}
+          />
+        </ViewStyled>
+      </View>
+
+      {/* Buttons */}
       <ViewStyled
         backgroundColor={theme_colors.transparent}
         marginTop={2}
-        height={8}
         style={{
           width: '95%',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexDirection: 'row',
-          gap: 10
+          gap: 10,
         }}
       >
         <ButtonWithIcon
@@ -207,14 +249,17 @@ export default function PaymentContent() {
           colorText={theme_colors.primary}
           borderRadius={1.5}
           fontSize={theme_textStyles.small}
+          width={90}
           height={5}
           fontFamily={'SFPro-Bold'}
           textButton={'Editar'}
-          style={{ flex: 1 }}
         />
 
         <ButtonWithIcon
-          withIcon={false}
+          withIcon={true}
+          MatIcons={true}
+          iconName={'save-alt'}
+          sizeIcon={theme_textStyles.smedium}
           onPress={saveQR}
           borderWidth={0}
           backgroundColor={theme_colors.primary}
@@ -222,14 +267,16 @@ export default function PaymentContent() {
           borderRadius={1.5}
           fontSize={theme_textStyles.small}
           height={5}
+          width={90}
           fontFamily={'SFPro-Bold'}
-          textButton={'Guardar'}
-          style={{ flex: 1 }}
-
+          textButton={'Guardar en galería'}
         />
 
         <ButtonWithIcon
-          withIcon={false}
+          withIcon={true}
+          iconName={'share-variant'}
+          MaterialIcons={true}
+          sizeIcon={theme_textStyles.smedium}
           onPress={shareQR}
           borderWidth={0}
           backgroundColor={theme_colors.primary}
@@ -237,13 +284,11 @@ export default function PaymentContent() {
           borderRadius={1.5}
           fontSize={theme_textStyles.small}
           height={5}
+          width={90}
           fontFamily={'SFPro-Bold'}
           textButton={'Compartir'}
-          style={{ flex: 1 }}
-
         />
       </ViewStyled>
-
 
       {showEditModal && (
         <QREditModal

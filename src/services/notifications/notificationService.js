@@ -20,7 +20,7 @@ export const configureNotifications = () => {
 // Registrar para notificaciones push
 export const registerForPushNotificationsAsync = async () => {
   let token;
-  
+
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('default', {
       name: 'default',
@@ -30,37 +30,37 @@ export const registerForPushNotificationsAsync = async () => {
     });
   }
 
-  if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    
-    if (finalStatus !== 'granted') {
-      console.log('Failed to get push token for push notification!');
-      toastService.showWarningToast("No se pudo obtener permiso para notificaciones");
-      return null;
-    }
-    
-    // Get the token that uniquely identifies this device
-    token = await Notifications.getExpoPushTokenAsync({
-      projectId: Constants.expoConfig?.extra?.eas?.projectId,
-    });
-    
-    console.log('Expo push token:', token);
-    
-    // Store token in AsyncStorage for future use
-    await AsyncStorage.setItem('expoPushToken', token.data);
-    
-    return token.data;
-  } else {
-    console.log('Must use physical device for Push Notifications');
-    toastService.showInfoToast("Debes usar un dispositivo físico para recibir notificaciones");
+  // if (Device.isDevice) {
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
+
+  if (existingStatus !== 'granted') {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
+
+  if (finalStatus !== 'granted') {
+    console.log('Failed to get push token for push notification!');
+    toastService.showWarningToast("No se pudo obtener permiso para notificaciones");
     return null;
   }
+
+  // Get the token that uniquely identifies this device
+  token = await Notifications.getExpoPushTokenAsync({
+    projectId: Constants.expoConfig?.extra?.eas?.projectId,
+  });
+
+  console.log('Expo push token:', token);
+
+  // Store token in AsyncStorage for future use
+  await AsyncStorage.setItem('expoPushToken', token.data);
+
+  return token.data;
+  // } else {
+  //   console.log('Must use physical device for Push Notifications');
+  //   toastService.showInfoToast("Debes usar un dispositivo físico para recibir notificaciones");
+  //   return null;
+  // }
 };
 
 // Enviar el token al backend
@@ -111,11 +111,11 @@ export const initializeNotificationsAfterLogin = async (userId) => {
 
     // Register for push notifications
     const token = await registerForPushNotificationsAsync();
-    
+
     if (token) {
       // Setup notification listeners
       const listeners = setupNotificationListeners();
-      
+
       // Send token to backend
       if (userId) {
         await sendTokenToBackend(userId);

@@ -9,12 +9,13 @@ import ActiveOrderBanner from './ActiveOrderBanner'
 import { useNavigation } from '@react-navigation/native'
 import useTabBarStore from '../../../utils/tools/interface/tabBarStore'
 import { private_name_routes } from '../../../utils/route/private_name_routes'
+import { toastService } from '../../../utils/tools/interface/toastService'
 
 export default function PromoSection({ refreshing }) {
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(true);
     const { getActiveOrder } = useOrdersStore();
-    const activeOrder = getActiveOrder();
+    const activeOrders = getActiveOrder();
     const { toggleTabBar, changeColorStatusBar } = useTabBarStore();
 
     const promos = [
@@ -47,30 +48,49 @@ export default function PromoSection({ refreshing }) {
     }
 
     const handleOrderPress = (order) => {
-        changeColorStatusBar(theme_colors.transparent);
-        toggleTabBar(false);
-        if (order.status && ["created", "accepted", "pickup", "store", "taken", "delivering", "arrived"].includes(order.status)) {
+        console.log('handleOrderPress:', order);
+        if (order.order.status && ["created", "accepted", "pickup", "store", "picked", "taken", "delivering", "arrived"].includes(order.order.status)) {
+            changeColorStatusBar(theme_colors.transparent);
+            toggleTabBar(false);
             navigation.navigate(private_name_routes.pedidos.pedidosStack, {
                 screen: private_name_routes.pedidos.orderTracking,
-                params: { order }
+                params: { orderId: order.order.id }
             });
+        } else {
+            toastService.showInfoToast("El pedido ya fue entregado.");
         }
     };
 
-    if (activeOrder) {
+    if (activeOrders && activeOrders.length > 0) {
         return (
             <ViewStyled
                 backgroundColor={theme_colors.transparent}
-                width={100}
+                paddingVertical={1}
                 style={{
+                    width: '100%',
                     height: 'auto',
                     justifyContent: 'center',
                     alignItems: 'center',
                 }}
             >
-                <ActiveOrderBanner
-                    order={activeOrder}
-                    onPress={() => handleOrderPress(activeOrder)}
+                <FlatList
+                    contentContainerStyle={{
+                        paddingHorizontal: 20,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                    ItemSeparatorComponent={() => <ViewStyled backgroundColor={theme_colors.transparent} width={2} />}
+                    horizontal={true}
+                    scrollEnabled={true}
+                    data={activeOrders}
+                    renderItem={({ item }) =>
+                        <ActiveOrderBanner
+                            order={item}
+                            onPress={() => handleOrderPress(item)}
+                        />
+                    }
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
                 />
             </ViewStyled>
         );

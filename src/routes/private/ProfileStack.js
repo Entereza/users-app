@@ -4,6 +4,8 @@ import { private_name_routes } from '../../utils/route/private_name_routes';
 import ProfileHomeScreen from '../../screens/private/Perfil/ProfileHomeScreen';
 import PersonalDataScreen from '../../screens/private/Perfil/PersonalDataScreen';
 import ChangePasswordScreen from '../../screens/private/Perfil/ChangePasswordScreen';
+import TransferHistoryScreen from '../../screens/private/Billetera/TransferHistoryScreen';
+import HeaderDefaultScreen from '../../components/Header/HeaderDefaultScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -57,6 +59,20 @@ export default function ProfileStack() {
                     gestureDirection: 'horizontal',
                 }}
             />
+
+            <Stack.Screen
+                name={private_name_routes.profile.transferHistoryScreen}
+                component={TransferHistoryScreen}
+                options={{
+                    navigationBarHidden: true,
+                    animation: "slide_from_right",
+                    animationTypeForReplace: 'pop',
+                    headerShown: false,
+                    gestureEnabled: true,
+                    gestureDirection: 'horizontal'
+                }}
+            />
+
         </Stack.Navigator>
     )
 }

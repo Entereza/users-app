@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native'
 import useTabBarStore from '../../utils/tools/interface/tabBarStore'
 import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 
-export default function HeaderInternalScreen({ title, onPress }) {
+export default function HeaderInternalScreen({ title, onPress, showBackButton = true }) {
     const navigation = useNavigation();
     const { toggleTabBar } = useTabBarStore();
 
@@ -32,34 +32,36 @@ export default function HeaderInternalScreen({ title, onPress }) {
                 position: 'relative'
             }}
         >
-            <Pressable
-                onPress={onPress ? onPress : goBack}
-                style={{
-                    left: 10,
-                    position: 'absolute',
-                    zIndex: 2
-                }}
-            >
-                <ViewStyled
-                    width={11}
-                    height={5.5}
-                    borderRadius={50}
-                    backgroundColor={theme_colors.transparent}
+            {showBackButton && (
+                <Pressable
+                    onPress={onPress ? onPress : goBack}
                     style={{
-                        justifyContent: 'center',
-                        alignItems: 'center',
-
-                        borderWidth: 1,
-                        borderColor: theme_colors.primary
+                        left: 10,
+                        position: 'absolute',
+                        zIndex: 2
                     }}
                 >
-                    <MaterialCommunityIcons
-                        name="arrow-left"
-                        size={adjustFontSize(theme_textStyles.xlarge)}
-                        color={theme_colors.primary}
-                    />
-                </ViewStyled>
-            </Pressable>
+                    <ViewStyled
+                        width={11}
+                        height={5.5}
+                        borderRadius={50}
+                        backgroundColor={theme_colors.transparent}
+                        style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+
+                            borderWidth: 1,
+                            borderColor: theme_colors.primary
+                        }}
+                    >
+                        <MaterialCommunityIcons
+                            name="arrow-left"
+                            size={adjustFontSize(theme_textStyles.xlarge)}
+                            color={theme_colors.primary}
+                        />
+                    </ViewStyled>
+                </Pressable>
+            )}
 
             <ViewStyled
                 backgroundColor={theme_colors.transparent}

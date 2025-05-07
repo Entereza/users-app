@@ -4,14 +4,14 @@ import ViewStyled from '../../../utils/ui/ViewStyled'
 import { FlatList } from 'react-native'
 import { theme_colors } from '../../../utils/theme/theme_colors'
 
-export default function CategoriesProductsList({ 
-    categories = [], 
-    selectedCategory, 
+export default function CategoriesProductsList({
+    categories = [],
+    selectedCategory,
     onCategoryPress,
     categoriesListRef
 }) {
     const flatListRef = useRef(null)
-    
+
     // Establecer la referencia del FlatList
     useEffect(() => {
         if (categoriesListRef) {
@@ -60,15 +60,15 @@ export default function CategoriesProductsList({
             style={{
                 width: '100%',
                 height: 'auto',
-                justifyContent: 'center',
-                alignItems: 'center',
+                justifyContent: 'flex-start',
+                alignItems: 'flex-start',
             }}
         >
             <FlatList
                 ref={flatListRef}
                 contentContainerStyle={{
                     paddingHorizontal: 10,
-                    justifyContent: 'flex-start',
+                    justifyContent: 'center',
                     alignItems: 'center',
                 }}
                 horizontal={true}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Modal, Pressable } from 'react-native'
+import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet } from 'react-native'
 import { theme_colors } from '../../utils/theme/theme_colors'
 import ViewStyled from '../../utils/ui/ViewStyled'
 import AddInfoAddressData from '../AdressComponents/AddInfoAddressData'
@@ -13,6 +13,9 @@ import { locationsService } from '../../services/api/empresas/locationsService'
 import { showToast } from '../../utils/tools/toast/toastService'
 import Toast from 'react-native-root-toast'
 import useAuthStore from '../../utils/tools/interface/authStore'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { heightPercentageToDP } from 'react-native-responsive-screen'
+import SafeAreaStyled from '../SafeAreaComponents/SafeAreaStyled'
 
 export default function AddInfoAddressModal({
     open,
@@ -24,6 +27,7 @@ export default function AddInfoAddressModal({
 }) {
     const [isLoading, setIsLoading] = useState(false);
     const { user } = useAuthStore();
+    const { top } = useSafeAreaInsets();
 
     const formik = useFormik({
         initialValues: {
@@ -77,20 +81,15 @@ export default function AddInfoAddressModal({
             animationType="fade"
             transparent={true}
         >
-            <ViewStyled
+            <SafeAreaStyled
                 backgroundColor={theme_colors.backgroundModal}
-                paddingBottom={1.5}
-                style={{
-                    height: '100%',
-                    justifyContent: 'flex-end',
-                    alignItems: 'center',
-                    position: 'relative'
-                }}
+                styleArea={styles.safeArea}
+                styleView={styles.container}
             >
                 <Pressable
                     onPress={handleCloseModal}
                     style={{
-                        top: 0,
+                        top: Platform.OS === 'ios' ? top + 5 : 10,
                         left: 10,
                         position: 'absolute',
                         zIndex: 2
@@ -116,42 +115,66 @@ export default function AddInfoAddressModal({
                     </ViewStyled>
                 </Pressable>
 
-                <ViewStyled
-                    width={95}
-                    paddingVertical={2}
-                    borderRadius={2}
-                    backgroundColor={theme_colors.white}
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     style={{
-                        height: 'auto',
+                        width: '100%',
+                        height: '100%',
+                        justifyContent: 'flex-end',
                         alignItems: 'center',
-                        justifyContent: 'center',
                     }}
                 >
-                    <AddInfoAddressData formik={formik} disabled={isLoading} />
-
-                    <ButtonWithIcon
-                        disabled={isDisabled || isLoading}
-                        backgroundColor={isDisabled ? `${theme_colors.grey}22` : theme_colors.primary}
-                        loading={isLoading}
-                        borderWidth={0}
-                        colorText={theme_colors.white}
-                        onPress={formik.handleSubmit}
-                        borderRadius={1.5}
-                        withIcon={false}
-                        fontSize={theme_textStyles.medium}
-                        fontFamily={'SFPro-Bold'}
-                        textButton={isLoading 
-                            ? (isEditing ? 'Actualizando...' : 'Guardando...') 
-                            : (isEditing ? 'Actualizar ubicación' : 'Guardar ubicación')
-                        }
-                        height={6}
+                    <ViewStyled
+                        width={95}
+                        paddingVertical={2}
+                        borderRadius={2}
+                        backgroundColor={theme_colors.white}
                         style={{
-                            width: '90%',
-                            marginTop: 10
+                            height: 'auto',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                         }}
-                    />
-                </ViewStyled>
-            </ViewStyled>
+                    >
+                        <AddInfoAddressData formik={formik} disabled={isLoading} />
+
+                        <ButtonWithIcon
+                            disabled={isDisabled || isLoading}
+                            backgroundColor={isDisabled ? `${theme_colors.grey}22` : theme_colors.primary}
+                            loading={isLoading}
+                            borderWidth={0}
+                            colorText={theme_colors.white}
+                            onPress={formik.handleSubmit}
+                            borderRadius={1.5}
+                            withIcon={false}
+                            fontSize={theme_textStyles.medium}
+                            fontFamily={'SFPro-Bold'}
+                            textButton={isLoading
+                                ? (isEditing ? 'Actualizando...' : 'Guardando...')
+                                : (isEditing ? 'Actualizar ubicación' : 'Guardar ubicación')
+                            }
+                            height={6}
+                            style={{
+                                width: '90%',
+                                marginTop: 10
+                            }}
+                        />
+                    </ViewStyled>
+                </KeyboardAvoidingView>
+            </SafeAreaStyled>
         </Modal>
     );
 }
+
+const styles = StyleSheet.create({
+    safeArea: {
+        backgroundColor: theme_colors.transparent,
+        flex: 1,
+    },
+    container: {
+        height: '100%',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        position: 'relative',
+        paddingBottom: heightPercentageToDP(2)
+    },
+});

@@ -2,6 +2,7 @@ import React from 'react';
 import AppNavigation from './src/routes/AppNavigation';
 import { useFonts } from 'expo-font';
 import { RootSiblingParent } from 'react-native-root-siblings';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-reanimated'
 import 'react-native-gesture-handler'
 
@@ -34,8 +35,10 @@ export default function App() {
   };
 
   return (
-    <RootSiblingParent>
-      <AppNavigation />
-    </RootSiblingParent>
+    <SafeAreaProvider>
+      <RootSiblingParent>
+        <AppNavigation />
+      </RootSiblingParent>
+    </SafeAreaProvider>
   );
 }

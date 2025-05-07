@@ -26,7 +26,7 @@ export default function CatProductsItem({ item, isSelected = false, onPress }) {
         }}
       >
         <TextStyled
-          fontFamily='SFPro-Bold'
+          fontFamily='SFPro-SemiBold'
           textAlign='center'
           fontSize={theme_textStyles.smedium}
           color={isSelected ? theme_colors.white : theme_colors.black}

@@ -94,9 +94,9 @@ export default function TotalBarAlternative({ quantity, total, title, branchId, 
                     }}
                 >
                     <TextStyled
-                        fontFamily='SFPro-Bold'
+                        fontFamily='SFPro-SemiBold'
                         color={theme_colors.white}
-                        fontSize={theme_textStyles.medium}
+                        fontSize={theme_textStyles.smedium}
                     >
                         {title}
                     </TextStyled>

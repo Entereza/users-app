@@ -1,11 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme_colors } from '../../../utils/theme/theme_colors';
 
-const ProductVariableList = ({ namePv = "", variables = [], isRequired = false, maxSelect = 2, onSelectionChange }) => {
+const ProductVariableList = ({ 
+    namePv = "", 
+    variables = [], 
+    isRequired = false, 
+    maxSelect = 2, 
+    onSelectionChange,
+    initialSelections = [] 
+}) => {
     const [isExpanded, setIsExpanded] = useState(true);
     const [selectedItems, setSelectedItems] = useState([]);
+
+    // Inicializar las selecciones cuando el componente se monta o cuando cambian las selecciones iniciales
+    useEffect(() => {
+        if (initialSelections && initialSelections.length > 0) {
+            // Convertir los IDs iniciales a índices del array de variables
+            const initialIndices = initialSelections.map(id => 
+                variables.findIndex(v => v.id === id)
+            ).filter(index => index !== -1);
+            
+            setSelectedItems(initialIndices);
+        }
+    }, [initialSelections, variables]);
 
     const toggleItem = (index) => {
         setSelectedItems(prev => {
@@ -148,7 +167,7 @@ const styles = StyleSheet.create({
     },
     priceText: {
         fontSize: 14,
-        color: theme_colors.primary,
+        color: theme_colors.grey,
         fontFamily: 'SFPro-Regular',
         marginLeft: 5,
     },
@@ -165,7 +184,6 @@ const styles = StyleSheet.create({
         backgroundColor: theme_colors.primary,
         borderColor: theme_colors.primary,
     },
-
 });
 
 export default ProductVariableList;

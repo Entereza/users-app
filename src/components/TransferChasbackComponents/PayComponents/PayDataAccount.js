@@ -5,7 +5,15 @@ import TextStyled from '../../../utils/ui/TextStyled'
 import PaymentInfo from '../PaymentComponents/PaymentInfo'
 import { theme_textStyles } from '../../../utils/theme/theme_textStyles'
 
-export default function PayDataAccount({ nameUser, numberCard }) {
+export default function PayDataAccount({ expirationDate, singleUse, client }) {
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
+
     return (
         <ViewStyled
             width={95}
@@ -53,7 +61,27 @@ export default function PayDataAccount({ nameUser, numberCard }) {
 
             <PaymentInfo
                 iconName={'account'}
-                text={nameUser}
+                text={`Usuario: ${client?.names || ''} ${client?.lastnames || ''} `}
+                textColor={theme_colors.grey}
+                style={{
+                    marginBottom: 10
+                }}
+            />
+
+            {client?.carnet && (
+                <PaymentInfo
+                    iconName={'card-account-details'}
+                    text={`CI: ${client?.carnet || ''}`}
+                    textColor={theme_colors.grey}
+                    style={{
+                        marginBottom: 10
+                    }}
+                />
+            )}
+
+            <PaymentInfo
+                iconName={'phone'}
+                text={`Teléfono: ${client?.phoneNumber || ''}`}
                 textColor={theme_colors.grey}
                 style={{
                     marginBottom: 10
@@ -61,8 +89,17 @@ export default function PayDataAccount({ nameUser, numberCard }) {
             />
 
             <PaymentInfo
-                iconName={'card-account-details'}
-                text={numberCard}
+                iconName={'calendar-outline'}
+                text={`Válido hasta: ${formatDate(expirationDate)}`}
+                textColor={theme_colors.grey}
+                style={{
+                    marginBottom: 10
+                }}
+            />
+
+            <PaymentInfo
+                iconName={'refresh'}
+                text={`Uso: ${singleUse ? 'Una vez' : 'Múltiple'}`}
                 textColor={theme_colors.grey}
             />
         </ViewStyled>

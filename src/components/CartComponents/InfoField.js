@@ -33,7 +33,7 @@ export default function InfoField({
 
                     shadowColor: theme_colors.black,
                     shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.5,
+                    shadowOpacity: 0.2,
                     shadowRadius: 2,
                     elevation: 3,
                 }}

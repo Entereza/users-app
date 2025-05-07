@@ -57,11 +57,7 @@ export default function ButtonGoToCart({ branchId, tripPrice, cashbackBusiness }
 
     const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
-    const totalPrice = cart.reduce((sum, item) => {
-        const itemPrice = item.price || 0;
-        const itemQuantity = item.quantity || 1;
-        return sum + (itemPrice * itemQuantity);
-    }, 0);
+    const totalPrice = cart.reduce((sum, item) => sum + (item.totalPrice * item.quantity), 0);
 
     return (
         <Animated.View

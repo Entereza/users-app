@@ -35,13 +35,12 @@ export default function ButtonsAddToCart({
         return total;
     }, 0);
 
-    // Determinar qué cantidad mostrar según la prop showTotalQuantity
     const displayQuantity = showTotalQuantity ? totalQuantity : (cartItem ? cartItem.quantity : 0);
 
     const navigation = useNavigation()
 
     const goToDetailsProduct = () => {
-        navigation.navigate(private_name_routes.empresas.empresaProducto, { product: item })
+        navigation.navigate(private_name_routes.empresas.empresaProducto, { product: item, isEditing: false })
     }
 
     return (

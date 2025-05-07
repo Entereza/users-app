@@ -8,6 +8,7 @@ import ImageStyled from '../../utils/ui/ImageStyled'
 import { LinearGradient } from 'expo-linear-gradient'
 import IndicatorItem from './IndicatorItem'
 import { theme_textStyles } from '../../utils/theme/theme_textStyles'
+import { heightPercentageToDP } from 'react-native-responsive-screen'
 
 export default function BusinessItem({ item, onPress }) {
   const price = item?.branch?.tripPrice || 0;
@@ -144,10 +145,11 @@ export default function BusinessItem({ item, onPress }) {
           backgroundColor={theme_colors.transparent}
           style={{
             width: '95%',
+            height: '30%',
             flex: 1,
             marginTop: 5,
             justifyContent: 'flex-start',
-            alignItems: 'center',
+            alignItems: 'flex-start',
           }}
         >
           <TextStyled
@@ -156,7 +158,7 @@ export default function BusinessItem({ item, onPress }) {
             fontSize={theme_textStyles.smedium}
             color={isOpen ? theme_colors.black : theme_colors.grey}
             style={{
-              width: '95%',
+              width: '60%',
             }}
           >
             {item.name} - {item.branch?.sectorName || ''}
@@ -165,7 +167,6 @@ export default function BusinessItem({ item, onPress }) {
           <ViewStyled
             backgroundColor={theme_colors.transparent}
             style={{
-              width: '95%',
               height: 'auto',
               flexDirection: 'row',
               justifyContent: 'flex-start',

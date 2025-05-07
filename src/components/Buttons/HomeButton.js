@@ -32,12 +32,12 @@ export default function HomeButton({ text, icon, onPress }) {
                         alignItems: 'center',
                     }}
                 >
-                    <FontAwesome6 name={icon} color={theme_colors.white} size={20} />
+                    <FontAwesome6 name={icon} color={theme_colors.white} size={22} />
                 </ViewStyled>
             </TouchableOpacity>
 
             <TextStyled
-                fontSize={theme_textStyles.smaller + .5}
+                fontSize={theme_textStyles.small}
                 fontFamily='SFPro-Medium'
                 color={theme_colors.white}
                 numberOfLines={1}

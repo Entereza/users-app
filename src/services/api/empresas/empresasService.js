@@ -8,6 +8,14 @@ export const empresasService = {
         });
     },
 
+    // Buscar empresas por regex pattern
+    getBranchesByCityRegex: async (cityId, lat, lng, regex = "", idCategory = "", page = 0, size = 10) => {
+        console.log('idCategory: ', idCategory)
+        return createApiRequest(`/branches/by-city-regex/${cityId}?lat=${lat}&lng=${lng}&regex=${regex}&idCategory=${idCategory}&page=${page}&size=${size}`, {
+            method: 'GET'
+        });
+    },
+
     // Obtener todas las categorías por ciudad
     getCategoriesByCity: async (cityId) => {
         return createApiRequest(`/categories/get-data?cityID=${cityId}`, {
@@ -52,6 +60,7 @@ export const empresasService = {
 
     // Obtener precios por variable de producto
     getPricingByProductVariable: async (pvId) => {
+        console.log('pvId: ', pvId)
         return createApiRequest(`/pricing/by-products-variable/${pvId}`, {
             method: 'GET'
         });
@@ -65,7 +74,6 @@ export const empresasService = {
 
         return businessData.business.content
             .map(business => {
-                // Buscar la primera sucursal abierta
                 const openBranch = business.branch.find(branch => branch.status === true);
                 
                 // Si no hay sucursal abierta, retornar null para filtrar después

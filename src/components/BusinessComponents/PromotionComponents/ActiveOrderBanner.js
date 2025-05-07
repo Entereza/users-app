@@ -12,7 +12,7 @@ import ButtonWithIcon from '../../Buttons/ButtonWithIcon'
 
 
 export default function ActiveOrderBanner({ order, onPress }) {
-    console.log('order: ', order)
+    // console.log('order: ', order)
     const { getOrderStatusText } = useOrdersStore();
 
     const statusOrders = {
@@ -21,6 +21,7 @@ export default function ActiveOrderBanner({ order, onPress }) {
         pickup: "pickup",
         store: "store",
         taken: "taken",
+        picked: "picked",
         delivering: "delivering",
         arrived: "arrived",
         completed: "completed"
@@ -37,9 +38,11 @@ export default function ActiveOrderBanner({ order, onPress }) {
                 return require('../../../../assets/gifs/mix.gif')
             case statusOrders.pickup:
                 return require('../../../../assets/gifs/mix.gif')
+            case statusOrders.taken:
+                return require('../../../../assets/gifs/mix.gif')
             case statusOrders.store:
                 return require('../../../../assets/gifs/mix.gif')
-            case statusOrders.taken:
+            case statusOrders.picked:
                 return require('../../../../assets/gifs/food-delivery.gif')
             case statusOrders.delivering:
                 return require('../../../../assets/gifs/food-delivery.gif')

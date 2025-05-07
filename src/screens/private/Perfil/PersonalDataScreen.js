@@ -75,12 +75,11 @@ export default function PersonalDataScreen() {
         onSubmit: async (values) => {
             try {
                 setIsLoading(true);
-                setIsDisabled(true);
 
                 const dataEditProfile = {
                     names: values.names,
                     lastnames: values.lastNames,
-                    email: values.email,
+                    email: user?.email || values.email,
                     phoneNumber: values.phoneNumber,
                     carnet: values.carnet || "",
                 };
@@ -221,8 +220,9 @@ export default function PersonalDataScreen() {
                             {
                                 !isDisabled &&
                                 <ButtonWithIcon
-                                    disabled={isDisabled}
-                                    backgroundColor={isDisabled ? `${theme_colors.grey}22` : theme_colors.primary}
+                                    disabled={isDisabled || isLoading}
+                                    loading={isLoading}
+                                    backgroundColor={isDisabled && !isLoading ? `${theme_colors.grey}22` : theme_colors.primary}
                                     borderWidth={0}
                                     colorText={theme_colors.white}
                                     onPress={formik.handleSubmit}

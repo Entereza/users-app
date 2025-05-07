@@ -80,9 +80,13 @@ export default function LoginScreen() {
                         id: response.client.id,
                         names: response.client.names,
                         lastNames: response.client.lastNames,
-                        email: response.client.email,
                         phoneNumber: response.client.phoneNumber,
-                        image: response.client.image,
+                        ci: response.client.carnet,
+                        cashback: response.client.cashback,
+                        email: response.client.email,
+                        image: response.client.img,
+                        password: response.client?.password || response.client?.plainPassword || "",
+                        status: response.client.status,
                         username: response.client.username,
                     }
 
@@ -95,6 +99,8 @@ export default function LoginScreen() {
                     await handleNotificationsSetup(response.client.id);
                 } else if (response && response.code === 'COD723') {
                     navigation.navigate(public_name_routes.auth.accountRecovery);
+                } else if (response && response.code === 'COD401') {
+                    toastService.showErrorToast("Correo electrónico o contraseña incorrectos");
                 } else {
                     toastService.showErrorToast(response.msg || "Error al iniciar sesión");
                 }

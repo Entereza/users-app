@@ -40,6 +40,10 @@ export default function WalletTransactions() {
                 // Since pagination data is not in the new structure, we'll reset these
                 setTotalPages(1);
                 setCurrentPage(0);
+            } else {
+                setOrders([]);
+                setTotalPages(1);
+                setCurrentPage(0);
             }
         } catch (error) {
             console.error('Error refreshing orders:', error);
@@ -50,12 +54,14 @@ export default function WalletTransactions() {
     };
 
     const goToOrderDetails = (order) => {
+        // console.log('goToOrderDetails', order.order.products);
         changeColorStatusBar(theme_colors.transparent);
         toggleTabBar(false);
-        if (order.status && ["created", "accepted", "pickup", "store", "taken", "delivering", "arrived"].includes(order.status)) {
+        const activeStates = ["created", "accepted", "pickup", "store", "taken", "picked", "delivering", "arrived"];
+        if (order.order.status && activeStates.includes(order.order.status)) {
             navigation.navigate(private_name_routes.pedidos.pedidosStack, {
                 screen: private_name_routes.pedidos.orderTracking,
-                params: { order }
+                params: { orderId: order.order.id }
             });
         } else {
             navigation.navigate(private_name_routes.pedidos.pedidosStack, {

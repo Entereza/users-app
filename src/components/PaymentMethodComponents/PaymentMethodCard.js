@@ -10,9 +10,10 @@ import { heightPercentageToDP } from 'react-native-responsive-screen'
 import AddCreditCard from './AddCreditCard'
 
 export default function PaymentMethodCard({ item, isSelected, isKeyboardVisible, onPressSelect }) {
-    const colorIcon = isSelected ? theme_colors.white : theme_colors.grey
-    const colorText = isSelected ? theme_colors.white : theme_colors.black
-    const backgroundColor = isSelected ? theme_colors.primary : theme_colors.white
+    const colorIcon = isSelected ? theme_colors.primary : theme_colors.grey
+    const iconName = isSelected ? "checkbox-marked-circle-outline" : "checkbox-blank-circle-outline"
+    const colorText = theme_colors.black
+    const backgroundColor = theme_colors.white
 
     const isQrSelected = isSelected && item.name === "QR"
     const isTarjetaSelected = isSelected && item.name === "Tarjeta"
@@ -116,7 +117,7 @@ export default function PaymentMethodCard({ item, isSelected, isKeyboardVisible,
                             </TextStyled>
                         </ViewStyled>
 
-                        <MaterialCommunityIcons name={"checkbox-blank-circle-outline"} size={adjustFontSize(theme_textStyles.small + .5)} color={colorIcon} />
+                        <MaterialCommunityIcons name={iconName} size={adjustFontSize(theme_textStyles.small + .5)} color={colorIcon} />
                     </ViewStyled>
                 </Pressable>
 

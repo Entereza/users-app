@@ -9,7 +9,7 @@ import useTabBarStore from '../../../utils/tools/interface/tabBarStore'
 import { theme_textStyles } from '../../../utils/theme/theme_textStyles'
 import ImageStyled from '../../../utils/ui/ImageStyled'
 
-export default function CategoryItem({ item }) {
+export default function CategoryItem({ item, onPress }) {
     const navigation = useNavigation()
     const { toggleTabBar } = useTabBarStore();
 
@@ -33,7 +33,7 @@ export default function CategoryItem({ item }) {
             }}
         >
             <Pressable
-                onPress={goToCategoryScreen}
+                onPress={onPress ? onPress : goToCategoryScreen}
                 style={{
                     width: 70,
                     height: 70,

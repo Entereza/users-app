@@ -29,7 +29,7 @@ export default function HeaderProfile({ user, onPress }) {
                 }}
             >
                 <TextStyled
-                    fontSize={theme_textStyles.medium}
+                    fontSize={theme_textStyles.medium + .5}
                     color={theme_colors.black}
                     style={{
                         fontFamily: 'SFPro-Bold',
@@ -56,7 +56,7 @@ export default function HeaderProfile({ user, onPress }) {
                     <TextStyled
                         fontFamily='SFPro-Bold'
                         textAlign={'center'}
-                        fontSize={theme_textStyles.smedium}
+                        fontSize={theme_textStyles.small + .5}
                         numberOfLines={1}
                         ellipsizeMode='tail'
                         color={theme_colors.primary}
@@ -88,8 +88,8 @@ export default function HeaderProfile({ user, onPress }) {
                         borderRadius={'50%'}
                         source={user?.image ? { uri: user?.image } : require('../../../assets/images/DefaultProfileUser.png')}
                         style={{
-                            maxHeight: 54,
-                            maxWidth: 54,
+                            maxHeight: 48,
+                            maxWidth: 48,
                             borderWidth: 0.2,
                             borderColor: theme_colors.grey
                         }}

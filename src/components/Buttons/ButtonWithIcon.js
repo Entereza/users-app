@@ -2,7 +2,7 @@ import React from 'react';
 
 //Importacion de Etiquetas de ReactNative
 import { ActivityIndicator, TouchableOpacity } from 'react-native';
-import { Entypo, FontAwesome5, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Entypo, FontAwesome5, Ionicons, MaterialCommunityIcons, MaterialIcons as MatIconsComponent } from '@expo/vector-icons';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
 import ViewStyled from '../../utils/ui/ViewStyled';
 
@@ -14,6 +14,7 @@ export default function ButtonWithIcon({
     textButton,
     iconName = "apps",
     MaterialIcons = false,
+    MatIcons = false,
     FontAwesome = false,
     EntypoIcon = false,
     onPress,
@@ -101,23 +102,29 @@ export default function ButtonWithIcon({
                                     size={adjustFontSize(sizeIcon)}
                                     color={colorIcon}
                                 />
-                                : FontAwesome
-                                    ? <FontAwesome5
+                                : MatIcons
+                                    ? <MatIconsComponent
                                         name={iconName}
                                         size={adjustFontSize(sizeIcon)}
                                         color={colorIcon}
                                     />
-                                    : EntypoIcon
-                                        ? <Entypo
+                                    : FontAwesome
+                                        ? <FontAwesome5
                                             name={iconName}
                                             size={adjustFontSize(sizeIcon)}
                                             color={colorIcon}
                                         />
-                                        : <Ionicons
-                                            name={iconName}
-                                            size={adjustFontSize(sizeIcon)}
-                                            color={colorIcon}
-                                        />
+                                        : EntypoIcon
+                                            ? <Entypo
+                                                name={iconName}
+                                                size={adjustFontSize(sizeIcon)}
+                                                color={colorIcon}
+                                            />
+                                            : <Ionicons
+                                                name={iconName}
+                                                size={adjustFontSize(sizeIcon)}
+                                                color={colorIcon}
+                                            />
                         }
                     </ViewStyled>
                 }

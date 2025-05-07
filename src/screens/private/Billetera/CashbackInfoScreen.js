@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native";
 import { theme_colors } from "../../../utils/theme/theme_colors";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { private_name_routes } from "../../../utils/route/private_name_routes";
 import useTabBarStore from "../../../utils/tools/interface/tabBarStore";
 import { useCallback, useRef } from "react";
 import SafeAreaStyled from "../../../components/SafeAreaComponents/SafeAreaStyled";

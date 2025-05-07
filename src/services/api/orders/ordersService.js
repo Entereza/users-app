@@ -4,9 +4,8 @@ export const ordersService = {
     // Crear un nuevo pedido
     createOrder: async (orderData) => {
         try {
-            console.log('orderData: ', orderData)
             console.log('orderData: ', JSON.stringify(orderData))
-            
+
             const response = await createApiRequest('/orders/create', {
                 method: 'POST',
                 body: JSON.stringify(orderData)
@@ -19,7 +18,7 @@ export const ordersService = {
     },
 
     // Formatear los datos del carrito para la API
-    formatOrderData: (cart, userId, branchId, paymentMethod, cashbackApplied) => {
+    formatOrderData: (cart, userId, branchId, paymentMethod, cashbackApplied, tripPrice, locationId, billingInfo) => {
         // Calcular totales
         const totalFinal = cart.reduce((total, item) => {
             return total + (item.totalPrice * item.quantity);
@@ -68,12 +67,16 @@ export const ordersService = {
         return {
             clientId: userId,
             branchId,
+            locationId,
             totalFinal,
             paymentMethod: paymentMethod.toLowerCase(),
             serviceFee,
             useCashback: cashbackApplied > 0,
             cashbackApplied,
-            data
+            data,
+            deliveryFee: tripPrice,
+            nit: billingInfo.nit,
+            razonSocial: billingInfo.name,
         };
     },
 

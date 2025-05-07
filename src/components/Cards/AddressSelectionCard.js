@@ -11,11 +11,11 @@ import { private_name_routes } from '../../utils/route/private_name_routes';
 import { locationsService } from '../../services/api/empresas/locationsService';
 import useAddressStore from '../../utils/tools/interface/addressStore';
 
-export default function AddressSelectionCard({ item, isSelected, onPressSelect }) {
-    const colorIcon = isSelected ? theme_colors.white : theme_colors.grey
-    const colorText = isSelected ? theme_colors.white : theme_colors.black
-    const colorSubtitle = isSelected ? theme_colors.white : theme_colors.grey
-    const backgroundColor = isSelected ? theme_colors.primary : theme_colors.white
+export default function AddressSelectionCard({ item, isSelected, onPressSelect, canDoActions = true }) {
+    const colorIcon = isSelected ? theme_colors.primary : theme_colors.grey
+    const iconName = isSelected ? "checkbox-marked-circle-outline" : 'checkbox-blank-circle-outline'
+    const colorText = theme_colors.black
+    const colorSubtitle = theme_colors.grey
 
     const navigation = useNavigation()
     const { deleteAddress } = useAddressStore()
@@ -71,7 +71,7 @@ export default function AddressSelectionCard({ item, isSelected, onPressSelect }
                 <ViewStyled
                     borderRadius={2}
                     paddingHorizontal={3.5}
-                    backgroundColor={backgroundColor}
+                    backgroundColor={theme_colors.white}
                     style={{
                         width: '100%',
                         height: '90%',
@@ -123,20 +123,26 @@ export default function AddressSelectionCard({ item, isSelected, onPressSelect }
                         </TextStyled>
                     </ViewStyled>
 
-                    <MaterialCommunityIcons name={"checkbox-blank-circle-outline"} size={adjustFontSize(theme_textStyles.smedium)} color={colorIcon} />
+                    <MaterialCommunityIcons name={iconName} size={adjustFontSize(theme_textStyles.smedium)} color={colorIcon} />
                 </ViewStyled>
             </Pressable>
 
-            <ActionIcon
-                icon="pencil"
-                color={theme_colors.secondary}
-                onPress={onPressEdit}
-            />
-            <ActionIcon
-                icon="trash-can"
-                color={theme_colors.danger}
-                onPress={onDelete}
-            />
+            {
+                canDoActions && (
+                    <>
+                        <ActionIcon
+                            icon="pencil"
+                            color={theme_colors.grey}
+                            onPress={onPressEdit}
+                        />
+                        <ActionIcon
+                            icon="trash-can"
+                            color={`${theme_colors.danger}99`}
+                            onPress={onDelete}
+                        />
+                    </>
+                )
+            }
         </ViewStyled >
     );
 }

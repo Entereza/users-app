@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { theme_colors } from '../../../utils/theme/theme_colors';
 import SafeAreaStyled from '../../../components/SafeAreaComponents/SafeAreaStyled';
@@ -9,7 +9,7 @@ import BusinessSection from '../../../components/BusinessComponents/BusinessSect
 import useAuthStore from '../../../utils/tools/interface/authStore';
 import HeaderProfile from '../../../components/Header/HeaderProfile';
 import { private_name_routes } from '../../../utils/route/private_name_routes';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import useTabBarStore from '../../../utils/tools/interface/tabBarStore';
 import SearchBar from '../../../components/BusinessComponents/SearchBar';
 import HeaderBusiness from '../../../components/Header/HeaderBusiness';
@@ -21,15 +21,16 @@ import PromoSkeleton from '../../../components/Skeletons/PromoSkeleton';
 import BusinessSkeleton from '../../../components/Skeletons/BusinessSkeleton';
 import { ordersService } from '../../../services/api/orders/ordersService';
 import useOrdersStore from '../../../utils/tools/interface/ordersStore';
+import useAddressStore from '../../../utils/tools/interface/addressStore';
+import PermissionNotActive from '../../../components/BusinessComponents/PermissionNotActive';
 
 export default function EmpresasHomeScreen() {
     const navigation = useNavigation();
     const { toggleTabBar, changeNameStackBack, changeNameRouteBack } = useTabBarStore();
-    const { isDepartmentEnabled, isCountryEnabled, isSearchingLocation } = useLocationStore();
+    const { isDepartmentEnabled, isCountryEnabled, isSearchingLocation, hasLocationPermissions } = useLocationStore();
+    const { selectedAddress } = useAddressStore();
     const {
         setOrders,
-        setIsLoading,
-        setError,
         setTotalPages,
         setCurrentPage
     } = useOrdersStore();
@@ -45,6 +46,31 @@ export default function EmpresasHomeScreen() {
 
     const { user } = useAuthStore();
 
+    const checkAddressSelection = () => {
+        if (!selectedAddress?.nameAddress && !isSearchingLocation) {
+            toggleTabBar(false)
+            navigation.navigate(private_name_routes.empresas.addressScreen);
+        }
+    };
+
+    useEffect(() => {
+        if (isCountryEnabled && isDepartmentEnabled && hasLocationPermissions) {
+            checkAddressSelection();
+        }
+    }, [isCountryEnabled, isDepartmentEnabled, hasLocationPermissions]);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const timer = setTimeout(() => {
+                if (isCountryEnabled && isDepartmentEnabled && hasLocationPermissions) {
+                    checkAddressSelection();
+                }
+            }, 500);
+
+            return () => clearTimeout(timer);
+        }, [selectedAddress, isSearchingLocation, isCountryEnabled, isDepartmentEnabled, hasLocationPermissions])
+    );
+
     const onRefresh = async () => {
         setRefreshing(true);
         const response = await ordersService.getClientOrders(user.id);
@@ -58,6 +84,11 @@ export default function EmpresasHomeScreen() {
         setTimeout(() => {
             setRefreshing(false);
         }, 2000);
+    }
+
+    const goToSearchScreen = () => {
+        toggleTabBar(false)
+        navigation.navigate(private_name_routes.empresas.searchScreen)
     }
 
     if (isSearchingLocation) {
@@ -82,35 +113,37 @@ export default function EmpresasHomeScreen() {
     }
 
     return (
-        isCountryEnabled
-            ? isDepartmentEnabled
-                ? <>
-                    <SafeAreaStyled
-                        backgroundColor={theme_colors.white}
-                        styleArea={styles.safeArea}
-                        styleView={styles.startView}
-                    >
-                        <HeaderBusiness imageUri={user?.image} onPress={goToProfileScreen} />
-
-                        <ScrollView
-                            showsVerticalScrollIndicator={false}
-                            contentContainerStyle={styles.scrollContent}
-                            refreshControl={
-                                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                            }
+        hasLocationPermissions
+            ? isCountryEnabled
+                ? isDepartmentEnabled
+                    ? <>
+                        <SafeAreaStyled
+                            backgroundColor={theme_colors.white}
+                            styleArea={styles.safeArea}
+                            styleView={styles.startView}
                         >
-                            <SearchBar nameUser={user.names.split(' ')[0]} onPress={null} />
+                            <HeaderBusiness imageUri={user?.image} onPress={goToProfileScreen} />
 
-                            <CategorySection refreshing={refreshing} />
+                            <ScrollView
+                                showsVerticalScrollIndicator={false}
+                                contentContainerStyle={styles.scrollContent}
+                                refreshControl={
+                                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                                }
+                            >
+                                <SearchBar nameUser={user.names.split(' ')[0]} onPress={goToSearchScreen} />
 
-                            <PromoSection refreshing={refreshing} />
+                                <CategorySection refreshing={refreshing} />
 
-                            <BusinessSection refreshing={refreshing} />
-                        </ScrollView>
-                    </SafeAreaStyled>
-                </>
-                : <DepartmentNotActive />
-            : <CountryNotActive />
+                                <PromoSection refreshing={refreshing} />
+
+                                <BusinessSection refreshing={refreshing} />
+                            </ScrollView>
+                        </SafeAreaStyled>
+                    </>
+                    : <DepartmentNotActive />
+                : <CountryNotActive />
+            : <PermissionNotActive />
     )
 }
 

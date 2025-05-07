@@ -11,11 +11,12 @@ export default function SelectOptionItem({
     isActive,
     activeColor = theme_colors.primary,
     inactiveColor = theme_colors.grey,
-    textColor = theme_colors.dark
+    textColor = theme_colors.dark,
+    disabled
 }) {
     return (
         <TouchableOpacity
-            disabled={isActive}
+            disabled={isActive || disabled}
             onPress={onPress}
             style={{
                 width: '40%'

@@ -100,7 +100,6 @@ export default function QREditModal({ visible, onClose, onSave, currentQRData })
                 <ViewStyled
                     backgroundColor={theme_colors.white}
                     style={styles.modalContent}
-                    borderRadius={4}
                 >
                     <ViewStyled
                         backgroundColor={theme_colors.transparent}
@@ -232,6 +231,8 @@ const styles = StyleSheet.create({
     modalContent: {
         padding: 20,
         width: '100%',
+        borderTopRightRadius: 25,
+        borderTopLeftRadius: 25
     },
     header: {
         flexDirection: 'row',

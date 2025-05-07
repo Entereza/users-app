@@ -19,6 +19,7 @@ import EmpresaProductDetails from '../../screens/private/Empresas/EmpresaProduct
 import AddAddressScreen from '../../screens/private/Pedidos/AddAddressScreen';
 import EditAddressScreen from '../../screens/private/Pedidos/EditAddressScreen';
 import OrderConfirmedScreen from '../../screens/private/Empresas/OrderConfirmedScreen';
+import SearchBusiness from '../../screens/private/Empresas/SearchBusiness';
 
 const Stack = createNativeStackNavigator();
 
@@ -132,6 +133,18 @@ export default function EmpresasStack() {
                         navigationBarHidden: true,
                         animation: "slide_from_right",
                         animationTypeForReplace: 'pop',
+                    }}
+                />
+
+                <Stack.Screen
+                    name={private_name_routes.empresas.searchScreen}
+                    component={SearchBusiness}
+                    options={{
+                        presentation: 'fullScreenModal',
+                        navigationBarHidden: true,
+                        animation: "slide_from_right",
+                        animationTypeForReplace: 'pop',
+                        headerShown: false,
                     }}
                 />
 

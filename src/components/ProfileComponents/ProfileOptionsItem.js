@@ -59,7 +59,7 @@ export default function ProfileOptionsItem({
                     }}
                 >
                     <TextStyled
-                        fontFamily='SFPro-SemiBold'
+                        fontFamily='SFPro-Medium'
                         textAlign='left'
                         fontSize={theme_textStyles.smedium}
                         color={theme_colors.black}

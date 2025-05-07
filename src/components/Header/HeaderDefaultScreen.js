@@ -31,12 +31,13 @@ export default function HeaderDefaultScreen({ title, onPress, withBorder = true 
                     position: 'relative'
                 }}
             >
-                <Pressable
+                <TouchableOpacity
+                    disabled={false}
                     onPress={onPress ? onPress : goBack}
                     style={{
                         left: 10,
                         position: 'absolute',
-                        zIndex: 2
+                        zIndex: 100,
                     }}
                 >
                     <ViewStyled
@@ -58,7 +59,7 @@ export default function HeaderDefaultScreen({ title, onPress, withBorder = true 
                             color={theme_colors.primary}
                         />
                     </ViewStyled>
-                </Pressable>
+                </TouchableOpacity>
 
                 <ViewStyled
                     backgroundColor={theme_colors.transparent}

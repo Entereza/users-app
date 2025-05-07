@@ -71,71 +71,79 @@ export default function AuthButtons() {
     }
 
     // Google Sign In
-    const signInWithGoogle = async () => {
+    const signUpWithGoogle = async () => {
         try {
             setLoadingGoogle(true);
+            if (GoogleSignin.hasPreviousSignIn()) {
+                await GoogleSignin.signOut();
+            }
+            await AsyncStorage.clear();
             await GoogleSignin.hasPlayServices()
 
             const userInfo = await GoogleSignin.signIn()
             // Try signup first
-            try {
-                const signupResponse = await authService.signupWithGoogle({
-                    token_id: userInfo.idToken
-                });
+            const signupResponse = await authService.signupWithGoogle({
+                token_id: userInfo.idToken
+            });
 
-                console.log('SignupResponse: ', signupResponse)
+            console.log('SignupResponse: ', signupResponse)
 
-                if (signupResponse.code === 'COD200') {
-                    return;
-                }
-            } catch (signupError) {
-                console.log('Signup failed, trying login:', signupError);
-                if (signupError.message !== 'Usuario ya existe') {
-                    toastService.showErrorToast(signupError.message || "Error en el registro");
-                }
-            }
-
-            // If signup fails, try login
-            try {
-                const loginResponse = await authService.loginWithGoogle({
-                    token_id: userInfo.idToken
-                });
-
-                console.log('LoginRsponse: ', loginResponse)
-
-                if (loginResponse.code === 'COD200') {
-                    AsyncStorage.setItem('token', loginResponse.token)
-                    AsyncStorage.setItem('userId', loginResponse.client.id.toString())
-
-                    let userData = {
-                        id: loginResponse.client.id,
-                        names: loginResponse.client.names,
-                        lastNames: loginResponse.client.lastnames,
-                        phoneNumber: loginResponse.client.phoneNumber,
-                        ci: loginResponse.client.carnet,
-                        cashback: loginResponse.client.cashback,
-                        email: loginResponse.client.email,
-                        image: loginResponse.client.img,
-                        password: loginResponse.client.password,
-                        status: loginResponse.client.status,
-                        username: loginResponse.client.username,
-                    }
-                    setUserData(userData);
-                    AsyncStorage.setItem('userData', JSON.stringify(userData));
-
-                    // Initialize notifications after successful login
-                    await handleNotificationsSetup(loginResponse.client.id);
-                } else {
-                    toastService.showErrorToast(loginResponse.msg || "Error al iniciar sesión");
-                }
-            } catch (loginError) {
-                console.error('Login failed:', loginError);
-                toastService.showErrorToast(loginError.message || "Error al iniciar sesión con Google");
-                throw loginError;
+            if (signupResponse.code === 'COD200') {
+                toastService.showInfoToast("Registro exitoso, iniciando sesión...")
+                signInWithGoogle(userInfo.idToken)
+                return;
+            } else if (signupResponse.code === 'COD353') {
+                console.log('Cuenta existente, iniciando sesión...')
+                signInWithGoogle(userInfo.idToken)
+            } else {
+                toastService.showErrorToast(signupResponse.msg || "Error en el registro");
             }
         } catch (error) {
             console.log('Google Error: ', error);
             toastService.showErrorToast("Hubo un problema al autenticar con Google");
+        } finally {
+            setLoadingGoogle(false);
+        }
+    }
+
+    const signInWithGoogle = async (token) => {
+        try {
+            const loginResponse = await authService.loginWithGoogle({
+                token_id: token
+            });
+
+            console.log('Google Login Response: ', loginResponse)
+
+            if (loginResponse.code === 'COD200') {
+                if (loginResponse.token) {
+                    AsyncStorage.setItem('token', loginResponse.token)
+                }
+
+                let userData = {
+                    id: loginResponse.client.id,
+                    names: loginResponse.client.names,
+                    lastNames: loginResponse.client.lastnames,
+                    phoneNumber: loginResponse.client.phoneNumber,
+                    ci: loginResponse.client.carnet,
+                    cashback: loginResponse.client.cashback,
+                    email: loginResponse.client.email,
+                    image: loginResponse.client.img,
+                    password: loginResponse.client.password,
+                    status: loginResponse.client.status,
+                    username: loginResponse.client.username,
+                    password: loginResponse.client?.password || loginResponse.client?.plainPassword || "",
+                }
+
+                setUserData(userData);
+                AsyncStorage.setItem('userData', JSON.stringify(userData));
+
+                await handleNotificationsSetup(loginResponse.client.id);
+            } else {
+                toastService.showErrorToast(loginResponse.msg || "Error al iniciar sesión");
+            }
+        } catch (loginError) {
+            console.error('Google Login failed:', loginError);
+            toastService.showErrorToast(loginError.message || "Error al iniciar sesión con Google");
         } finally {
             setLoadingGoogle(false);
         }
@@ -155,12 +163,12 @@ export default function AuthButtons() {
             // credential.user is the unique identifier for this user
             console.log('Apple Credential: ', credential);
             setUserDataFake();
-            
+
             // Initialize notifications after successful Apple login
             if (credential.user) {
                 await handleNotificationsSetup(credential.user);
             }
-            
+
             return credential;
         } catch (error) {
             if (error.code === 'ERR_CANCELED') {
@@ -185,7 +193,7 @@ export default function AuthButtons() {
         {
             'title': 'Continuar con Google',
             'icon': require('../../../../assets/icons/logoGoogle.png'),
-            'onPress': signInWithGoogle,
+            'onPress': signUpWithGoogle,
             'backgroundColor': theme_colors.white,
             'borderColor': theme_colors.lightGrey,
             'colorText': theme_colors.black,

@@ -21,7 +21,7 @@ export default function CarritoHomeScreen() {
     }
 
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const totalPrice = cart.reduce((sum, item) => sum + (item.totalPrice * item.quantity), 0);
 
     return (
         <ViewStyled
@@ -64,7 +64,11 @@ export default function CarritoHomeScreen() {
                 }}
             />
 
-            <CartProductsList products={cart} />
+            <CartProductsList products={[...cart].sort((a, b) => {
+                if (a.hasVariables && !b.hasVariables) return -1;
+                if (!a.hasVariables && b.hasVariables) return 1;
+                return 0;
+            })} />
 
             <NotasComponent isSelected={isSelected} />
 

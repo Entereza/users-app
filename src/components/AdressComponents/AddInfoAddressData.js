@@ -22,6 +22,7 @@ export default function AddInfoAddressData({
             }}
         >
             <TextInputStyled
+                autoFocus={true}
                 editable={!disabled}
                 value={formik.values.nameAddress}
                 label='Nombre del lugar'
@@ -89,7 +90,11 @@ const styles = StyleSheet.create({
 
         elevation: 2,
         shadowColor: theme_colors.black,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
+
     textAreaInput: {
         textAlignVertical: 'top',
         textAlign: 'left',

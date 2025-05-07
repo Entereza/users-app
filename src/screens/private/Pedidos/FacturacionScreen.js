@@ -6,7 +6,7 @@ import { theme_textStyles } from '../../../utils/theme/theme_textStyles'
 import TextInputStyled from '../../../utils/ui/TextInputStyled'
 import { useFormik } from 'formik'
 import { schemaFacturacion } from '../../../utils/tools/interface/schemasFormik'
-import { StyleSheet } from 'react-native'
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet } from 'react-native'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import adjustFontSize from '../../../utils/ui/adjustText'
 import ButtonWithIcon from '../../../components/Buttons/ButtonWithIcon'
@@ -63,66 +63,74 @@ export default function FacturacionScreen() {
     }, [formik.values, formik.isValid, billingInfo])
 
     return (
-        <ViewStyled
-            backgroundColor={theme_colors.white}
-            style={{
-                width: '100%',
-                flex: 1,
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-            }}
-        >
-            <TextInputStyled
-                value={formik.values.name}
-                label='Nombre / Razón Social *'
-                placeholder="Ej: Rocha"
-                onChangeText={text => formik.setFieldValue('name', text)}
-                onBlur={() => formik.setFieldTouched('name')}
-                errorMessage={formik.touched.name && formik.errors.name}
-                placeholderTextColor={styles.textPlaceholder}
-                labelStyle={styles.labelInput}
-                containerStyle={styles.containerInput}
-                inputStyle={styles.inputText}
-                errorStyle={styles.errorText}
-                returnKeyType='next'
-            />
+        <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={{ flex: 1 }}
+            >
+                <ViewStyled
+                    backgroundColor={theme_colors.white}
+                    style={{
+                        width: '100%',
+                        flex: 1,
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                    }}
+                >
+                    <TextInputStyled
+                        value={formik.values.name}
+                        label='Nombre / Razón Social *'
+                        placeholder="Ej: Rocha"
+                        onChangeText={text => formik.setFieldValue('name', text)}
+                        onBlur={() => formik.setFieldTouched('name')}
+                        errorMessage={formik.touched.name && formik.errors.name}
+                        placeholderTextColor={styles.textPlaceholder}
+                        labelStyle={styles.labelInput}
+                        containerStyle={styles.containerInput}
+                        inputStyle={styles.inputText}
+                        errorStyle={styles.errorText}
+                        returnKeyType='next'
+                    />
 
-            <TextInputStyled
-                value={formik.values.nit}
-                label='CI / NIT *'
-                placeholder="Ej: 123456"
-                onChangeText={text => formik.setFieldValue('nit', text)}
-                onBlur={() => formik.setFieldTouched('nit')}
-                keyboardType={"number-pad"}
-                errorMessage={formik.touched.nit && formik.errors.nit}
-                placeholderTextColor={styles.textPlaceholder}
-                labelStyle={styles.labelInput}
-                containerStyle={styles.containerInput}
-                inputStyle={styles.inputText}
-                errorStyle={styles.errorText}
-                returnKeyType='next'
-            />
+                    <TextInputStyled
+                        value={formik.values.nit}
+                        label='CI / NIT *'
+                        placeholder="Ej: 123456"
+                        onChangeText={text => formik.setFieldValue('nit', text)}
+                        onBlur={() => formik.setFieldTouched('nit')}
+                        keyboardType={"number-pad"}
+                        errorMessage={formik.touched.nit && formik.errors.nit}
+                        placeholderTextColor={styles.textPlaceholder}
+                        labelStyle={styles.labelInput}
+                        containerStyle={styles.containerInput}
+                        inputStyle={styles.inputText}
+                        errorStyle={styles.errorText}
+                        returnKeyType='done'
+                        onSubmitEditing={formik.handleSubmit}
+                    />
 
-            <ButtonWithIcon
-                disabled={isDisabled || isLoading}
-                loading={isLoading}
-                backgroundColor={isDisabled ? `${theme_colors.grey}22` : theme_colors.primary}
-                borderWidth={0}
-                colorText={theme_colors.white}
-                onPress={formik.handleSubmit}
-                borderRadius={1.5}
-                withIcon={false}
-                fontSize={theme_textStyles.medium}
-                fontFamily={'SFPro-Bold'}
-                textButton={isLoading ? 'Guardando datos...' : 'Guardar cambios'}
-                height={6}
-                style={{
-                    width: '95%',
-                    marginTop: 'auto',
-                    marginBottom: 20
-                }}
-            />
-        </ViewStyled>
+                    <ButtonWithIcon
+                        disabled={isDisabled || isLoading}
+                        loading={isLoading}
+                        backgroundColor={isDisabled ? `${theme_colors.grey}22` : theme_colors.primary}
+                        borderWidth={0}
+                        colorText={theme_colors.white}
+                        onPress={formik.handleSubmit}
+                        borderRadius={1.5}
+                        withIcon={false}
+                        fontSize={theme_textStyles.medium}
+                        fontFamily={'SFPro-Bold'}
+                        textButton={isLoading ? 'Guardando datos...' : 'Guardar cambios'}
+                        height={6}
+                        style={{
+                            width: '95%',
+                            marginTop: 'auto',
+                            marginBottom: 20
+                        }}
+                    />
+                </ViewStyled>
+            </KeyboardAvoidingView>
+        </Pressable>
     )
 }
 
@@ -157,6 +165,9 @@ const styles = StyleSheet.create({
 
         elevation: 2,
         shadowColor: theme_colors.black,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
     errorText: {
         width: '100%',

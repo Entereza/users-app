@@ -6,6 +6,7 @@ import { widthPercentageToDP } from 'react-native-responsive-screen';
 import OrderProductItem from './OrderProductItem';
 
 export default function OrderProductsList({ products = [] }) {
+    console.log('products', products);
     const renderItem = ({ item }) => (
         <OrderProductItem item={item} />
     );
@@ -15,7 +16,7 @@ export default function OrderProductsList({ products = [] }) {
             width={100}
             backgroundColor={theme_colors.transparent}
             style={{
-                flex: 1,
+                height: 'auto',
                 justifyContent: 'center',
                 alignItems: 'center',
             }}

@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import useTabBarStore from './tabBarStore';
 
 const useAuthStore = create(set => ({
@@ -27,7 +26,6 @@ const useAuthStore = create(set => ({
   },
 
   logout: async () => {
-    GoogleSignin.signOut()
     await AsyncStorage.clear();
     set({ user: null });
     useTabBarStore.getState().toggleTabBar(true);

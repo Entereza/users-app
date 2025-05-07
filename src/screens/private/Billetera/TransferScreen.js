@@ -1,27 +1,29 @@
-import { View, Text } from 'react-native'
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { theme_colors } from '../../../utils/theme/theme_colors';
 import useTabBarStore from '../../../utils/tools/interface/tabBarStore';
-import SafeAreaStyled from '../../../components/SafeAreaComponents/SafeAreaStyled';
 import ViewStyled from '../../../utils/ui/ViewStyled';
 import SelectionOption from '../../../components/TransferChasbackComponents/SelectionOption';
 import PaymentContent from '../../../components/TransferChasbackComponents/PaymentComponents/PaymentContent';
 import PayContent from '../../../components/TransferChasbackComponents/PayComponents/PayContent';
 import HeaderDefaultScreen from '../../../components/Header/HeaderDefaultScreen';
 import useTransferAmountStore from '../../../utils/tools/interface/transferAmountStore';
-import SwipeToConfirm from '../../../components/TransferChasbackComponents/PayComponents/SwipeToConfirm';
+import SwipeToTransfer from '../../../components/TransferChasbackComponents/PayComponents/SwipeToTransfer';
+import { qrService } from '../../../services/api/transfers/qrService';
+import { toastService } from '../../../utils/tools/interface/toastService';
+import { private_name_routes } from '../../../utils/route/private_name_routes';
 
 export default function TransferScreen() {
     const navigation = useNavigation();
+    const { changeColorStatusBar, changeScreenAnimationType } = useTabBarStore();
+    const { toggleTabBar } = useTabBarStore();
+    const { showTabSlider, toggleTabSlider } = useTransferAmountStore();
+    const [qrTransactionData, setQrTransactionData] = useState(null);
 
     const goBack = () => {
         navigation.goBack();
         toggleTabBar(true);
     };
-
-    const { toggleTabBar } = useTabBarStore()
-    const { showTabSlider, toggleTabSlider } = useTransferAmountStore()
 
     const isGoingBack = useRef(false);
 
@@ -43,14 +45,24 @@ export default function TransferScreen() {
         }, [navigation])
     );
 
-    const [paymentOption, setPaymentOption] = React.useState(true)
+    const [paymentOption, setPaymentOption] = React.useState(true);
 
     const handlePress = () => {
-        setPaymentOption(!paymentOption)
+        setPaymentOption(!paymentOption);
         if (paymentOption) {
-            toggleTabSlider(false)
+            toggleTabSlider(false);
         }
-    }
+    };
+
+    const handleAmountValid = (isValid, data) => {
+        if (isValid) {
+            toggleTabSlider(true);
+            setQrTransactionData(data);
+        } else {
+            toggleTabSlider(false);
+            setQrTransactionData(null);
+        }
+    };
 
     return (
         <ViewStyled
@@ -64,17 +76,24 @@ export default function TransferScreen() {
         >
             <HeaderDefaultScreen title={"Transferir Cashback"} />
 
-            <SelectionOption nameOption1={"Cobro"} nameOption2={"Pago"} optionSelected={paymentOption} onPress={handlePress} />
+            <SelectionOption
+                nameOption1={"Cobro"}
+                nameOption2={"Pago"}
+                optionSelected={paymentOption}
+                onPress={handlePress}
+            />
 
             {
                 paymentOption
                     ? <PaymentContent />
-                    : <PayContent />
+                    : <PayContent onAmountValid={handleAmountValid} />
             }
 
             {
-                (!paymentOption && showTabSlider) &&
-                <SwipeToConfirm />
+                (!paymentOption && showTabSlider && qrTransactionData) &&
+                <SwipeToTransfer
+                    qrTransactionData={qrTransactionData}
+                />
             }
         </ViewStyled>
     )

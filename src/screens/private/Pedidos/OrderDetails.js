@@ -41,7 +41,7 @@ export default function OrderDetails({ route }) {
             styleArea={styles.safeArea}
             styleView={styles.startView}
         >
-            <HeaderInternalScreen title={order.companyName || "Pedido"} />
+            <HeaderInternalScreen title={order.name || "Pedido"} />
 
             <ViewStyled
                 width={'90%'}
@@ -66,7 +66,6 @@ export default function OrderDetails({ route }) {
                     style={{
                         flexDirection: 'row',
                         justifyContent: 'space-between',
-                        marginBottom: 10,
                     }}
                 >
                     <TextStyled
@@ -74,18 +73,64 @@ export default function OrderDetails({ route }) {
                         fontSize={theme_textStyles.small}
                         color={theme_colors.grey}
                     >
-                        Total Inicial:
+                        Total:
                     </TextStyled>
                     <TextStyled
                         fontFamily='SFPro-Medium'
                         fontSize={theme_textStyles.small}
                         color={theme_colors.black}
                     >
-                        Bs. {order.totalInitial}
+                        Bs. {order.order.totalFinal}
                     </TextStyled>
                 </ViewStyled>
 
-                {order.cashback > 0 && (
+                <ViewStyled
+                    backgroundColor={theme_colors.transparent}
+                    style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                    }}
+                >
+                    <TextStyled
+                        fontFamily='SFPro-Medium'
+                        fontSize={theme_textStyles.small}
+                        color={theme_colors.grey}
+                    >
+                        Tarifa de Envío:
+                    </TextStyled>
+                    <TextStyled
+                        fontFamily='SFPro-Medium'
+                        fontSize={theme_textStyles.small}
+                        color={theme_colors.black}
+                    >
+                        Bs. {order.order.deliveryFee}
+                    </TextStyled>
+                </ViewStyled>
+
+                <ViewStyled
+                    backgroundColor={theme_colors.transparent}
+                    style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                    }}
+                >
+                    <TextStyled
+                        fontFamily='SFPro-Medium'
+                        fontSize={theme_textStyles.small}
+                        color={theme_colors.grey}
+                    >
+                        Tarifa de Servicio:
+                    </TextStyled>
+                    <TextStyled
+                        fontFamily='SFPro-Medium'
+                        fontSize={theme_textStyles.small}
+                        color={theme_colors.black}
+                    >
+                        Bs. {order.order.serviceFee}
+                    </TextStyled>
+                </ViewStyled>
+
+                {order.order.userCashback > 0 && (
                     <ViewStyled
                         backgroundColor={theme_colors.transparent}
                         style={{
@@ -106,7 +151,7 @@ export default function OrderDetails({ route }) {
                             fontSize={theme_textStyles.small}
                             color={theme_colors.success}
                         >
-                            - Bs. {order.cashback}
+                            - Bs. {order.order.userCashback}
                         </TextStyled>
                     </ViewStyled>
                 )}
@@ -130,12 +175,12 @@ export default function OrderDetails({ route }) {
                         fontSize={theme_textStyles.smedium}
                         color={theme_colors.primary}
                     >
-                        Bs. {order.totalFinal}
+                        Bs. {order.order.totalFinal + order.order.deliveryFee + order.order.serviceFee - (order.order.userCashback || 0)}
                     </TextStyled>
                 </ViewStyled>
             </ViewStyled>
 
-            <OrderProductsList products={order.data} />
+            <OrderProductsList products={order.order.products} />
         </SafeAreaStyled>
     )
 }

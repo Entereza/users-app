@@ -12,7 +12,7 @@ const alertTypes = {
     error: { color: theme_colors.danger, icon: "alert-circle" },
     warning: { color: theme_colors.warning, icon: "alert" },
     info: { color: theme_colors.info, icon: "information" },
-    dark: { color: theme_colors.black, icon: "alert-circle" },
+    dark: { color: theme_colors.black, icon: "" },
 };
 
 export default function AlertStyled({
@@ -92,12 +92,16 @@ export default function AlertStyled({
                             alignItems: 'center'
                         }}
                     >
-                        <MaterialCommunityIcons name={icon} size={adjustFontSize(size)} color={color} />
+                        {
+                            icon && (
+                                <MaterialCommunityIcons name={icon} size={adjustFontSize(size)} color={color} />
+                            )
+                        }
 
                         <TextStyled
                             fontSize={theme_textStyles.medium}
                             textAlign='center'
-                            fontFamily='SFPro-Bold'
+                            fontFamily='SFPro-SemiBold'
                             color={color}
                             style={{
                                 width: '100%',
@@ -106,7 +110,7 @@ export default function AlertStyled({
                             {title}
                         </TextStyled>
                         <TextStyled
-                            fontFamily='SFPro-Medium'
+                            fontFamily='SFPro-Regular'
                             fontSize={theme_textStyles.smedium}
                             textAlign='center'
                             color={theme_colors.black}
@@ -153,7 +157,7 @@ export default function AlertStyled({
                                     <TextStyled
                                         fontSize={theme_textStyles.medium}
                                         color={theme_colors.danger}
-                                        fontFamily='SFPro-SemiBold'
+                                        fontFamily='SFPro-Medium'
                                         textAlign={'center'}
                                         style={{
                                             width: '90%',
@@ -187,7 +191,7 @@ export default function AlertStyled({
                                     <TextStyled
                                         fontSize={theme_textStyles.medium}
                                         color={theme_colors.white}
-                                        fontFamily='SFPro-Bold'
+                                        fontFamily='SFPro-Medium'
                                         textAlign='center'
                                         style={{
                                             width: '90%'

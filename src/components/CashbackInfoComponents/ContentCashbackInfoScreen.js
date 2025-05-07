@@ -74,7 +74,7 @@ export default function ContentCashbackInfoScreen({ onPress }) {
                             fontFamily='SFPro-Heavy'
                             textAlign='left'
                             fontSize={theme_textStyles.xlarge + 2}
-                            color={theme_colors.primary}
+                            color={theme_colors.secondary}
                             numberOfLines={3}
                             style={{
                                 width: "100%",

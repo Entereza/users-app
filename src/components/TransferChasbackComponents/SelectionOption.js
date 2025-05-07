@@ -8,7 +8,9 @@ export default function SelectionOption({
     nameOption1,
     nameOption2,
     optionSelected,
-    onPress
+    onPress,
+    disabledOption1,
+    disabledOption2
 }) {
     return (
         <ViewStyled
@@ -27,6 +29,7 @@ export default function SelectionOption({
                 onPress={onPress}
                 isActive={optionSelected}
                 nameOption={nameOption1}
+                disabled={disabledOption1}
             />
 
             {
@@ -35,6 +38,7 @@ export default function SelectionOption({
                         onPress={onPress}
                         isActive={!optionSelected}
                         nameOption={nameOption2}
+                        disabled={disabledOption2}
                     />
                 )
             }

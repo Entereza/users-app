@@ -28,11 +28,11 @@ export default function WalletCard() {
         });
     }
 
-    const goToCodeScreen = () => {
-        toggleTabBar(false)
-        changeColorStatusBar(theme_colors.dark)
-        navigation.navigate(private_name_routes.billetera.codeScreen);
-    }
+    // const goToCodeScreen = () => {
+    //     toggleTabBar(false)
+    //     changeColorStatusBar(theme_colors.dark)
+    //     navigation.navigate(private_name_routes.billetera.codeScreen);
+    // }
 
     return (
         <ViewStyled
@@ -78,13 +78,13 @@ export default function WalletCard() {
                         fontFamily='Artegra-SemiBold'
                         color={theme_colors.white}
                     >
-                        BOB. {user?.cashback?.toFixed(2) || 0}
+                        BOB. {user?.cashback?.toFixed(2) || '0.00'}
                     </TextStyled>
                 </ViewStyled>
 
                 <ViewStyled
-                    paddingHorizontal={10}
-                    paddingVertical={3}
+                    paddingHorizontal={6}
+                    paddingVertical={2}
                     backgroundColor={`${theme_colors.backgroundLightGrey}22`}
                     borderRadius={3}
                     style={{

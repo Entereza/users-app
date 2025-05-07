@@ -23,6 +23,7 @@ export default function ConfirmOrderScreen() {
     const { branchId } = route.params || {};
 
     console.log('branchId', branchId)
+    console.log('selectedAddress', selectedAddress)
 
     const navigation = useNavigation();
 
@@ -32,7 +33,8 @@ export default function ConfirmOrderScreen() {
 
     const goToAddressScreen = () => {
         navigation.navigate(private_name_routes.empresas.addressScreen, {
-            internScreen: true
+            internScreen: true,
+            canDoActions: false
         });
     }
 
@@ -130,7 +132,7 @@ export default function ConfirmOrderScreen() {
 
             </ScrollView>
             {validateOrder() && branchId && (
-                <SwipeToConfirm branchId={branchId} />
+                <SwipeToConfirm branchId={branchId} tripPrice={tripPrice} />
             )}
         </ViewStyled>
     );

@@ -12,8 +12,17 @@ import { StyleSheet } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import adjustFontSize from '../../../utils/ui/adjustText'
 import ImageStyled from '../../../utils/ui/ImageStyled'
+import { userService } from '../../../services/api/users/userService'
+import { toastService } from '../../../utils/tools/interface/toastService';
+import useAuthStore from '../../../utils/tools/interface/authStore'
+import { useNavigation } from '@react-navigation/native'
 
 export default function ChangePasswordScreen() {
+  const { user } = useAuthStore()
+  const navigation = useNavigation()
+  const [isLoading, setIsLoading] = useState(false)
+  const [isDisabled, setIsDisabled] = useState(true)
+
   const formik = useFormik({
     initialValues: {
       password: "",
@@ -24,20 +33,42 @@ export default function ChangePasswordScreen() {
     validateOnChange: true,
     onSubmit: async (values) => {
       try {
-        const dataChangePassword = {
-          password: values.password,
-          newPassword: values.newPassword,
-          confirmNewPassword: values.confirmNewPassword
-        };
+        setIsLoading(true)
+        setIsDisabled(true)
 
-        console.log(dataChangePassword)
+        const response = await userService.changePassword(
+          user.email,
+          values.password,
+          values.newPassword
+        )
+
+        if (response.code === 'COD200') {
+          toastService.showSuccessToast('Contraseña actualizada correctamente')
+          navigation.goBack()
+        } else if (response.code === 'COD400') {
+          toastService.showWarningToast('Contraseña actual incorrecta')
+        } else {
+          toastService.showErrorToast('Error al cambiar la contraseña')
+        }
       } catch (err) {
         console.log('Error on ChangePasswordScreen: ', err)
+        toastService.showErrorToast('Error al cambiar la contraseña')
+      } finally {
+        setIsLoading(false)
+        setIsDisabled(false)
       }
     }
   });
 
-  const isDisabled = (formik.dirty && !formik.isValid)
+  React.useEffect(() => {
+    const formValues = formik.values;
+    const hasChanges = formValues.password !== "" &&
+      formValues.newPassword !== "" &&
+      formValues.confirmNewPassword !== "" &&
+      formik.isValid;
+
+    setIsDisabled(!hasChanges || isLoading);
+  }, [formik.values, formik.isValid, isLoading]);
 
   return (
     <ViewStyled
@@ -84,12 +115,13 @@ export default function ChangePasswordScreen() {
             resizeMode="cover"
           />
         </ViewStyled>
-        
+
         <ChangePasswordData formik={formik} />
 
         <ButtonWithIcon
+          loading={isLoading}
           disabled={isDisabled}
-          backgroundColor={isDisabled ? `${theme_colors.grey}22` : theme_colors.primary}
+          backgroundColor={isDisabled && !isLoading ? `${theme_colors.grey}22` : theme_colors.primary}
           borderWidth={0}
           colorText={theme_colors.white}
           onPress={formik.handleSubmit}
@@ -97,7 +129,7 @@ export default function ChangePasswordScreen() {
           withIcon={false}
           fontSize={theme_textStyles.medium}
           fontFamily={'SFPro-Bold'}
-          textButton={'Guardar cambios'}
+          textButton={isLoading ? 'Guardando...' : 'Guardar cambios'}
           height={6}
           style={{
             width: '95%',

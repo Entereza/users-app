@@ -32,7 +32,7 @@ export default function ProductsList({ products = [], category, onLayout }) {
                     }}
                 >
                     <TextStyled
-                        fontFamily='SFPro-Bold'
+                        fontFamily='SFPro-SemiBold'
                         textAlign='left'
                         fontSize={theme_textStyles.large}
                         color={theme_colors.black}
@@ -81,7 +81,7 @@ export default function ProductsList({ products = [], category, onLayout }) {
                 }}
             >
                 <TextStyled
-                    fontFamily='SFPro-Bold'
+                    fontFamily='SFPro-SemiBold'
                     textAlign='left'
                     fontSize={theme_textStyles.large}
                     color={theme_colors.black}
@@ -97,7 +97,6 @@ export default function ProductsList({ products = [], category, onLayout }) {
 
             <FlatList
                 contentContainerStyle={{
-                    paddingVertical: 5,
                     paddingHorizontal: 5,
                 }}
                 style={{

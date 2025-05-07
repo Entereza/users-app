@@ -88,7 +88,7 @@ export default function AppNavigation() {
                         };
                     },
                 }}>
-                <StatusBar backgroundColor={user ? colorStatusBar : theme_colors.dark} style='dark' animated={true} hidden={false} />
+                <StatusBar backgroundColor={user ? colorStatusBar : theme_colors.dark} style={user ? 'dark' : 'light'} animated={true} hidden={false} />
                 {
                     user
                         ? <PrivateNavigation />

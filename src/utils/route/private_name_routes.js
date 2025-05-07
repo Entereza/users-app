@@ -8,10 +8,11 @@ export const private_name_routes = {
         cashbackInfoScreen: 'cashbackInfoScreen',
         transferScreen: 'transferScreen',
         transferConfirmedScreen: 'transferConfirmedScreen',
+        transferSuccessScreen: 'transferSuccessScreen',
         cashbackKeyboardModal: 'cashbackKeyboardModal',
         billeteraFinalConfirmation: 'billeteraFinalConfirmation',
         recargarScreen: 'recargarScreen',
-        allOrdersScreen: 'allOrdersScreen'
+        allOrdersScreen: 'allOrdersScreen',
     },
     empresas: {
         empresasStack: 'EmpresasStack',
@@ -23,6 +24,7 @@ export const private_name_routes = {
         carritoHome: 'carritoHome',
         confirmOrder: 'confirmOrder',
         empresasFinalConfirmation: 'empresasFinalConfirmation',
+        searchScreen: 'searchScreen',
         addressScreen: 'addressScreen',
         methodScreen: 'methodScreen',
         cashbackScreen: 'cashbackScreen',
@@ -51,5 +53,6 @@ export const private_name_routes = {
         profileHome: 'profileHome',
         editProfile: 'editProfile',
         changePassword: 'changePassword',
+        transferHistoryScreen: 'transferHistoryScreen'
     },
 }

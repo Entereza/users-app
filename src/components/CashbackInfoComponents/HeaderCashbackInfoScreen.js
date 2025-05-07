@@ -30,7 +30,7 @@ export default function HeaderCashbackInfoScreen({ goBack }) {
                 <ViewStyled
                     width={11}
                     height={5.5}
-                    borderRadius={50}
+                    borderRadius={1.5}
                     backgroundColor={theme_colors.transparent}
                     style={{
                         justifyContent: 'center',

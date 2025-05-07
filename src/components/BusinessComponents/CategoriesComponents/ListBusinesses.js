@@ -10,7 +10,7 @@ import useTabBarStore from '../../../utils/tools/interface/tabBarStore'
 import { useNavigation } from '@react-navigation/native'
 import { private_name_routes } from '../../../utils/route/private_name_routes'
 
-export default function ListBusinesses({ businesses = [], nameCategory = '' }) {
+export default function ListBusinesses({ businesses = [], nameCategory = '', isSearching = false }) {
     const { toggleTabBar, changeColorStatusBar } = useTabBarStore();
     const navigation = useNavigation();
 
@@ -19,8 +19,20 @@ export default function ListBusinesses({ businesses = [], nameCategory = '' }) {
         changeColorStatusBar(theme_colors.transparent);
         toggleTabBar(false);
         navigation.navigate(private_name_routes.empresas.empresasDetails, {
-            business: item
+            business: item,
+            showTabBar: false
         });
+    }
+
+    const getFooterMessage = () => {
+        if (businesses.length > 0) {
+            return isSearching 
+                ? `Estos son los resultados encontrados en '${nameCategory}'`
+                : `Estas son las empresas disponibles en '${nameCategory}'`;
+        }
+        return isSearching
+            ? `No se encontraron resultados para tu búsqueda en '${nameCategory}'`
+            : `No hay empresas disponibles en '${nameCategory}'`;
     }
 
     return (
@@ -72,11 +84,7 @@ export default function ListBusinesses({ businesses = [], nameCategory = '' }) {
                                     width: "100%",
                                 }}
                             >
-                                {
-                                    businesses.length > 0
-                                        ? `Estas son las empresas encontradas en '${nameCategory}'`
-                                        : `Aquí aparecerán las empresas de '${nameCategory}'`
-                                }
+                                {getFooterMessage()}
                             </TextStyled>
                         </ViewStyled>
                     )

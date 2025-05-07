@@ -4,12 +4,12 @@
     "slug": "enterezaClient",
     "version": "1.2.4",
     "orientation": "portrait",
-    "icon": "./assets/IconEntereza.png",
+    "icon": "./assets/icons/icon-app.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/IconEntereza.png",
+      "image": "./assets/icons/icon-app.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000000"
+      "backgroundColor": "#ffffff"
     },
     "scheme": "com.entereza.client",
     "platforms": ["ios", "android"],
@@ -23,7 +23,7 @@
       },
       "supportsTablet": true,
       "bundleIdentifier": "com.entereza.client",
-      "buildNumber": "78",
+      "buildNumber": "81",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Requerimos tu ubicación para poder darte información sobre las empresas afiliadas de tu ciudad.",
         "NSUserTrackingUsageDescription": "Esto permite a Entereza ofrecerte la mejor experiencia y mayor información sobre las empresas afiliadas que están en tu ciudad.",
@@ -51,11 +51,11 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/IconEntereza.png",
-        "backgroundColor": "#000000"
+        "foregroundImage": "./assets/icons/icon-app.png",
+        "backgroundColor": "#ffffff"
       },
       "package": "com.entereza.client",
-      "versionCode": 67,
+      "versionCode": 69,
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.FOREGROUND_SERVICE",
@@ -86,7 +86,7 @@
       ]
     },
     "web": {
-      "favicon": "./assets/IconEntereza.png"
+      "favicon": "./assets/icons/icon-app.png"
     },
     "plugins": [
       "expo-apple-authentication",
@@ -112,7 +112,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/IconEntereza.png",
+          "icon": "./assets/icons/icon-app.png",
           "color": "#ffffff"
         }
       ],
@@ -125,6 +125,9 @@
       [
         "expo-build-properties",
         {
+          "ios": {
+            "deploymentTarget": "18.0"
+          },
           "android": {
             "targetSdkVersion": 33
           }

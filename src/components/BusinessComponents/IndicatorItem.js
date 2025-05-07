@@ -5,7 +5,7 @@ import { FontAwesome, FontAwesome6 } from '@expo/vector-icons'
 import TextStyled from '../../utils/ui/TextStyled'
 import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 
-export default function IndicatorItem({ indicator, iconSize = 16, fontSize = theme_textStyles.small }) {
+export default function IndicatorItem({ indicator, iconSize = 16, fontSize = theme_textStyles.small, iconColor = theme_colors.lightGrey2 }) {
     return (
         <ViewStyled
             backgroundColor={theme_colors.transparent}
@@ -18,7 +18,7 @@ export default function IndicatorItem({ indicator, iconSize = 16, fontSize = the
                 gap: 5,
             }}
         >
-            <FontAwesome6 name={indicator.icon} size={iconSize} color={theme_colors.primary} />
+            <FontAwesome6 name={indicator.icon} size={iconSize} color={iconColor} />
             <TextStyled
                 fontFamily='SFPro-SemiBold'
                 fontSize={fontSize}
