@@ -248,7 +248,7 @@ export default function AddAddressScreen() {
                             <ViewStyled
                                 width={11}
                                 height={5.5}
-                                borderRadius={50}
+                                borderRadius={1.5}
                                 backgroundColor={theme_colors.white}
                                 style={{
                                     justifyContent: 'center',

@@ -23,6 +23,9 @@ export default function IndicatorItem({ indicator, iconSize = 16, fontSize = the
                 fontFamily='SFPro-SemiBold'
                 fontSize={fontSize}
                 color={theme_colors.lightGrey2}
+                style={{
+                    marginTop: 2
+                }}
             >
                 {indicator.title}
             </TextStyled>

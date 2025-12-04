@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme_colors } from '../../../utils/theme/theme_colors';
 
-const ProductVariableList = ({ 
-    namePv = "", 
-    variables = [], 
-    isRequired = false, 
-    maxSelect = 2, 
+const ProductVariableList = ({
+    namePv = "",
+    variables = [],
+    isRequired = false,
+    maxSelect = 2,
     onSelectionChange,
-    initialSelections = [] 
+    initialSelections = []
 }) => {
     const [isExpanded, setIsExpanded] = useState(true);
     const [selectedItems, setSelectedItems] = useState([]);
@@ -18,13 +18,21 @@ const ProductVariableList = ({
     useEffect(() => {
         if (initialSelections && initialSelections.length > 0) {
             // Convertir los IDs iniciales a índices del array de variables
-            const initialIndices = initialSelections.map(id => 
+            const initialIndices = initialSelections.map(id =>
                 variables.findIndex(v => v.id === id)
             ).filter(index => index !== -1);
-            
+
             setSelectedItems(initialIndices);
         }
     }, [initialSelections, variables]);
+
+    // Detectar si todas las opciones requeridas están seleccionadas
+    useEffect(() => {
+        if (isRequired && selectedItems.length >= 1) {
+            // Cambiar a completado y cerrar el panel
+            setTimeout(() => setIsExpanded(false), 100)
+        }
+    }, [selectedItems, isRequired]);
 
     const toggleItem = (index) => {
         setSelectedItems(prev => {
@@ -44,6 +52,9 @@ const ProductVariableList = ({
         });
     };
 
+    // Estado de completado
+    const isCompleted = isRequired && selectedItems.length >= 1;
+
     return (
         <View style={styles.container}>
             <TouchableOpacity
@@ -54,8 +65,10 @@ const ProductVariableList = ({
                     <Text style={styles.title}>{namePv}</Text>
                     <Text style={styles.maxSelect}>{` (max. ${maxSelect})`}</Text>
                     {isRequired && (
-                        <View style={styles.requiredBadge}>
-                            <Text style={styles.requiredText}>Requerido</Text>
+                        <View style={[styles.requiredBadge, isCompleted && { backgroundColor: theme_colors.green }]}>
+                            <Text style={[styles.requiredText, isCompleted && { color: theme_colors.white }]}>
+                                {isCompleted ? 'Completado' : 'Requerido'}
+                            </Text>
                         </View>
                     )}
                 </View>
@@ -67,32 +80,35 @@ const ProductVariableList = ({
             </TouchableOpacity>
 
             {isExpanded && (
-                <ScrollView style={styles.itemsContainer}>
-                    {variables.map((variable, index) => {
-                        return (
-                            <TouchableOpacity
-                                key={index}
-                                style={styles.item}
-                                onPress={() => toggleItem(index)}
-                            >
-                                <View style={styles.itemContent}>
-                                    <Text style={styles.itemText}>{variable.name}</Text>
-                                    {variable.price > 0 && (
-                                        <Text style={styles.priceText}>+Bs. {variable.price}</Text>
-                                    )}
-                                </View>
-                                <View style={[
-                                    styles.checkbox,
-                                    selectedItems.includes(index) && styles.checkboxSelected
-                                ]}>
-                                    {selectedItems.includes(index) && (
-                                        <Ionicons name="checkmark" size={16} color="white" />
-                                    )}
-                                </View>
-                            </TouchableOpacity>
-                        );
-                    })}
-                </ScrollView>
+                <FlatList
+                    scrollEnabled={false}
+                    style={styles.itemsContainer}
+                    data={variables}
+                    keyExtractor={(_, index) => index.toString()}
+                    renderItem={({ item: variable, index }) => (
+                        <TouchableOpacity
+                            key={index}
+                            style={styles.item}
+                            onPress={() => toggleItem(index)}
+                        >
+                            <View style={styles.itemContent}>
+                                <Text style={styles.itemText}>{variable.name}</Text>
+                                {variable.price > 0 && (
+                                    <Text style={styles.priceText}>+Bs. {variable.price}</Text>
+                                )}
+                            </View>
+                            <View style={[
+                                styles.checkbox,
+                                selectedItems.includes(index) && styles.checkboxSelected
+                            ]}>
+                                {selectedItems.includes(index) && (
+                                    <Ionicons name="checkmark" size={16} color="white" />
+                                )}
+                            </View>
+                        </TouchableOpacity>
+                    )}
+                    nestedScrollEnabled
+                />
             )}
         </View>
     );
@@ -143,7 +159,7 @@ const styles = StyleSheet.create({
         color: '#666',
     },
     itemsContainer: {
-        maxHeight: 300,
+        flex: 1,
     },
     item: {
         flexDirection: 'row',

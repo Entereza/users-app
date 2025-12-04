@@ -148,10 +148,10 @@ const SwipeIndicator = () => (
 
 export default function SwipeToConfirm({ branchId, tripPrice }) {
     const navigation = useNavigation();
-    const screenHeight = (Dimensions.get('window').height + 30);
+    const screenHeight = (Dimensions.get('window').height + 100);
 
     const { changeColorStatusBar, changeScreenAnimationType } = useTabBarStore();
-    const { cart, paymentMethod, myCashback: appliedCashback, billingInfo } = useCartStore();
+    const { cart, paymentMethod, myCashback: appliedCashback, billingInfo, deliveryTip } = useCartStore();
     const { user } = useAuthStore();
     const { selectedAddress } = useAddressStore();
 
@@ -223,7 +223,8 @@ export default function SwipeToConfirm({ branchId, tripPrice }) {
                 appliedCashback,
                 tripPrice,
                 selectedAddress.id,
-                billingInfo
+                billingInfo,
+                deliveryTip
             );
 
             const response = await ordersService.createOrder(orderData);

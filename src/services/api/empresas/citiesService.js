@@ -8,6 +8,12 @@ export const citiesService = {
         });
     },
 
+    getAllCities: async () => {
+        return createApiRequest('/cities/cities', {
+            method: 'GET'
+        });
+    },
+
     // Obtener ID de ciudad por nombre
     getCityIdByName: async (cityName) => {
         try {

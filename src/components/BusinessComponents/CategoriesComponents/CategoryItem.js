@@ -13,7 +13,11 @@ export default function CategoryItem({ item, onPress }) {
     const navigation = useNavigation()
     const { toggleTabBar } = useTabBarStore();
 
-    const goToCategoryScreen = () => {
+    const goToCategoryScreen = (event) => {
+        if (onPress) {
+            onPress(event);
+        }
+
         toggleTabBar(false)
         navigation.navigate(private_name_routes.empresas.empresaCategory, { category: item })
     }
@@ -33,7 +37,7 @@ export default function CategoryItem({ item, onPress }) {
             }}
         >
             <Pressable
-                onPress={onPress ? onPress : goToCategoryScreen}
+                onPress={goToCategoryScreen}
                 style={{
                     width: 70,
                     height: 70,

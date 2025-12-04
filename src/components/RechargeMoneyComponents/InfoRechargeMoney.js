@@ -11,7 +11,7 @@ export default function InfoRechargeMoney() {
         <ViewStyled
             backgroundColor={theme_colors.black}
             width={95}
-            height={16}
+            height={18}
             marginTop={1}
             borderRadius={1.5}
             marginBottom={2}
@@ -42,7 +42,7 @@ export default function InfoRechargeMoney() {
                     }}
                 >
                     <TextStyled
-                        fontFamily='SFPro-Bold'
+                        fontFamily='SFPro-SemiBold'
                         textAlign='left'
                         fontSize={theme_textStyles.smedium + 0.5}
                         color={theme_colors.white}
@@ -57,7 +57,7 @@ export default function InfoRechargeMoney() {
                     <TextStyled
                         fontFamily='SFPro-Regular'
                         textAlign='left'
-                        fontSize={theme_textStyles.smedium}
+                        fontSize={theme_textStyles.small + 0.5}
                         color={theme_colors.white}
                         style={{
                             width: "100%",
@@ -65,9 +65,9 @@ export default function InfoRechargeMoney() {
                     >
                         Al recargar dinero obtendrás un
                         <TextStyled
-                            fontFamily='SFPro-Bold'
+                            fontFamily='SFPro-Medium'
                             textAlign='left'
-                            fontSize={theme_textStyles.smedium + 0.5}
+                            fontSize={theme_textStyles.smedium}
                             color={theme_colors.white}
                             style={{
                                 width: "100%",

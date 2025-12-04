@@ -55,13 +55,22 @@ export default function CategoriesProductsList({
 
     return (
         <ViewStyled
-            backgroundColor={theme_colors.transparent}
+            backgroundColor={theme_colors.white}
             paddingVertical={1}
             style={{
                 width: '100%',
                 height: 'auto',
                 justifyContent: 'flex-start',
                 alignItems: 'flex-start',
+                elevation: 2,
+                shadowColor: theme_colors.black,
+                shadowOffset: { width: 0, height: 6 },
+                shadowOpacity: 0.18,
+                shadowRadius: 6.0,
+
+                borderBottomLeftRadius: 15,
+                borderBottomRightRadius: 15,
+                zIndex: 1000,
             }}
         >
             <FlatList

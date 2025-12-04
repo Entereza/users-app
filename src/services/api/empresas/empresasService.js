@@ -113,7 +113,35 @@ export const empresasService = {
         }, null)?.branch;
     },
 
-    // Obtener menú completo de una empresa
+    // Obtener menú base de una empresa
+    getBusinessMenuBase: async (businessId, userLat, userLng) => {
+        try {
+            const response = await createApiRequest(`/app-client/menu/base?businessId=${businessId}&userLat=${userLat}&userLng=${userLng}`, {
+                method: 'GET'
+            });
+            console.log('getBusinessMenuBase: ', response)
+            return response;
+        } catch (error) {
+            console.error('Error fetching business menu base:', error);
+            throw error;
+        }
+    },
+
+    // Obtener extras/variables de productos
+    getProductExtras: async (productId) => {
+        try {
+            const response = await createApiRequest(`/app-client/menu/extras?productId=${productId}`, {
+                method: 'GET'
+            });
+            console.log('getProductExtras: ', response)
+            return response;
+        } catch (error) {
+            console.error('Error fetching product extras:', error);
+            throw error;
+        }
+    },
+
+    // Obtener menú completo de una empresa (mantenido para compatibilidad)
     getBusinessMenu: async (businessId, userLat, userLng, page = 0, size = 100, sort = 'string') => {
         try {
             const response = await createApiRequest(`/app-client/menu?businessId=${businessId}&userLat=${userLat}&userLng=${userLng}&page=${page}&size=${size}&sort=${sort}`, {

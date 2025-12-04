@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 const initialState = {
-    selectedCategory: 'Menú',
+    selectedCategory: '',
     scrollViewRef: null,
     sectionPositions: {},
     categoriesListRef: null,

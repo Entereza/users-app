@@ -1,8 +1,9 @@
 import { create } from 'zustand';
+import useAuthStore from './authStore';
 
 const useOrdersStore = create((set, get) => ({
     orders: [],
-    isLoading: false,
+    isLoading: true,
     error: null,
     totalPages: 0,
     currentPage: 0,
@@ -33,6 +34,9 @@ const useOrdersStore = create((set, get) => ({
                     oldOrder: orderItem.order,
                     newOrder: updatedOrder
                 });
+                if (updatedOrder.status === get().statusOrders.completed) {
+                    useAuthStore.getState().getUserData();
+                }
                 return {
                     ...orderItem,
                     order: updatedOrder

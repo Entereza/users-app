@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native'
 import { private_name_routes } from '../../utils/route/private_name_routes'
 
 export default function ResumeCard({ tripPrice }) {
-    const { cart, myCashback, serviceFee } = useCartStore();
+    const { cart, myCashback, serviceFee, deliveryTip } = useCartStore();
     const navigation = useNavigation()
 
     const totalPrice = cart.reduce((sum, item) => sum + (item.totalPrice * item.quantity), 0);
@@ -25,6 +25,12 @@ export default function ResumeCard({ tripPrice }) {
             "price": tripPrice,
             "freeShipping": tripPrice <= 0,
         },
+        // Solo mostrar propina si es mayor a 0
+        ...(deliveryTip > 0 ? [{
+            "text": "Propina",
+            "price": deliveryTip,
+            "colorText": theme_colors.primary,
+        }] : []),
         // {
         //     "text": "Cupón",
         //     "price": 0,
@@ -241,7 +247,7 @@ export default function ResumeCard({ tripPrice }) {
                         width: '50%'
                     }}
                 >
-                    BOB. {totalPrice - myCashback + serviceFeePrice + tripPrice}
+                    BOB. {totalPrice - myCashback + serviceFeePrice + tripPrice + deliveryTip}
                 </TextStyled>
             </ViewStyled>
         </ViewStyled>

@@ -24,6 +24,7 @@ import useNotificationStore from '../../utils/tools/interface/notificationStore'
 import RecoverPasswordModal from '../../components/Modals/RecoverPasswordModal';
 import MessageModal from '../../components/Modals/MessageModal';
 import { userService } from '../../services/api/users/userService';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function LoginScreen() {
     const insets = useSafeAreaInsets();
@@ -150,6 +151,10 @@ export default function LoginScreen() {
         }
     };
 
+    const goBack = () => {
+        navigation.goBack();
+    };
+
     return (
         <>
             <KeyboardAvoidingView
@@ -170,9 +175,39 @@ export default function LoginScreen() {
                             alignItems: 'center',
                             paddingTop: insets.top + heightPercentageToDP(10),
                             paddingBottom: insets.bottom,
+                            position: 'relative',
                         }}
                         keyboardShouldPersistTaps="handled"
                     >
+                        <Pressable
+                            onPress={goBack}
+                            style={{
+                                position: 'absolute',
+                                left: 20,
+                                top: insets.top + 10,
+                                zIndex: 2
+                            }}
+                        >
+                            <ViewStyled
+                                width={11}
+                                height={5.5}
+                                borderRadius={1.5}
+                                backgroundColor={theme_colors.transparent}
+                                style={{
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    borderWidth: 1,
+                                    borderColor: theme_colors.white
+                                }}
+                            >
+                                <MaterialCommunityIcons
+                                    name="arrow-left"
+                                    size={adjustFontSize(theme_textStyles.xlarge)}
+                                    color={theme_colors.white}
+                                />
+                            </ViewStyled>
+                        </Pressable>
+
                         <ViewStyled
                             width={80}
                             height={20}
@@ -183,7 +218,7 @@ export default function LoginScreen() {
                             }}
                         >
                             <ImageStyled
-                                source={require('../../../assets/icons/IconColorsEntereza.png')}
+                                source={require('../../../assets/icons/logoWhiteEntereza.png')}
                                 style={{
                                     resizeMode: 'contain',
                                     width: '100%',

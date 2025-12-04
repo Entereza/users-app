@@ -106,7 +106,7 @@ export default function ButtonsAddToCart({
                 )
             }
 
-            <TouchableOpacity onPress={item.hasVariables ? goToDetailsProduct : () => addToCart({ ...item, quantity: 1 })}>
+            <TouchableOpacity onPress={displayQuantity <= 0 ? goToDetailsProduct : () => addToCart({ ...item, quantity: 1 })}>
                 <ViewStyled
                     backgroundColor={theme_colors.transparent}
                     paddingHorizontal={item.hasVariables ? 1 : 0}

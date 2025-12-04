@@ -268,6 +268,12 @@ const styles = StyleSheet.create({
         color: theme_colors.white,
         fontFamily: 'SFPro-Regular',
         fontSize: adjustFontSize(theme_textStyles.small),
+
+        elevation: 2,
+        shadowColor: theme_colors.black,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
     errorText: {
         color: theme_colors.error,

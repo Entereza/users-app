@@ -66,5 +66,12 @@ export const authService = {
             method: 'POST',
             body: JSON.stringify(data)
         });
+    },
+
+    // Get client by ID
+    getClientById: async (clientId) => {
+        return createApiRequest(`/clients-op/get-client?id=${clientId}`, {
+            method: 'GET',
+        });
     }
 };

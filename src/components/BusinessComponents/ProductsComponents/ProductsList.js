@@ -71,11 +71,11 @@ export default function ProductsList({ products = [], category, onLayout }) {
         >
             <ViewStyled
                 width={93}
-                height={4}
                 marginBottom={1}
                 backgroundColor={theme_colors.transparent}
                 paddingLeft={1}
                 style={{
+                    height: 'auto',
                     justifyContent: 'flex-start',
                     alignItems: 'flex-start',
                 }}

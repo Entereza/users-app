@@ -35,64 +35,67 @@ export const locationService = {
     // Obtener información del departamento usando geocoding inverso
     getDepartmentFromCoords: async (latitude, longitude) => {
         const MAX_RETRIES = 3;
-        const RETRY_DELAY = 1000; // 1 segundo
+        const RETRY_DELAY = 1000;
 
         const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
         for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
             try {
                 const response = await Promise.race([
-                    Location.reverseGeocodeAsync({
-                        latitude,
-                        longitude
-                    }),
+                    Location.reverseGeocodeAsync({ latitude, longitude }),
                     new Promise((_, reject) =>
                         setTimeout(() => reject(new Error('Timeout')), 5000)
                     )
                 ]);
 
                 if (response && response.length > 0) {
-                    console.log('reverseGeocodeAsync: ', response)
+                    console.log('reverseGeocodeAsync: ', response);
+                    const { region, country } = response[0];
 
-                    const region = response[0].region;
-                    const country = response[0].country;
-
-                    // Extraer el nombre del departamento removiendo "Departamento de "
-                    const city = region.replace('Departamento de ', '');
-
-                    if (!city || !country) {
-                        console.warn('No se encontró ciudad o país en las coordenadas proporcionadas');
+                    if (!region || !country) {
+                        console.warn('No se encontró región o país');
                         return null;
                     }
 
-                    // Verificar si el país es Bolivia
                     if (country.toLowerCase() !== 'bolivia') {
-                        console.warn('La aplicación solo está disponible en Bolivia');
                         return {
-                            city,
+                            city: null,
                             country,
                             isBolivia: false
                         };
                     }
 
-                    const cityId = await citiesService.getCityIdByName(city);
+                    const cities = await citiesService.getAllCities();
+                    const regionLower = region.toLowerCase();
+
+                    const matchedCity = cities.find(city =>
+                        regionLower.includes(city.name.toLowerCase())
+                    );
+
+                    if (!matchedCity) {
+                        console.warn('No se encontró ninguna coincidencia con el nombre del departamento');
+                        return null;
+                    }
+
                     return {
-                        name: city,
-                        id: cityId,
+                        name: matchedCity.name,
+                        id: matchedCity.id,
                         country,
                         isBolivia: true,
-                        isEnabled: cityId !== null
+                        isEnabled: true
                     };
                 }
+
                 return null;
             } catch (error) {
                 console.warn(`Intento ${attempt + 1}/${MAX_RETRIES} falló:`, error.message);
                 if (attempt === MAX_RETRIES - 1) {
-                    throw new Error(`No se pudo obtener la ubicación después de ${MAX_RETRIES} intentos: ${error.message}`);
+                    throw new Error(`No se pudo obtener la ubicación: ${error.message}`);
                 }
                 await sleep(RETRY_DELAY);
             }
         }
+
         return null;
     }
 }; 

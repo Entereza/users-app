@@ -9,23 +9,52 @@ import { private_name_routes } from '../../utils/route/private_name_routes'
 import useTabBarStore from '../../utils/tools/interface/tabBarStore'
 import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 import useAuthStore from '../../utils/tools/interface/authStore'
+import { sendHeatmapEvent } from '../../utils/analytics'
 
-export default function WalletCard() {
+export default function WalletCard({ onPress }) {
     const navigation = useNavigation()
     const { toggleTabBar, changeColorStatusBar } = useTabBarStore()
     const { user } = useAuthStore()
 
-    const goToCashbackInfoScreen = () => {
+    const goToCashbackInfoScreen = (event) => {
+        if (event?.nativeEvent) {
+            sendHeatmapEvent({
+                userId: user.id,
+                screen: ' @HomeScreen.js ',
+                elementType: 'button',
+                elementId: 'btn-que-es-cashback',
+                x: event.nativeEvent.locationX,
+                y: event.nativeEvent.locationY
+            });
+        }
+        
         toggleTabBar(false)
         changeColorStatusBar(theme_colors.black)
         navigation.navigate(private_name_routes.billetera.cashbackInfoScreen);
     }
 
-    const goToTransferScreen = () => {
+    const goToTransferScreen = (event) => {
+        if (event?.nativeEvent) {
+            sendHeatmapEvent({
+                userId: user.id,
+                screen: ' @HomeScreen.js ',
+                elementType: 'button',
+                elementId: 'btn-transferir-cashback',
+                x: event.nativeEvent.locationX,
+                y: event.nativeEvent.locationY
+            });
+        }
+        
         toggleTabBar(false)
         navigation.navigate(private_name_routes.billetera.transferScreen, {
             cashback: ''
         });
+    }
+
+    const handleCardPress = (event) => {
+        if (onPress) {
+            onPress(event);
+        }
     }
 
     // const goToCodeScreen = () => {
@@ -45,6 +74,7 @@ export default function WalletCard() {
                 justifyContent: 'center',
                 alignItems: 'center',
             }}
+            onTouchEnd={handleCardPress}
         >
             <ImageBackground
                 source={require('../../../assets/Lines/LinesBG.png')}

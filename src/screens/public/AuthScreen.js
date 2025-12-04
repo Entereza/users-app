@@ -35,7 +35,7 @@ export default function AuthScreen() {
                 }}
             >
                 <ImageStyled
-                    source={require('../../../assets/icons/IconColorsEntereza.png')}
+                    source={require('../../../assets/icons/logoWhiteEntereza.png')}
                     style={{
                         resizeMode: 'contain',
                         width: '100%',

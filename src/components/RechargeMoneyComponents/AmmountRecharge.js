@@ -97,9 +97,9 @@ export default function AmmountRecharge({
           }}
         >
           <TextStyled
-            fontFamily='SFPro-Bold'
+            fontFamily='SFPro-SemiBold'
             textAlign='left'
-            fontSize={theme_textStyles.medium}
+            fontSize={theme_textStyles.smedium}
             color={theme_colors.primary}
             style={{
               width: "auto",
@@ -118,9 +118,9 @@ export default function AmmountRecharge({
                 }}
               >
                 <TextStyled
-                  fontFamily='SFPro-Medium'
+                  fontFamily='SFPro-SemiBold'
                   textAlign='left'
-                  fontSize={theme_textStyles.medium}
+                  fontSize={theme_textStyles.smedium}
                   color={theme_colors.primary}
                   style={{
                     width: "auto",
@@ -161,9 +161,9 @@ export default function AmmountRecharge({
           }}
         >
           <TextStyled
-            fontFamily='SFPro-Bold'
+            fontFamily='SFPro-SemiBold'
             textAlign='left'
-            fontSize={theme_textStyles.medium}
+            fontSize={theme_textStyles.smedium + 0.5}
             color={theme_colors.black}
             style={{
               width: "auto",
@@ -175,7 +175,7 @@ export default function AmmountRecharge({
           <TextStyled
             fontFamily='SFPro-Bold'
             textAlign='left'
-            fontSize={theme_textStyles.medium}
+            fontSize={theme_textStyles.smedium + .5}
             color={theme_colors.dark}
             style={{
               width: "auto",
@@ -184,7 +184,7 @@ export default function AmmountRecharge({
             {`BOB. ${amountWithPercentage}`}
           </TextStyled>
         </ViewStyled>
-      </ViewStyled>
+      </ViewStyled >
 
       <ModalCalculator
         open={showCalculator}

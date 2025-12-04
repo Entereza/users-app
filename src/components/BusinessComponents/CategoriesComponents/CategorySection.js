@@ -9,7 +9,7 @@ import { showToast } from '../../../utils/tools/toast/toastService'
 import Toast from 'react-native-root-toast'
 import CategorySkeleton from '../../Skeletons/CategorySkeleton'
 
-export default function CategorySection({ refreshing }) {
+export default function CategorySection({ refreshing, onCategoryPress }) {
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const { departmentId } = useLocationStore();
@@ -41,6 +41,12 @@ export default function CategorySection({ refreshing }) {
             );
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleCategoryPress = (item, event) => {
+        if (onCategoryPress && event) {
+            onCategoryPress(item.id, event);
         }
     };
 
@@ -78,6 +84,7 @@ export default function CategorySection({ refreshing }) {
                             categoryCode: item.id
                         }}
                         key={index}
+                        onPress={(event) => handleCategoryPress(item, event)}
                     />
                 }
                 showsHorizontalScrollIndicator={false}

@@ -93,9 +93,11 @@ export default function AddressSelectionScreen({ route }) {
 
     const goToHomeScreen = () => {
         toggleTabBar(true);
-        navigation.navigate(private_name_routes.billetera.billeteraHome);
+        navigation.navigate(private_name_routes.billetera.billeteraStack, {
+            screen: private_name_routes.billetera.billeteraHome
+        });
     };
-    
+
     useFocusEffect(
         React.useCallback(() => {
             toggleTabBar(false);

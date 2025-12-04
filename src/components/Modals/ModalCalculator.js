@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import ViewStyled from '../../utils/ui/ViewStyled'
 import { theme_colors } from '../../utils/theme/theme_colors'
-import { Modal } from 'react-native'
+import { Modal, Pressable } from 'react-native'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import TextStyled from '../../utils/ui/TextStyled'
 import NumbersCalculator from '../CalculatorComponents/NumbersCalculator'
@@ -168,76 +168,80 @@ export default function ModalCalculator({
                 animationType="slide"
                 transparent={true}
             >
-                <ViewStyled
-                    height={100}
-                    backgroundColor={theme_colors.backgroundModal}
-                    style={{
-                        justifyContent: 'flex-end',
-                        alignItems: 'center',
-                    }}
-                >
+                <Pressable onPress={closeModalCalculator}>
                     <ViewStyled
-                        width={100}
-                        height={60}
-                        paddingTop={1}
-                        backgroundColor={theme_colors.white}
+                        height={100}
+                        backgroundColor={theme_colors.backgroundModal}
                         style={{
-                            borderTopLeftRadius: heightPercentageToDP(5),
-                            borderTopRightRadius: heightPercentageToDP(5),
+                            justifyContent: 'flex-end',
                             alignItems: 'center',
-                            justifyContent: 'flex-start',
-                            shadowColor: theme_colors.black,
-                            shadowOffset: { width: 0, height: 2 },
-                            shadowOpacity: 0.5,
-                            shadowRadius: 2,
-                            elevation: 11,
                         }}
                     >
-                        <ViewStyled
-                            width={85}
-                            backgroundColor={theme_colors.transparent}
-                            style={{
-                                height: 'auto',
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                alignItems: 'flex-start',
-                            }}
-                        >
-                            <TextStyled
-                                fontFamily='SFPro-Bold'
-                                textAlign='left'
-                                fontSize={theme_textStyles.medium}
-                                color={theme_colors.primary}
-                                numberOfLines={1}
+                        <Pressable onPress={e => e.stopPropagation()}>
+                            <ViewStyled
+                                width={100}
+                                height={60}
+                                paddingTop={1}
+                                backgroundColor={theme_colors.white}
                                 style={{
-                                    marginTop: 15
+                                    borderTopLeftRadius: heightPercentageToDP(5),
+                                    borderTopRightRadius: heightPercentageToDP(5),
+                                    alignItems: 'center',
+                                    justifyContent: 'flex-start',
+                                    shadowColor: theme_colors.black,
+                                    shadowOffset: { width: 0, height: 2 },
+                                    shadowOpacity: 0.5,
+                                    shadowRadius: 2,
+                                    elevation: 11,
                                 }}
                             >
-                                {'Bs. '}
-                            </TextStyled>
-                            <TextStyled
-                                fontFamily='SFPro-Bold'
-                                textAlign='left'
-                                fontSize={20}
-                                color={theme_colors.primary}
-                                numberOfLines={1}
-                            >
-                                {ammountTransfer ? ammountTransfer : 0}
-                            </TextStyled>
-                        </ViewStyled>
+                                <ViewStyled
+                                    width={85}
+                                    backgroundColor={theme_colors.transparent}
+                                    style={{
+                                        height: 'auto',
+                                        flexDirection: 'row',
+                                        justifyContent: 'center',
+                                        alignItems: 'flex-start',
+                                    }}
+                                >
+                                    <TextStyled
+                                        fontFamily='SFPro-Bold'
+                                        textAlign='left'
+                                        fontSize={theme_textStyles.medium}
+                                        color={theme_colors.primary}
+                                        numberOfLines={1}
+                                        style={{
+                                            marginTop: 15
+                                        }}
+                                    >
+                                        {'Bs. '}
+                                    </TextStyled>
+                                    <TextStyled
+                                        fontFamily='SFPro-Bold'
+                                        textAlign='left'
+                                        fontSize={20}
+                                        color={theme_colors.primary}
+                                        numberOfLines={1}
+                                    >
+                                        {ammountTransfer ? ammountTransfer : 0}
+                                    </TextStyled>
+                                </ViewStyled>
 
-                        <SelectAmmountTransfer
-                            cashbackUser={cashbackUser ? cashbackUser : 100}
-                            ammountTransfer={ammountTransfer}
-                            onPress={handlePress}
-                            handleClose={addAmmount}
-                        />
+                                <SelectAmmountTransfer
+                                    cashbackUser={cashbackUser ? cashbackUser : 100}
+                                    ammountTransfer={ammountTransfer}
+                                    onPress={handlePress}
+                                    handleClose={addAmmount}
+                                />
 
-                        <NumbersCalculator
-                            onPress={handlePress}
-                        />
+                                <NumbersCalculator
+                                    onPress={handlePress}
+                                />
+                            </ViewStyled>
+                        </Pressable>
                     </ViewStyled>
-                </ViewStyled>
+                </Pressable>
             </Modal>
         </>
     )

@@ -30,9 +30,9 @@ export default function BusinessItem({ item, onPress }) {
     }
   ]
 
-  const handlePress = () => {
-    if (isOpen) {
-      onPress();
+  const handlePress = (event) => {
+    if (isOpen && onPress) {
+      onPress(event);
     }
   }
 
@@ -44,10 +44,13 @@ export default function BusinessItem({ item, onPress }) {
       <ViewStyled
         backgroundColor={theme_colors.white}
         width={90}
-        height={28}
         marginBottom={1}
-        paddingVertical={1}
+        paddingTop={1}
+        paddingBottom={0.3}
         style={{
+          height: 'auto',
+          minHeight: heightPercentageToDP(25),
+          maxHeight: heightPercentageToDP(28),
           alignItems: 'center',
           justifyContent: 'flex-start',
           borderRadius: 15,
@@ -145,46 +148,49 @@ export default function BusinessItem({ item, onPress }) {
           backgroundColor={theme_colors.transparent}
           style={{
             width: '95%',
-            height: '30%',
-            flex: 1,
+            height: 'auto',
             marginTop: 5,
             justifyContent: 'flex-start',
             alignItems: 'flex-start',
           }}
         >
           <TextStyled
+            numberOfLines={1}
             fontFamily='SFPro-Bold'
             textAlign='left'
-            fontSize={theme_textStyles.smedium}
+            fontSize={theme_textStyles.small + .5}
             color={isOpen ? theme_colors.black : theme_colors.grey}
             style={{
-              width: '60%',
+              width: '100%',
+              marginTop: 2,
             }}
           >
             {item.name} - {item.branch?.sectorName || ''}
           </TextStyled>
+        </ViewStyled>
 
-          <ViewStyled
-            backgroundColor={theme_colors.transparent}
-            style={{
-              height: 'auto',
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              marginTop: 5,
-              gap: 20,
-            }}
-          >
-            {indicators.map((indicator, index) => (
-              indicator.show && (
-                <IndicatorItem
-                  key={index}
-                  indicator={indicator}
-                  disabled={!isOpen}
-                />
-              )
-            ))}
-          </ViewStyled>
+        <ViewStyled
+          backgroundColor={theme_colors.transparent}
+          style={{
+            width: '95%',
+            height: 'auto',
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            gap: 20,
+          }}
+        >
+          {indicators.map((indicator, index) => (
+            indicator.show && (
+              <IndicatorItem
+                key={index}
+                indicator={indicator}
+                disabled={!isOpen}
+                iconSize={14}
+                fontSize={theme_textStyles.small}
+              />
+            )
+          ))}
         </ViewStyled>
       </ViewStyled>
     </Pressable>

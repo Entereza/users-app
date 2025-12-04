@@ -22,8 +22,8 @@ import { locationService } from '../../../services/location/locationService'
 import { showToast } from '../../../utils/tools/toast/toastService'
 import Toast from 'react-native-root-toast'
 import EmpresaDetailsSkeleton from '../../../components/Skeletons/EmpresaDetailsSkeleton'
-import { heightPercentageToDP } from 'react-native-responsive-screen'
 import AlertStyled from '../../../utils/ui/AlertStyled'
+import useAddressStore from '../../../utils/tools/interface/addressStore'
 
 export default function EmpresaDetails({ route }) {
     const { business, showTabBar = true } = route.params
@@ -31,21 +31,22 @@ export default function EmpresaDetails({ route }) {
     const { id, companyID: businessId, lat, long, sectorName, tripPrice } = branch
 
     const { top } = useSafeAreaInsets()
-    const { toggleTabBar } = useTabBarStore()
+    const { toggleTabBar, changeColorStatusBar } = useTabBarStore()
     const navigation = useNavigation()
     const { cart, clearCart } = useCartStore()
+    const { selectedAddress } = useAddressStore()
 
     // Estados para manejo de datos y loading
     const [isLoading, setIsLoading] = useState(true)
     const [isRefreshing, setIsRefreshing] = useState(false)
     const [error, setError] = useState(null)
     const [nearestBranch, setNearestBranch] = useState(null)
-    const [categoryList, setCategories] = useState(['Menú'])
+    const [categoryList, setCategories] = useState([])
     const [productsData, setProductsData] = useState({})
     const [promotionsData, setPromotionsData] = useState([])
 
     // Estados que antes estaban en categoryStore
-    const [selectedCategory, setSelectedCategory] = useState('Menú')
+    const [selectedCategory, setSelectedCategory] = useState('')
     const [sectionPositions, setSectionPositions] = useState({})
     const [hasPromotions, setHasPromotions] = useState(false)
     const [isManualSelection, setIsManualSelection] = useState(false)
@@ -54,28 +55,53 @@ export default function EmpresaDetails({ route }) {
     const scrollViewRef = useRef(null)
     const categoriesListRef = useRef(null)
 
+    // Flag to bypass navigation listener when intentionally navigating
+    const isNavigatingRef = useRef(false)
+
+    // Alert states
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertText, setAlertText] = useState({
+        title: '',
+        message: '',
+        type: 'success',
+        textConfirmButton: '',
+        showCancelButton: true,
+        textCancelButton: ''
+    });
+
     // Función para cargar los datos iniciales
     const loadInitialData = async () => {
         try {
             setError(null);
             setIsLoading(true);
 
-            // 1. Obtener ubicación actual
-            const location = await locationService.getCurrentLocation();
-            console.log('location: ', location);
+            // 1. Obtener coordenadas del usuario: priorizar selectedAddress, fallback a ubicación actual
+            let userLatitude = null
+            let userLongitude = null
 
-            // 2. Obtener menú completo
-            const menuResponse = await empresasService.getBusinessMenu(
+            if (selectedAddress?.lat && selectedAddress?.lng) {
+                userLatitude = selectedAddress.lat
+                userLongitude = selectedAddress.lng
+                console.log('Using selectedAddress coords: ', { userLatitude, userLongitude })
+            } else {
+                const location = await locationService.getCurrentLocation();
+                console.log('Using device location: ', location);
+                userLatitude = location.coords.latitude
+                userLongitude = location.coords.longitude
+            }
+
+            // 2. Obtener menú base
+            const menuResponse = await empresasService.getBusinessMenuBase(
                 businessId,
-                location.coords.latitude,
-                location.coords.longitude
+                userLatitude,
+                userLongitude
             );
             if (!menuResponse || !menuResponse.menu) {
                 throw new Error('No se encontró el menú del restaurante');
             }
 
             // Procesar datos del menú
-            const validCategories = ['Menú'];
+            const validCategories = [];
             const tempProductsData = {};
             const promotions = [];
 
@@ -83,7 +109,7 @@ export default function EmpresaDetails({ route }) {
                 if (menuItem.category && menuItem.productsData) {
                     const categoryName = menuItem.category.categoryName;
 
-                    // Procesar productos
+                    // Procesar productos desde productsData
                     const products = menuItem.productsData
                         .filter(item => item.products.status === 1)
                         .map(item => ({
@@ -94,8 +120,7 @@ export default function EmpresaDetails({ route }) {
                             image: item.products.url,
                             status: item.products.status,
                             categoryId: item.products.categoryProductId,
-                            position: item.products.position,
-                            variables: item.productVariable
+                            position: item.products.position
                         }))
                         .sort((a, b) => a.position - b.position);
 
@@ -115,6 +140,7 @@ export default function EmpresaDetails({ route }) {
             setProductsData(tempProductsData);
             setPromotionsData(promotions);
             setHasPromotions(promotions.length > 0);
+            setSelectedCategory(validCategories[0] || '');
             setNearestBranch(menuResponse.branch);
 
         } catch (error) {
@@ -172,13 +198,96 @@ export default function EmpresaDetails({ route }) {
         setIsRefreshing(false)
     }, [])
 
+    // Navigation handlers
+    const handleNavigationBack = useCallback(() => {
+        if (cart.length === 0) {
+            // No items in cart, go back directly
+            if (showTabBar) {
+                toggleTabBar(true)
+            }
+            changeColorStatusBar(theme_colors.white)
+            navigation.goBack()
+            return
+        }
+
+        // Show alert if there are items in cart
+        setShowAlert(true)
+        setAlertText({
+            title: '¿Quieres eliminar el carrito?',
+            message: `Se eliminarán todos los productos del carrito`,
+            type: 'dark',
+            textConfirmButton: 'Eliminar',
+            showCancelButton: true,
+            textCancelButton: 'Cancelar'
+        });
+    }, [cart.length, showTabBar, toggleTabBar, navigation, changeColorStatusBar])
+
+    const handleConfirmExit = useCallback(() => {
+        isNavigatingRef.current = true // Set flag to bypass listener
+        toggleTabBar(true)
+        clearCart()
+        // Limpiar estados
+        setSelectedCategory('')
+        setSectionPositions({})
+        setHasPromotions(false)
+        setIsManualSelection(false)
+        setShowAlert(false)
+        navigation.goBack()
+        changeColorStatusBar(theme_colors.white)
+    }, [toggleTabBar, clearCart, navigation])
+
+    const handleCloseAlert = useCallback(() => {
+        setShowAlert(false)
+    }, [])
+
+    // Setup navigation interceptor and back handler
+    useEffect(() => {
+        // Intercept navigation events
+        const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+            // If we're intentionally navigating, allow it
+            if (isNavigatingRef.current) {
+                isNavigatingRef.current = false // Reset flag
+                return;
+            }
+
+            if (cart.length === 0) {
+                // No items in cart, allow navigation
+                return;
+            }
+
+            // Prevent default behavior
+            e.preventDefault();
+
+            // Show confirmation dialog
+            handleNavigationBack();
+        });
+
+        return unsubscribe;
+    }, [navigation, cart.length, handleNavigationBack]);
+
+    // Android back button handler (as fallback)
+    useFocusEffect(
+        useCallback(() => {
+            const onBackPress = () => {
+                handleNavigationBack();
+                return true; // Prevent default behavior
+            };
+
+            BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+            return () => {
+                BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+            };
+        }, [handleNavigationBack])
+    );
+
     // Cargar datos iniciales
     useEffect(() => {
         loadInitialData()
 
         return () => {
             // Limpiar estados al desmontar
-            setSelectedCategory('Menú')
+            setSelectedCategory('')
             setSectionPositions({})
             setHasPromotions(false)
             setIsManualSelection(false)
@@ -233,17 +342,17 @@ export default function EmpresaDetails({ route }) {
         if (isManualSelection) return;
 
         // Encontrar la sección actual basada en la posición del scroll
-        let currentSection = 'Menú'
+        let currentSection = ''
 
         if (scrollY <= 10) {
-            currentSection = 'Menú'
+            currentSection = categoryList[0] || ''
         } else if (isCloseToBottom) {
             // Si estamos cerca del final, seleccionar la última categoría
-            const nonMenuCategories = categoryList.filter(cat => cat !== 'Menú')
+            const nonMenuCategories = categoryList
             currentSection = nonMenuCategories[nonMenuCategories.length - 1]
         } else {
             // Usamos un enfoque más preciso para determinar la categoría actual
-            let lastMatchedCategory = 'Menú'
+            let lastMatchedCategory = categoryList[0] || ''
             let lastPosition = 0
 
             Object.entries(sectionPositions).forEach(([category, position]) => {
@@ -279,9 +388,7 @@ export default function EmpresaDetails({ route }) {
         setIsManualSelection(true)
         setSelectedCategory(category)
 
-        if (category === 'Menú') {
-            scrollToCategory('Promociones')
-        } else {
+        if (category) {
             scrollToCategory(category)
         }
 
@@ -321,79 +428,9 @@ export default function EmpresaDetails({ route }) {
         </ViewStyled>
     )
 
-    // alert functions
-    const [showAlert, setShowAlert] = useState(false);
-    const [alertText, setAlertText] = useState({
-        title: '',
-        message: '',
-        type: 'success',
-        textConfirmButton: '',
-        showCancelButton: true,
-        textCancelButton: ''
-    });
-
-    const handleCloseAlert = () => {
-        setShowAlert(false)
-    }
-
-    const isGoingBack = useRef(false)
-
-    const alertDeleteCart = () => {
-        if (cart.length === 0) {
-            isGoingBack.current = true;
-            if (showTabBar) {
-                toggleTabBar(true)
-            }
-            navigation.goBack()
-            return
-        }
-
-        setShowAlert(true)
-        setAlertText({
-            title: '¿Quieres eliminar el carrito?',
-            message: `Se eliminarán todos los productos del carrito`,
-            type: 'dark',
-            textConfirmButton: 'Eliminar',
-            showCancelButton: true,
-            textCancelButton: 'Cancelar'
-        });
-    }
-
-    const goBack = () => {
-        isGoingBack.current = true;
-        toggleTabBar(true)
-        clearCart()
-        // Limpiar estados
-        setSelectedCategory('Menú')
-        setSectionPositions({})
-        setHasPromotions(false)
-        setIsManualSelection(false)
-        navigation.goBack()
-    }
-
-    // Manejar el botón de retroceso del hardware
-    useFocusEffect(
-        React.useCallback(() => {
-            const onBackPress = () => {
-                if (isGoingBack.current) {
-                    isGoingBack.current = false;
-                } else {
-                    alertDeleteCart();
-                }
-            };
-
-            BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-            return () => {
-                BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-            };
-        }, [])
-    );
-
     return (
         <>
-            {
-                showAlert &&
+            {showAlert && (
                 <AlertStyled
                     widthModal={90}
                     heightModal={30}
@@ -401,16 +438,16 @@ export default function EmpresaDetails({ route }) {
                     title={alertText.title}
                     message={alertText.message}
                     type={alertText.type}
-                    onConfirmPressed={handleCloseAlert}
-                    onCancelPressed={alertText.showCancelButton ? goBack : handleCloseAlert}
-                    textConfirmButton={alertText.textCancelButton}
-                    textCancelButton={alertText.textConfirmButton}
+                    onConfirmPressed={handleConfirmExit}
+                    onCancelPressed={handleCloseAlert}
+                    textConfirmButton={alertText.textConfirmButton}
+                    textCancelButton={alertText.textCancelButton}
                     showCloseButton={false}
                     showCancelButton={alertText.showCancelButton}
                     widthConfirm={alertText.showCancelButton ? '55%' : '95%'}
                     widthCancel={'40%'}
                 />
-            }
+            )}
 
             <ViewStyled
                 backgroundColor={theme_colors.white}
@@ -444,7 +481,7 @@ export default function EmpresaDetails({ route }) {
                     />
 
                     <Pressable
-                        onPress={alertDeleteCart}
+                        onPress={handleNavigationBack}
                         style={{
                             top: top,
                             left: 10,
@@ -455,7 +492,7 @@ export default function EmpresaDetails({ route }) {
                         <ViewStyled
                             width={11}
                             height={5.5}
-                            borderRadius={50}
+                            borderRadius={1.5}
                             backgroundColor={theme_colors.white}
                             style={{
                                 justifyContent: 'center',
@@ -487,6 +524,38 @@ export default function EmpresaDetails({ route }) {
                         paddingTop: 15,
                     }}
                 >
+                    <TextStyled
+                        fontFamily='SFPro-Bold'
+                        textAlign='left'
+                        fontSize={theme_textStyles.large}
+                        color={theme_colors.black}
+                        numberOfLines={1}
+                        ellipsizeMode='tail'
+                        style={{
+                            width: '90%',
+                        }}
+                    >
+                        {businessName} - {sectorName}
+                    </TextStyled>
+
+                    <ViewStyled
+                        width={40}
+                        backgroundColor={theme_colors.transparent}
+                        marginBottom={2}
+                        marginLeft={5}
+                        style={{
+                            height: 'auto',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            alignSelf: 'flex-start',
+                        }}
+                    >
+                        {indicators.map((indicator, index) => (
+                            <IndicatorItem key={index} indicator={indicator} iconSize={18} fontSize={theme_textStyles.smedium} iconColor={theme_colors.primary} />
+                        ))}
+                    </ViewStyled>
+
                     {isLoading ? (
                         <EmpresaDetailsSkeleton />
                     ) : error ? (
@@ -510,45 +579,6 @@ export default function EmpresaDetails({ route }) {
                         </ViewStyled>
                     ) : (
                         <>
-                            <TextStyled
-                                fontFamily='SFPro-Bold'
-                                textAlign='left'
-                                fontSize={theme_textStyles.large}
-                                color={theme_colors.black}
-                                numberOfLines={1}
-                                ellipsizeMode='tail'
-                                style={{
-                                    width: '90%',
-                                }}
-                            >
-                                {businessName} - {sectorName}
-                            </TextStyled>
-
-                            <ViewStyled
-                                width={40}
-                                backgroundColor={theme_colors.transparent}
-                                marginBottom={2}
-                                marginLeft={5}
-                                style={{
-                                    height: 'auto',
-                                    flexDirection: 'row',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    alignSelf: 'flex-start',
-
-                                    // borderRadius: 10,
-                                    // shadowColor: theme_colors.black,
-                                    // shadowOffset: { width: 0, height: 2 },
-                                    // shadowOpacity: 0.5,
-                                    // shadowRadius: 2,
-                                    // elevation: 3,
-                                }}
-                            >
-                                {indicators.map((indicator, index) => (
-                                    <IndicatorItem key={index} indicator={indicator} iconSize={18} fontSize={theme_textStyles.smedium} iconColor={theme_colors.primary} />
-                                ))}
-                            </ViewStyled>
-
                             <CategoriesProductsList
                                 categories={categoryList}
                                 selectedCategory={selectedCategory}
@@ -580,7 +610,7 @@ export default function EmpresaDetails({ route }) {
                                     />
                                 )}
 
-                                {categoryList.filter(category => category !== 'Menú').map((category, index) => (
+                                {categoryList.map((category, index) => (
                                     <ProductsList
                                         key={index}
                                         category={category}

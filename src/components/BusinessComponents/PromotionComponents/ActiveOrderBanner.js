@@ -1,5 +1,5 @@
 import React from 'react'
-import { TouchableOpacity } from 'react-native'
+import { Pressable, TouchableOpacity } from 'react-native'
 import ViewStyled from '../../../utils/ui/ViewStyled'
 import { theme_colors } from '../../../utils/theme/theme_colors'
 import TextStyled from '../../../utils/ui/TextStyled'
@@ -9,11 +9,14 @@ import ImageStyled from '../../../utils/ui/ImageStyled'
 import { LinearGradient } from 'expo-linear-gradient';
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import ButtonWithIcon from '../../Buttons/ButtonWithIcon'
+import OrderProgressBar from '../OrderProgressBar'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+import adjustFontSize from '../../../utils/ui/adjustText'
 
 
 export default function ActiveOrderBanner({ order, onPress }) {
     // console.log('order: ', order)
-    const { getOrderStatusText } = useOrdersStore();
+    const { getOrderStatusText, getOrderStatusSubtle } = useOrdersStore();
 
     const statusOrders = {
         created: "created",
@@ -54,69 +57,70 @@ export default function ActiveOrderBanner({ order, onPress }) {
     }
 
     return (
-        <LinearGradient
-            dither={false}
-            colors={[`${theme_colors.primary}90`, theme_colors.white]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0.8, y: 0 }}
-            style={{
-                borderRadius: 15,
-            }}
-        >
+        <Pressable onPress={onPress}>
             <ViewStyled
                 width={90}
                 height={20}
-                paddingHorizontal={6}
-                backgroundColor={theme_colors.transparent}
+                paddingLeft={4}
+                paddingRight={2}
+                backgroundColor={theme_colors.white}
                 style={{
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     borderRadius: 15,
                     borderWidth: 0.3,
-                    borderColor: theme_colors.greyLine
+                    borderColor: theme_colors.greyLine,
+                    elevation: 2,
+                    shadowColor: theme_colors.black,
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 3.84,
+                    position: 'relative',
                 }}
             >
                 <ViewStyled
                     backgroundColor={theme_colors.transparent}
                     style={{
-                        width: '60%',
-                        height: '80%',
+                        width: '100%',
+                        flex: 1,
                         justifyContent: 'center',
                         alignItems: 'flex-start',
-                        gap: 6
                     }}
                 >
-                    <TextStyled
-                        fontSize={theme_textStyles.xlarge}
-                        color={theme_colors.black}
-                        fontFamily='SFPro-Medium'
-                        numberOfLines={2}
+                    <ViewStyled
+                        backgroundColor={theme_colors.transparent}
                         style={{
-                            letterSpacing: 0.4
+                            width: '100%',
+                            height: 'auto',
+                            justifyContent: 'center',
+                            alignItems: 'flex-start',
                         }}
                     >
-                        {getOrderStatusText(status)}
-                    </TextStyled>
+                        <TextStyled
+                            fontFamily='SFPro-SemiBold'
+                            textAlign='left'
+                            fontSize={theme_textStyles.medium + .5}
+                            color={theme_colors.dark}
+                        >
+                            {getOrderStatusText(order?.order?.status || "completed")}
+                        </TextStyled>
 
-                    <ButtonWithIcon
-                        withIcon={false}
+                        <TextStyled
+                            fontFamily='SFPro-Regular'
+                            textAlign='left'
+                            fontSize={theme_textStyles.small}
+                            color={theme_colors.black}
+                            style={{
+                                marginTop: 3
+                            }}
+                        >
+                            {getOrderStatusSubtle(order?.order?.status || "completed")}
+                        </TextStyled>
+                    </ViewStyled>
 
-                        onPress={onPress}
-                        borderWidth={0}
-                        backgroundColor={theme_colors.dark}
-                        colorText={theme_colors.white}
-                        borderRadius={50}
-                        fontSize={theme_textStyles.small + .5}
-                        height={5}
-                        fontFamily={'SFPro-SemiBold'}
-                        textButton={'Ver Detalles'}
-                        style={{
-                            width: '70%',
-                        }}
-                    />
+                    <OrderProgressBar status={order?.order?.status || "completed"} />
                 </ViewStyled>
-
                 <ViewStyled
                     backgroundColor={theme_colors.transparent}
                     style={{
@@ -137,6 +141,6 @@ export default function ActiveOrderBanner({ order, onPress }) {
                     />
                 </ViewStyled>
             </ViewStyled>
-        </LinearGradient>
+        </Pressable>
     )
 }

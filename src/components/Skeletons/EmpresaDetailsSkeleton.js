@@ -13,7 +13,6 @@ export default function EmpresaDetailsSkeleton() {
     return (
         <ViewStyled
             backgroundColor={theme_colors.transparent}
-            paddingTop={3}
             style={{
                 width: 'auto',
                 height: 'auto',
@@ -21,42 +20,6 @@ export default function EmpresaDetailsSkeleton() {
                 alignItems: 'center',
             }}
         >
-            <ViewStyled
-                width={90}
-                backgroundColor={theme_colors.transparent}
-                style={{
-                    justifyContent: 'center',
-                    alignItems: 'flex-start',
-                }}
-            >
-                <Skeleton
-                    show={true}
-                    colorMode="light"
-                    backgroundColor={theme_colors.semiTransparent}
-                    width={widthPercentageToDP(60)}
-                    height={heightPercentageToDP(4)}
-                />
-            </ViewStyled>
-
-            <ViewStyled
-                backgroundColor={theme_colors.transparent}
-                marginVertical={1}
-            />
-
-
-            <Skeleton
-                show={true}
-                colorMode="light"
-                backgroundColor={theme_colors.semiTransparent}
-                width={widthPercentageToDP(90)}
-                height={heightPercentageToDP(6)}
-            />
-
-            <ViewStyled
-                backgroundColor={theme_colors.transparent}
-                marginVertical={1}
-            />
-
             <CategoriesProductsSkeleton />
 
             <ViewStyled

@@ -83,7 +83,10 @@ const useCartStore = create((set) => ({
             }]
         };
     }),
-    clearCart: () => set({ cart: [] }),
+    clearCart: () => set({ 
+        cart: [],
+        deliveryTip: 5 // Reset tip to default when clearing cart
+    }),
 
     billingInfo: {
         name: "",
@@ -111,6 +114,9 @@ const useCartStore = create((set) => ({
     setTripPrice: (price) => set({ tripPrice: price }),
     cashbackBusiness: 0,
     setCashbackBusiness: (cashback) => set({ cashbackBusiness: cashback }),
+    
+    deliveryTip: 5, // Default tip of 5 Bs
+    setDeliveryTip: (tip) => set({ deliveryTip: tip }),
 }));
 
 export default useCartStore; 

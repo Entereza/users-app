@@ -3,6 +3,7 @@ import InfoRechargeMoney from './InfoRechargeMoney'
 import ButtonWithIcon from '../Buttons/ButtonWithIcon'
 import AmmountRecharge from './AmmountRecharge'
 import { theme_colors } from '../../utils/theme/theme_colors'
+import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 
 export default function SelectAmountRecharge({
     ammountSelected,
@@ -27,9 +28,9 @@ export default function SelectAmountRecharge({
                 backgroundColor={ammountSelected ? theme_colors.primary : theme_colors.lightGrey}
                 colorText={theme_colors.white}
                 borderRadius={1.5}
-                fontSize={8}
+                fontSize={theme_textStyles.medium}
                 height={6}
-                fontFamily={'SFPro-Bold'}
+                fontFamily={'SFPro-SemiBold'}
                 textButton={'Generar QR'}
                 style={{
                     width: '95%',

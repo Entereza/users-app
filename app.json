@@ -23,7 +23,7 @@
       },
       "supportsTablet": true,
       "bundleIdentifier": "com.entereza.client",
-      "buildNumber": "81",
+      "buildNumber": "92",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Requerimos tu ubicación para poder darte información sobre las empresas afiliadas de tu ciudad.",
         "NSUserTrackingUsageDescription": "Esto permite a Entereza ofrecerte la mejor experiencia y mayor información sobre las empresas afiliadas que están en tu ciudad.",
@@ -55,7 +55,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.entereza.client",
-      "versionCode": 69,
+      "versionCode": 70,
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.FOREGROUND_SERVICE",
@@ -154,6 +154,6 @@
     "updates": {
       "url": "https://u.expo.dev/7f0e7cbd-8088-4569-94bd-21702f3afe04"
     },
-    "owner": "intirraptor"
+    "owner": "entereza-devs"
   }
 }

@@ -10,24 +10,73 @@ import WalletRechargeButton from '../../../components/WalletComponents/WalletRec
 import WalletTransactions from '../../../components/WalletComponents/WalletTransactions';
 import useTabBarStore from '../../../utils/tools/interface/tabBarStore';
 import useAuthStore from '../../../utils/tools/interface/authStore';
+import { sendHeatmapEvent } from '../../../utils/analytics';
 
 export default function HomeScreen() {
     const { user } = useAuthStore();
     const navigation = useNavigation();
     const { toggleTabBar, changeNameStackBack, changeNameRouteBack } = useTabBarStore()
 
-    const goToRechargeMoneyScreen = () => {
+    const goToRechargeMoneyScreen = (event) => {
+        if (event?.nativeEvent) {
+            sendHeatmapEvent({
+                userId: user.id,
+                screen: ' @HomeScreen.js ',
+                elementType: 'button',
+                elementId: 'btn-recargar-dinero',
+                x: event.nativeEvent.locationX,
+                y: event.nativeEvent.locationY
+            });
+        }
+        
         toggleTabBar(false)
         navigation.navigate(private_name_routes.billetera.recargarScreen, {
             recarga: ''
         });
     }
 
-    const goToProfileScreen = () => {
+    const goToProfileScreen = (event) => {
+        if (event?.nativeEvent) {
+            sendHeatmapEvent({
+                userId: user.id,
+                screen: ' @HomeScreen.js ',
+                elementType: 'button',
+                elementId: 'btn-perfil-usuario',
+                x: event.nativeEvent.locationX,
+                y: event.nativeEvent.locationY
+            });
+        }
+        
         changeNameStackBack(private_name_routes.billetera.billeteraStack)
         changeNameRouteBack(private_name_routes.billetera.billeteraHome)
         toggleTabBar(false)
         navigation.navigate(private_name_routes.profile.profileStack, { screen: private_name_routes.pedidos.pedidosHome });
+    }
+
+    const handleWalletCardPress = (event) => {
+        if (event?.nativeEvent) {
+            sendHeatmapEvent({
+                userId: user.id,
+                screen: ' @HomeScreen.js ',
+                elementType: 'card',
+                elementId: 'card-billetera',
+                x: event.nativeEvent.locationX,
+                y: event.nativeEvent.locationY
+            });
+        }
+    }
+
+    const handleTransactionPress = (transactionId, event) => {
+        if (event?.nativeEvent) {
+            sendHeatmapEvent({
+                userId: user.id,
+                screen: ' @HomeScreen.js ',
+                elementType: 'list-item',
+                elementId: `transaction-${transactionId}`,
+                x: event.nativeEvent.locationX,
+                y: event.nativeEvent.locationY
+            });
+        }
     }
 
     return (
@@ -41,13 +90,17 @@ export default function HomeScreen() {
                 onPress={goToProfileScreen}
             />
 
-            <WalletCard />
+            <WalletCard 
+                onPress={handleWalletCardPress}
+            />
 
             <WalletRechargeButton
                 onPress={goToRechargeMoneyScreen}
             />
 
-            <WalletTransactions />
+            <WalletTransactions 
+                onTransactionPress={handleTransactionPress}
+            />
         </SafeAreaStyled>
     );
 };

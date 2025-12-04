@@ -11,8 +11,9 @@ import ViewStyled from '../../utils/ui/ViewStyled'
 import TextStyled from '../../utils/ui/TextStyled'
 import { theme_textStyles } from '../../utils/theme/theme_textStyles'
 import { private_name_routes } from '../../utils/route/private_name_routes';
+import { sendHeatmapEvent } from '../../utils/analytics';
 
-export default function WalletTransactions() {
+export default function WalletTransactions({ onTransactionPress }) {
     const navigation = useNavigation();
     const { user } = useAuthStore();
     const { toggleTabBar, changeColorStatusBar } = useTabBarStore();
@@ -53,7 +54,12 @@ export default function WalletTransactions() {
         }
     };
 
-    const goToOrderDetails = (order) => {
+    const goToOrderDetails = (order, event) => {
+        // Registrar evento de heatmap si existe onTransactionPress y event
+        if (event?.nativeEvent && onTransactionPress) {
+            onTransactionPress(order.order.id, event);
+        }
+        
         // console.log('goToOrderDetails', order.order.products);
         changeColorStatusBar(theme_colors.transparent);
         toggleTabBar(false);
@@ -71,6 +77,10 @@ export default function WalletTransactions() {
         }
     };
 
+    const handleOrderPress = (order, event) => {
+        goToOrderDetails(order, event);
+    };
+
     return (
         <>
             <HeaderTransactions
@@ -83,7 +93,7 @@ export default function WalletTransactions() {
                 onRefresh={handleRefresh}
                 orders={orders}
                 isLoading={isLoading}
-                onOrderPress={goToOrderDetails}
+                onOrderPress={handleOrderPress}
             />
         </>
     )

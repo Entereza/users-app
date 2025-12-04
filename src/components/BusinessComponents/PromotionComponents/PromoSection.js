@@ -11,7 +11,7 @@ import useTabBarStore from '../../../utils/tools/interface/tabBarStore'
 import { private_name_routes } from '../../../utils/route/private_name_routes'
 import { toastService } from '../../../utils/tools/interface/toastService'
 
-export default function PromoSection({ refreshing }) {
+export default function PromoSection({ refreshing, onPromoPress }) {
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(true);
     const { getActiveOrder } = useOrdersStore();
@@ -47,17 +47,23 @@ export default function PromoSection({ refreshing }) {
         return <PromoSkeleton />
     }
 
-    const handleOrderPress = (order) => {
+    const handleOrderPress = (order, event) => {
         console.log('handleOrderPress:', order);
         if (order.order.status && ["created", "accepted", "pickup", "store", "picked", "taken", "delivering", "arrived"].includes(order.order.status)) {
             changeColorStatusBar(theme_colors.transparent);
             toggleTabBar(false);
             navigation.navigate(private_name_routes.pedidos.pedidosStack, {
                 screen: private_name_routes.pedidos.orderTracking,
-                params: { orderId: order.order.id }
+                params: { orderId: order.order.id, isFromBusiness: true }
             });
         } else {
             toastService.showInfoToast("El pedido ya fue entregado.");
+        }
+    };
+
+    const handlePromoPress = (item, event) => {
+        if (onPromoPress && event) {
+            onPromoPress(item.id, event);
         }
     };
 
@@ -65,7 +71,6 @@ export default function PromoSection({ refreshing }) {
         return (
             <ViewStyled
                 backgroundColor={theme_colors.transparent}
-                paddingVertical={1}
                 style={{
                     width: '100%',
                     height: 'auto',
@@ -76,6 +81,7 @@ export default function PromoSection({ refreshing }) {
                 <FlatList
                     contentContainerStyle={{
                         paddingHorizontal: 20,
+                        paddingVertical: 2,
                         justifyContent: 'center',
                         alignItems: 'center',
                     }}
@@ -86,7 +92,7 @@ export default function PromoSection({ refreshing }) {
                     renderItem={({ item }) =>
                         <ActiveOrderBanner
                             order={item}
-                            onPress={() => handleOrderPress(item)}
+                            onPress={(event) => handleOrderPress(item, event)}
                         />
                     }
                     showsHorizontalScrollIndicator={false}
@@ -119,7 +125,7 @@ export default function PromoSection({ refreshing }) {
                 renderItem={({ item }) =>
                     <PromoItem
                         item={item}
-                        onPress={null}
+                        onPress={(event) => handlePromoPress(item, event)}
                     />
                 }
                 showsHorizontalScrollIndicator={false}

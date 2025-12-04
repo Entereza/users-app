@@ -43,7 +43,7 @@ export default function HeaderTransferSuccess({ title, onSavePress, onGoBack }) 
                     <ViewStyled
                         width={11}
                         height={5.5}
-                        borderRadius={50}
+                        borderRadius={1.5}
                         backgroundColor={theme_colors.transparent}
                         style={{
                             justifyContent: 'center',
@@ -69,7 +69,7 @@ export default function HeaderTransferSuccess({ title, onSavePress, onGoBack }) 
                     <ViewStyled
                         width={11}
                         height={5.5}
-                        borderRadius={50}
+                        borderRadius={1.5}
                         backgroundColor={theme_colors.transparent}
                         style={{
                             justifyContent: 'center',

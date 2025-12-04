@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import ViewStyled from '../../../../utils/ui/ViewStyled'
 import { theme_colors } from '../../../../utils/theme/theme_colors'
 import TransactionsItem from './TransactionsItem'
-import { FlatList } from 'react-native'
+import { ActivityIndicator, FlatList } from 'react-native'
 import TextStyled from '../../../../utils/ui/TextStyled'
 import { theme_textStyles } from '../../../../utils/theme/theme_textStyles'
 import useOrdersStore from '../../../../utils/tools/interface/ordersStore'
@@ -36,6 +36,12 @@ export default function TransactionsList({
   //   return null;
   // };
 
+  const handleOrderPress = (item, event) => {
+    if (onOrderPress) {
+      onOrderPress(item, event);
+    }
+  };
+
   return (
     <ViewStyled
       width={100}
@@ -48,7 +54,31 @@ export default function TransactionsList({
       }}
     >
       {
-        orders.length > 0 ? (
+        isLoading ? (
+          <ViewStyled
+            width={90}
+            backgroundColor={theme_colors.transparent}
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <ActivityIndicator
+              size="large"
+              color={theme_colors.primary}
+
+            />
+            <TextStyled
+              fontFamily='SFPro-Italic'
+              textAlign='center'
+              fontSize={theme_textStyles.smedium}
+              color={theme_colors.grey}
+            >
+              Cargando transacciones...
+            </TextStyled>
+          </ViewStyled>
+        ) : orders.length > 0 ? (
           <FlatList
             ref={flatListRef}
             data={orders}
@@ -91,7 +121,7 @@ export default function TransactionsList({
             renderItem={({ item }) => (
               <TransactionsItem
                 item={item}
-                onPress={() => onOrderPress(item)}
+                onPress={(event) => handleOrderPress(item, event)}
               />
             )}
           />

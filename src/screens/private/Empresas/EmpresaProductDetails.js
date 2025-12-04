@@ -47,50 +47,39 @@ export default function EmpresaProductDetails({ route }) {
       setIsLoading(true)
       setError(null)
 
-      // Obtener variables del producto
-      const variables = await empresasService.getProductVariables(product.id)
+      // Obtener extras/variables del producto
+      const productExtras = await empresasService.getProductExtras(product.id)
 
-      if (!variables || variables.length === 0) {
+      if (!productExtras || productExtras.length === 0) {
         setProductVariables([])
         return
       }
 
-      // Cargar precios para cada variable
-      const variablesWithPricing = await Promise.all(
-        variables.map(async (pv) => {
-          try {
-            const pricing = await empresasService.getPricingByProductVariable(pv.id)
-            // Solo retornar variables que tengan precios
-            if (!pricing || pricing.length === 0) {
-              return null
-            }
-            return {
-              id: pv.id,
-              namePv: pv.name,
-              required: pv.required,
-              canMany: pv.canMany,
-              maxSelect: pv.canMany ? pv.quantity : 1,
-              instructions: pv.instructions,
-              variables: pricing.map(price => ({
-                id: price.id,
-                name: price.name,
-                price: price.price,
-                position: price.position
-              })).sort((a, b) => a.position - b.position)
-            }
-          } catch (error) {
-            console.error(`Error loading pricing for variable ${pv.id}:`, error)
-            return null
-          }
-        })
-      )
-
-      // Filtrar variables nulas (en caso de error) y ordenar por posición
-      const validVariables = variablesWithPricing
-        .filter(v => v !== null && v.variables.length > 0)
+      // Procesar las variables con sus precios
+      const processedVariables = productExtras
+        .filter(item => item.pv && item.pricingpv && item.pricingpv.length > 0)
+        .map(item => ({
+          id: item.pv.id,
+          namePv: item.pv.name,
+          required: item.pv.required,
+          canMany: item.pv.canMany,
+          maxSelect: item.pv.canMany ? item.pv.quantity : 1,
+          instructions: item.pv.instructions,
+          position: item.pv.position,
+          variables: item.pricingpv
+            .filter(price => price.status === true)
+            .map(price => ({
+              id: price.id,
+              name: price.name,
+              price: price.price,
+              position: price.position
+            }))
+            .sort((a, b) => a.position - b.position)
+        }))
+        .filter(v => v.variables.length > 0)
         .sort((a, b) => a.position - b.position)
 
-      setProductVariables(validVariables)
+      setProductVariables(processedVariables)
 
       // Si estamos editando, marcar las variables seleccionadas
       if (isEditing && initialSelectedVariables) {
@@ -260,7 +249,7 @@ export default function EmpresaProductDetails({ route }) {
           <ViewStyled
             width={11}
             height={5.5}
-            borderRadius={50}
+            borderRadius={1.5}
             backgroundColor={theme_colors.white}
             style={{
               justifyContent: 'center',
@@ -294,6 +283,7 @@ export default function EmpresaProductDetails({ route }) {
         }}
       >
         <ScrollView
+          nestedScrollEnabled
           showsVerticalScrollIndicator={false}
           style={{
             width: '100%',

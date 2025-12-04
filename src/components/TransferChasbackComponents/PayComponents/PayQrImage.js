@@ -10,6 +10,8 @@ import { theme_textStyles } from '../../../utils/theme/theme_textStyles'
 import { Camera, CameraView } from 'expo-camera'
 import Toast from 'react-native-root-toast'
 import { qrService } from '../../../services/api/transfers/qrService'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { heightPercentageToDP } from 'react-native-responsive-screen'
 
 export default function PayQrImage({
     selectedImage,
@@ -19,6 +21,7 @@ export default function PayQrImage({
     setQrData,
     setShowDataQr
 }) {
+    const { bottom } = useSafeAreaInsets();
     const [showAlert, setShowAlert] = useState(false);
     const [alertText, setAlertText] = useState({
         title: '',
@@ -236,14 +239,23 @@ export default function PayQrImage({
             <View
                 style={{
                     position: 'absolute',
-                    width: '80%',
-                    height: '60%',
-                    borderWidth: 0,
-                    justifyContent: 'space-between',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: heightPercentageToDP(8) + bottom + 20, // Espacio del botón + padding adicional
+                    justifyContent: 'center',
                     alignItems: 'center',
                     zIndex: 10,
                 }}
             >
+                <View
+                    style={{
+                        width: '70%',
+                        height: '40%',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                    }}
+                >
                 {/* Fila superior */}
                 <View
                     style={{
@@ -303,6 +315,7 @@ export default function PayQrImage({
                         }}
                     />
                 </View>
+                </View>
             </View>
         );
     };
@@ -328,12 +341,12 @@ export default function PayQrImage({
 
             <ViewStyled
                 width={100}
-                paddingTop={2}
                 backgroundColor={theme_colors.transparent}
                 style={{
                     flex: 1,
                     alignItems: 'center',
                     justifyContent: 'flex-start',
+                    position: 'relative',
                 }}
             >
                 {isScanning ? (
@@ -355,40 +368,47 @@ export default function PayQrImage({
                             style={{
                                 flex: 1,
                                 width: '100%',
-                                alignItems: 'center',
-                                justifyContent: 'center',
+                                position: 'relative',
                             }}
                         >
                             {selectedImage ? (
                                 <ImageStyled
                                     source={{ uri: selectedImage }}
                                     style={{
-                                        width: '100%',
-                                        height: '100%',
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
                                         resizeMode: 'contain',
                                     }}
                                 />
                             ) : hasPermission ? (
-                                <>
+                                <View style={{ flex: 1, position: 'relative' }}>
                                     <CameraView
                                         barcodeScannerSettings={{
                                             barcodeTypes: ["qr"],
                                         }}
                                         onBarcodeScanned={handleBarcodeScanned}
                                         style={{
-                                            width: '100%',
-                                            height: '100%',
-                                            position: 'relative',
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
                                         }}
                                     />
                                     <ScannerFrame />
-                                </>
+                                </View>
                             ) : (
                                 <ImageStyled
                                     source={require('../../../../assets/images/ImageCamera.png')}
                                     style={{
-                                        width: '100%',
-                                        height: '100%',
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
                                         resizeMode: 'contain',
                                     }}
                                 />
@@ -398,21 +418,22 @@ export default function PayQrImage({
                         <ViewStyled
                             width={100}
                             height={8}
-                            borderRadius={3}
                             backgroundColor={theme_colors.white}
                             style={{
-                                marginTop: 'auto',
+                                borderTopLeftRadius: heightPercentageToDP(3),
+                                borderTopRightRadius: heightPercentageToDP(3),
+                                position: 'absolute',
+                                bottom: 0,
                                 alignItems: 'center',
                                 justifyContent: 'center',
-
                                 shadowColor: theme_colors.black,
-                                elevation: 15,
                             }}
                         >
                             <ButtonWithIcon
                                 withIcon={false}
                                 onPress={openGallery}
                                 borderWidth={1}
+                                height={5}
                                 borderColor={theme_colors.white}
                                 backgroundColor={theme_colors.primary}
                                 colorText={theme_colors.white}
@@ -424,7 +445,6 @@ export default function PayQrImage({
                                 textButton={!isLoadingData ? 'Abrir QR desde galería' : 'Cargando datos...'}
                                 style={{
                                     width: '90%',
-                                    height: '70%',
                                 }}
                             />
                         </ViewStyled>

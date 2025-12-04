@@ -20,10 +20,12 @@ import LocationTracker from '../../../components/Tracking/LocationTracker';
 import useLocationStore from '../../../utils/tools/interface/locationStore';
 import { toastService } from '../../../utils/tools/interface/toastService';
 import DetailsOrderModal from '../../../components/Modals/DetailsOrderModal';
+import CancelOrderModal from '../../../components/Modals/CancelOrderModal';
 
 export default function OrderTrackingScreen({ route }) {
     const { getOrderById } = useOrdersStore();
     const orderId = route.params?.orderId;
+    const isFromBusiness = route.params?.isFromBusiness || false;
     const activeOrder = orderId ? getOrderById(orderId) : null;
     const navigation = useNavigation();
 
@@ -49,7 +51,7 @@ export default function OrderTrackingScreen({ route }) {
 
     const { top } = useSafeAreaInsets()
     const { getOrderStatusText, getOrderStatusSubtle } = useOrdersStore();
-    const { toggleTabBar } = useTabBarStore();
+    const { toggleTabBar, changeColorStatusBar } = useTabBarStore();
     const [isDragging, setIsDragging] = useState(false);
     const {
         latitude,
@@ -173,7 +175,12 @@ export default function OrderTrackingScreen({ route }) {
 
     const goBack = () => {
         toggleTabBar(true)
-        navigation.navigate(private_name_routes.empresas.empresasHome);
+        changeColorStatusBar(theme_colors.white)
+        if (isFromBusiness) {
+            navigation.navigate(private_name_routes.empresas.empresasHome);
+        } else {
+            navigation.navigate(private_name_routes.billetera.billeteraHome);
+        }
     };
 
     // Map markers memorized
@@ -232,6 +239,12 @@ export default function OrderTrackingScreen({ route }) {
         </Marker >
     ));
 
+    const [showCancelOrder, setShowCancelOrder] = useState(false);
+    const handleCancelOrder = () => {
+        setShowCancelOrder(true)
+        changeColorStatusBar(theme_colors.backgroundModal)
+    }
+
     return (
         <>
             <ViewStyled
@@ -261,7 +274,8 @@ export default function OrderTrackingScreen({ route }) {
                         height: '100%',
                         position: 'relative'
                     }}
-                    loadingEnabled={true}
+                    loadingEnabled={false}
+                    liteMode
                     showsMyLocationButton={false}
                     initialRegion={initialRegion}
                     onPanDrag={() => setIsDragging(true)}
@@ -355,6 +369,45 @@ export default function OrderTrackingScreen({ route }) {
                     </Pressable>
                 </ViewStyled>
 
+                {
+                    activeOrder?.order?.status === "created" && (
+                        <ViewStyled
+                            backgroundColor={theme_colors.white}
+                            borderRadius={'50%'}
+                            style={{
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                position: 'absolute',
+                                left: 20,
+                                bottom: heightPercentageToDP(8),
+                                width: 45,
+                                height: 45,
+                                elevation: 3,
+                                shadowColor: theme_colors.black,
+                                display: !isDragging ? 'flex' : 'none',
+                                borderWidth: 1,
+                                borderColor: theme_colors.danger
+                            }}
+                        >
+                            <Pressable
+                                onPress={handleCancelOrder}
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <MaterialCommunityIcons
+                                    name={'block-helper'}
+                                    size={adjustFontSize(theme_textStyles.medium)}
+                                    color={theme_colors.danger}
+                                />
+                            </Pressable>
+                        </ViewStyled>
+                    )
+                }
+
                 {/* Header y Tarjeta de estado */}
                 <ViewStyled
                     width={95}
@@ -405,7 +458,10 @@ export default function OrderTrackingScreen({ route }) {
                         </Pressable>
 
                         <TouchableOpacity
-                            onPress={() => setShowDetailsOrder(true)}
+                            onPress={() => {
+                                setShowDetailsOrder(true)
+                                changeColorStatusBar(theme_colors.backgroundModal)
+                            }}
                         >
                             <ViewStyled
                                 width={25}
@@ -494,7 +550,19 @@ export default function OrderTrackingScreen({ route }) {
             <DetailsOrderModal
                 order={activeOrder}
                 visible={showDetailsOrder}
-                onClose={() => setShowDetailsOrder(false)}
+                onClose={() => {
+                    setShowDetailsOrder(false)
+                    changeColorStatusBar(theme_colors.transparent)
+                }}
+            />
+
+            <CancelOrderModal
+                visible={showCancelOrder}
+                onClose={() => {
+                    setShowCancelOrder(false)
+                    changeColorStatusBar(theme_colors.transparent)
+                }}
+                orderId={activeOrder?.order?.id}
             />
         </>
     )

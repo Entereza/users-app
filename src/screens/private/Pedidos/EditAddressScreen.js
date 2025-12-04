@@ -142,7 +142,7 @@ export default function EditAddressScreen({ route }) {
                             <ViewStyled
                                 width={11}
                                 height={5.5}
-                                borderRadius={50}
+                                borderRadius={1.5}
                                 backgroundColor={theme_colors.white}
                                 style={{
                                     justifyContent: 'center',

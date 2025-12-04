@@ -74,12 +74,10 @@ export default function CartProductsList({ products = [] }) {
     };
 
     const handleEdit = (item) => {
-        if (item.hasVariables) {
-            navigation.navigate(private_name_routes.empresas.empresaProducto, {
-                product: item,
-                isEditing: true
-            });
-        }
+        navigation.navigate(private_name_routes.empresas.empresaProducto, {
+            product: item,
+            isEditing: true
+        });
     };
 
     const handleCloseAlert = () => {
@@ -125,7 +123,7 @@ export default function CartProductsList({ products = [] }) {
             );
         }
 
-        if (direction === 'right' && item.hasVariables) {
+        if (direction === 'right') {
             return (
                 <TouchableOpacity
                     onPress={() => handleEdit(item)}
@@ -158,9 +156,8 @@ export default function CartProductsList({ products = [] }) {
     };
 
     const renderItem = ({ item, index }) => {
-        // Encontrar el primer producto con variables para la animación
-        const isFirstItemWithVariables = index === products.findIndex(product => product.hasVariables);
-        const shouldAnimate = isFirstItemWithVariables || (index === 0 && !products.some(product => product.hasVariables));
+        // Solo animar el primer producto
+        const shouldAnimate = index === 0;
 
         return (
             <Swipeable

@@ -51,7 +51,7 @@ export default function DetailsOrderModal({ order, visible, onClose }) {
                             <ViewStyled
                                 width={7}
                                 height={3.5}
-                                borderRadius={50}
+                                borderRadius={1.5}
                                 backgroundColor={theme_colors.white}
                                 style={{
                                     justifyContent: 'center',

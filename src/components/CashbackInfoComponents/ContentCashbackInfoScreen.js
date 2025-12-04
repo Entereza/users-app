@@ -6,8 +6,11 @@ import ImageStyled from '../../utils/ui/ImageStyled'
 import TextStyled from '../../utils/ui/TextStyled'
 import ButtonWithIcon from '../Buttons/ButtonWithIcon'
 import { theme_textStyles } from '../../utils/theme/theme_textStyles'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export default function ContentCashbackInfoScreen({ onPress }) {
+    const bottom = useSafeAreaInsets().bottom
+    
     return (
         <ViewStyled
             backgroundColor={theme_colors.transparent}
@@ -135,7 +138,7 @@ export default function ContentCashbackInfoScreen({ onPress }) {
                     style={{
                         width: '95%',
                         marginTop: 'auto',
-                        marginBottom: 10
+                        marginBottom: bottom + 10
                     }}
                 />
             </ImageBackground>

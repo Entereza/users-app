@@ -26,8 +26,42 @@ export default function TransactionsItem({ item, onPress }) {
         });
     };
 
+    const handlePress = (event) => {
+        if (onPress) {
+            onPress(event);
+        }
+    };
+
+    const statusOrders = {
+        created: "created",
+        accepted: "accepted",
+        pickup: "pickup",
+        store: "store",
+        taken: "taken",
+        picked: "picked",
+        delivering: "delivering",
+        arrived: "arrived",
+        completed: "completed"
+    }
+
+    const getOrderStatus = (status) => {
+        if (status !== statusOrders.completed) {
+            return 'En proceso'
+        }
+
+        return 'Completado'
+    }
+
+    const getOrderStatusColor = (status) => {
+        if (status !== statusOrders.completed) {
+            return theme_colors.green
+        }
+
+        return theme_colors.primary
+    }
+
     return (
-        <TouchableOpacity onPress={() => onPress(item)}>
+        <TouchableOpacity onPress={handlePress}>
             <ViewStyled
                 width={100}
                 height={10}
@@ -40,6 +74,7 @@ export default function TransactionsItem({ item, onPress }) {
                     alignItems: 'center',
                     alignSelf: 'center',
                     backgroundColor: theme_colors.transparent,
+                    position: 'relative',
                 }}
             >
                 <ImageStyled
@@ -119,6 +154,31 @@ export default function TransactionsItem({ item, onPress }) {
                                 : "Sin registro"
                             }
                         </TextStyled>
+
+                        <ViewStyled
+                            paddingVertical={.2}
+                            paddingHorizontal={3}
+                            backgroundColor={getOrderStatusColor(item.order.status)}
+                            style={{
+                                width: 'auto',
+                                height: 'auto',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderRadius: 5,
+                                zIndex: 2
+                            }}
+                        >
+                            <TextStyled
+                                fontFamily='SFPro-Italic'
+                                textAlign='center'
+                                fontSize={theme_textStyles.smaller + .5}
+                                color={theme_colors.white}
+                                numberOfLines={1}
+                                ellipsizeMode='tail'
+                            >
+                                {getOrderStatus(item.order.status)}
+                            </TextStyled>
+                        </ViewStyled>
 
                         <TextStyled
                             fontSize={theme_textStyles.smaller + .5}

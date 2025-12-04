@@ -7,6 +7,7 @@ import { private_name_routes } from '../../../utils/route/private_name_routes';
 import ResumeCard from '../../../components/Cards/ResumeCard';
 import AddressCard from '../../../components/Cards/AddressCard';
 import CashbackCard from '../../../components/Cards/CashbackCard';
+import TipSelectionCard from '../../../components/Cards/TipSelectionCard';
 import SwipeToConfirm from '../../../components/TransferChasbackComponents/PayComponents/SwipeToConfirm';
 import useAddressStore from '../../../utils/tools/interface/addressStore';
 import useAuthStore from '../../../utils/tools/interface/authStore';
@@ -124,6 +125,8 @@ export default function ConfirmOrderScreen() {
                         emptyValues='Seleccionar método'
                         onPress={goToMethodScreen}
                     />
+
+                    <TipSelectionCard />
 
                     <ResumeCard tripPrice={tripPrice} />
 

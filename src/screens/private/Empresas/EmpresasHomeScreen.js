@@ -23,6 +23,7 @@ import { ordersService } from '../../../services/api/orders/ordersService';
 import useOrdersStore from '../../../utils/tools/interface/ordersStore';
 import useAddressStore from '../../../utils/tools/interface/addressStore';
 import PermissionNotActive from '../../../components/BusinessComponents/PermissionNotActive';
+import { sendHeatmapEvent } from '../../../utils/analytics';
 
 export default function EmpresasHomeScreen() {
     const navigation = useNavigation();
@@ -37,7 +38,18 @@ export default function EmpresasHomeScreen() {
 
     const [refreshing, setRefreshing] = useState(false);
 
-    const goToProfileScreen = () => {
+    const goToProfileScreen = (event) => {
+        if (event?.nativeEvent) {
+            sendHeatmapEvent({
+                userId: user.id,
+                screen: ' @EmpresasHomeScreen.js ',
+                elementType: 'button',
+                elementId: 'btn-perfil-usuario',
+                x: event.nativeEvent.locationX,
+                y: event.nativeEvent.locationY
+            });
+        }
+
         toggleTabBar(false)
         changeNameStackBack(private_name_routes.empresas.empresasStack)
         changeNameRouteBack(private_name_routes.empresas.empresasHome)
@@ -47,9 +59,12 @@ export default function EmpresasHomeScreen() {
     const { user } = useAuthStore();
 
     const checkAddressSelection = () => {
+        console.log('checkAddressSelection working: ', selectedAddress)
         if (!selectedAddress?.nameAddress && !isSearchingLocation) {
             toggleTabBar(false)
             navigation.navigate(private_name_routes.empresas.addressScreen);
+        } else {
+            toggleTabBar(true)
         }
     };
 
@@ -65,7 +80,7 @@ export default function EmpresasHomeScreen() {
                 if (isCountryEnabled && isDepartmentEnabled && hasLocationPermissions) {
                     checkAddressSelection();
                 }
-            }, 500);
+            }, 200);
 
             return () => clearTimeout(timer);
         }, [selectedAddress, isSearchingLocation, isCountryEnabled, isDepartmentEnabled, hasLocationPermissions])
@@ -86,9 +101,59 @@ export default function EmpresasHomeScreen() {
         }, 2000);
     }
 
-    const goToSearchScreen = () => {
+    const goToSearchScreen = (event) => {
+        if (event?.nativeEvent) {
+            sendHeatmapEvent({
+                userId: user.id,
+                screen: ' @EmpresasHomeScreen.js ',
+                elementType: 'searchbar',
+                elementId: 'search-empresas',
+                x: event.nativeEvent.locationX,
+                y: event.nativeEvent.locationY
+            });
+        }
+
         toggleTabBar(false)
         navigation.navigate(private_name_routes.empresas.searchScreen)
+    }
+
+    const handleCategoryPress = (categoryId, event) => {
+        if (event?.nativeEvent) {
+            sendHeatmapEvent({
+                userId: user.id,
+                screen: ' @EmpresasHomeScreen.js ',
+                elementType: 'category',
+                elementId: `category-${categoryId}`,
+                x: event.nativeEvent.locationX,
+                y: event.nativeEvent.locationYF
+            });
+        }
+    }
+
+    const handlePromoPress = (promoId, event) => {
+        if (event?.nativeEvent) {
+            sendHeatmapEvent({
+                userId: user.id,
+                screen: ' @EmpresasHomeScreen.js ',
+                elementType: 'banner',
+                elementId: `promo-${promoId}`,
+                x: event.nativeEvent.locationX,
+                y: event.nativeEvent.locationY
+            });
+        }
+    }
+
+    const handleBusinessPress = (businessId, event) => {
+        if (event?.nativeEvent) {
+            sendHeatmapEvent({
+                userId: user.id,
+                screen: ' @EmpresasHomeScreen.js ',
+                elementType: 'business-card',
+                elementId: `business-${businessId}`,
+                x: event.nativeEvent.locationX,
+                y: event.nativeEvent.locationY
+            });
+        }
     }
 
     if (isSearchingLocation) {
@@ -133,17 +198,27 @@ export default function EmpresasHomeScreen() {
                             >
                                 <SearchBar nameUser={user.names.split(' ')[0]} onPress={goToSearchScreen} />
 
-                                <CategorySection refreshing={refreshing} />
+                                <CategorySection
+                                    refreshing={refreshing}
+                                    onCategoryPress={handleCategoryPress}
+                                />
 
-                                <PromoSection refreshing={refreshing} />
+                                <PromoSection
+                                    refreshing={refreshing}
+                                    onPromoPress={handlePromoPress}
+                                />
 
-                                <BusinessSection refreshing={refreshing} />
+                                <BusinessSection
+                                    refreshing={refreshing}
+                                    onBusinessPress={handleBusinessPress}
+                                />
                             </ScrollView>
                         </SafeAreaStyled>
                     </>
                     : <DepartmentNotActive />
                 : <CountryNotActive />
             : <PermissionNotActive />
+
     )
 }
 

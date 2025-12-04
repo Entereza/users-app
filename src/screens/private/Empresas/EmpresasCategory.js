@@ -22,6 +22,7 @@ export default function EmpresasCategory({ route }) {
     const { toggleTabBar } = useTabBarStore();
 
     const [isLoading, setIsLoading] = useState(true);
+    const [initialLoading, setInitialLoading] = useState(true);
     const [searchValue, setSearchValue] = useState("")
     const [initialBusinesses, setInitialBusinesses] = useState([]); // Negocios iniciales
     const [searchResults, setSearchResults] = useState([]); // Resultados de búsqueda
@@ -63,6 +64,9 @@ export default function EmpresasCategory({ route }) {
             }
         } finally {
             setIsLoading(false);
+            setTimeout(() => {
+                setInitialLoading(false);
+            }, 1000);
         }
     }, [departmentId, latitude, longitude, category.id]);
 
@@ -84,8 +88,10 @@ export default function EmpresasCategory({ route }) {
             }, 500);
             setSearchTimeout(timeoutId);
         } else {
-            setSearchResults([]);
-            setIsLoading(false);
+            if (!initialLoading) {
+                setSearchResults([]);
+                setIsLoading(false);
+            }
         }
 
         return () => {

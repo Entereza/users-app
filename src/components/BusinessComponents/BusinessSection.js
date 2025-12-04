@@ -16,7 +16,7 @@ import BusinessSkeleton from '../Skeletons/BusinessSkeleton'
 import useLocationStore from '../../utils/tools/interface/locationStore'
 import ImageStyled from '../../utils/ui/ImageStyled'
 
-export default function BusinessSection({ refreshing }) {
+export default function BusinessSection({ refreshing, onBusinessPress }) {
   const navigation = useNavigation();
   const { toggleTabBar, changeColorStatusBar } = useTabBarStore();
   const { latitude, longitude, departmentId } = useLocationStore();
@@ -51,10 +51,30 @@ export default function BusinessSection({ refreshing }) {
 
       if (response && response.business) {
         // Procesar los datos para obtener solo empresas con sucursales abiertas
-        const processedBusinesses = empresasService.processBusinessData(response);
-
-        // Limitar a 4 empresas para mostrar
-        const limitedBusinesses = processedBusinesses.slice(0, 4);
+        const allBusinesses = response.business.content || [];
+        console.log('allBusinesses', allBusinesses.length)
+        const openBusinesses = empresasService.processBusinessData(response);
+        
+        // Obtener empresas cerradas (sin sucursal abierta)
+        const closedBusinesses = allBusinesses
+          .filter(business => !business.branch.some(branch => branch.status === true))
+          .map(business => ({
+            ...business,
+            branch: business.branch[0], // Tomar la primera sucursal (cerrada)
+            image: business.img,
+            imageP: business.imgP,
+            cashback: business.cashBack,
+            isClosed: true
+          }));
+        
+        // Unir abiertas y cerradas, priorizando abiertas
+        const combinedBusinesses = [
+          ...openBusinesses.map(b => ({ ...b, isClosed: false })),
+          ...closedBusinesses
+        ];
+        
+        // Limitar a mínimo 5 empresas (o menos si no hay suficientes)
+        const limitedBusinesses = combinedBusinesses.slice(0, 5);
         setBusinesses(limitedBusinesses);
       } else {
         setBusinesses([]);
@@ -73,7 +93,11 @@ export default function BusinessSection({ refreshing }) {
     }
   };
 
-  const goToBusinessScreen = (item) => {
+  const goToBusinessScreen = (item, event) => {
+    if (onBusinessPress && event) {
+      onBusinessPress(item.id, event);
+    }
+    
     changeColorStatusBar(theme_colors.transparent);
     toggleTabBar(false);
     navigation.navigate(private_name_routes.empresas.empresasDetails, {
@@ -133,7 +157,7 @@ export default function BusinessSection({ refreshing }) {
           renderItem={({ item, index }) =>
             <BusinessItem
               item={item}
-              onPress={() => goToBusinessScreen(item)}
+              onPress={(event) => goToBusinessScreen(item, event)}
               key={index}
             />
           }

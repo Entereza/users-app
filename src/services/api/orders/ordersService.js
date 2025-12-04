@@ -18,13 +18,14 @@ export const ordersService = {
     },
 
     // Formatear los datos del carrito para la API
-    formatOrderData: (cart, userId, branchId, paymentMethod, cashbackApplied, tripPrice, locationId, billingInfo) => {
+    formatOrderData: (cart, userId, branchId, paymentMethod, cashbackApplied, tripPrice, locationId, billingInfo, deliveryTip) => {
         // Calcular totales
         const totalFinal = cart.reduce((total, item) => {
             return total + (item.totalPrice * item.quantity);
         }, 0);
 
         const serviceFee = totalFinal < 100 ? 1 : 2;
+        const finalTotal = totalFinal + tripPrice + (deliveryTip || 0) + serviceFee;
 
         // Formatear productos y sus variables
         const data = cart.map(item => ({
@@ -68,13 +69,14 @@ export const ordersService = {
             clientId: userId,
             branchId,
             locationId,
-            totalFinal,
+            totalFinal: finalTotal,
             paymentMethod: paymentMethod.toLowerCase(),
             serviceFee,
             useCashback: cashbackApplied > 0,
             cashbackApplied,
             data,
             deliveryFee: tripPrice,
+            deliveryTip: deliveryTip || 0,
             nit: billingInfo.nit,
             razonSocial: billingInfo.name,
         };
@@ -89,6 +91,19 @@ export const ordersService = {
             return response;
         } catch (error) {
             console.error('Error fetching client orders:', error);
+            throw error;
+        }
+    },
+
+    // Cancelar un pedido
+    cancelOrder: async (orderId) => {
+        try {
+            const response = await createApiRequest(`/orders/cancel?orderId=${orderId}`, {
+                method: 'PUT'
+            });
+            return response;
+        } catch (error) {
+            console.error('Error cancelling order:', error);
             throw error;
         }
     }

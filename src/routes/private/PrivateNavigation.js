@@ -135,8 +135,7 @@ export default function PrivateNavigation() {
             setLocation(location.coords.latitude, location.coords.longitude);
 
             const locationInfo = await locationService.getDepartmentFromCoords(
-                location.coords.latitude,
-                location.coords.longitude
+                -17.1770275033434, -66.18859912249759
             );
 
             if (locationInfo) {
